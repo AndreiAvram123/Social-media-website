@@ -1,0 +1,9 @@
+.navbar-collapse a{
+    font-size: 30px;
+}
+.errorMessage{
+    font-size: 25px;
+    color:red;
+    font-weight: bold;
+
+}

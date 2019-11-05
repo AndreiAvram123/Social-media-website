@@ -1,17 +1,5 @@
-<form class="form-inline my-2 my-lg-0 mr-4" method="post" >
-    <!-- Button trigger modal -->
-    <?php
-     if(isset($_POST['registerUser'])){
-     if(areUserDetailsValid()){
-      createUser();
-     }else{
-         //todo
-         //works
-       echo '<h1>' . "NOOOOO" . '</h1>';
-     }
-}
 
-    ?>
+<form class="form-inline my-2 my-lg-0 mr-4" method="post" action="index.php">
     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#signUpModal">
         Register
     </button>
@@ -31,37 +19,37 @@
             <div class="modal-body">
                  <!-- Username field -->
                 <div class="mt-3">
-                    <span id="usernameInputField">Username</span>
+                    <span id="usernameInput">Username</span>
                 <div class="input-group input-group-lg m">
-                    <input type="text" class="form-control" aria-label="Sizing example input"
+                    <input type="text" name="usernameInput" class="form-control" aria-label="Sizing example input"
                            aria-describedby="inputGroup-sizing-default">
                 </div>
                 </div>
 
                 <!-- Email field -->
                 <div class="mt-3">
-                    <span  id="usernameInputField">Email</span>
+                    <span  id="emailInput">Email</span>
 
                 <div class="input-group input-group-lg">
-                    <input type="text" class="form-control" aria-label="Sizing example input"
+                    <input type="text" name="emailInput" class="form-control" aria-label="Sizing example input"
                            aria-describedby="inputGroup-sizing-default">
                 </div>
                 </div>
 
                 <!-- Password field -->
             <div class="mt-3">
-                <span  id="passwordInputField">Password</span>
+                <span  id="passwordInput">Password</span>
                 <div class="input-group input-group-lg">
-                    <input type="text" class="form-control" aria-label="Sizing example input"
+                    <input type="password" name="passwordInput" class="form-control" aria-label="Sizing example input"
                            aria-describedby="inputGroup-sizing-default">
                 </div>
             </div>
 
             <!-- Confirm Password field -->
             <div class="mt-3">
-                <span id="passwordInputField">Confirm Password</span>
+                <span id="confirmedPasswordInput">Confirm Password</span>
                 <div class="input-group input-group-lg ">
-                    <input type="text" class="form-control" aria-label="Sizing example input"
+                    <input type="password" name="confirmedPasswordInput" class="form-control" aria-label="Sizing example input"
                            aria-describedby="inputGroup-sizing-default">
                 </div>
             </div>
@@ -74,14 +62,13 @@
                     </div>
                 </div>
 
-
-
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-primary" name="registerUser">Login</button>
+                <button type="submit" class="btn btn-primary" name="registerUser">Register</button>
             </div>
         </div>
     </div>
 </div>
+
 </form>
