@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<?php require_once "DB.php";
+?>
+<html lang="en">
+<head>
+    <?php include "structure/Header.phtml";?>
+    <title>Home</title></head>
+<body>
+<div class="container mt-3">
+    <!-- Content here -->
+
+    <?php
+    foreach (getAllPosts() as $post) {
+        echo '<div class="card" style="width: 50rem;">';
+        echo '<header class="p-3">';
+        echo '<h3 >Author : ' . $post->getAuthorName() . '</h3>';
+        echo '<h4 class="card-title text-primary">' . $post-> getPostTitle() . '</h4>';
+        echo '<h5>' . $post->getPostDate() . '</h5>';
+        echo '</header>';
+        echo '<img src="images/placeholder.jpg" class="card-img-top" alt="...">';
+        echo '<div class="card-body">';
+        echo '<p class="card-text">' . $post->getPostContent() . '</p>';
+        echo '<a href="structure/Post.phtml" class="btn btn-primary">See post</a>';
+        echo '</div></div>';
+    }
+    ?>
+</div>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+</body>
+</html>
