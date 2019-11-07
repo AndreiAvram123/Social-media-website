@@ -1,10 +1,9 @@
-<form class="form-inline my-2 my-lg-0 mr-4">
-    <!-- Button trigger modal -->
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+<form class="form-inline my-2 my-lg-0 mr-4" action="index.php" method="post">
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#loginModal">
         Login
     </button>
 <!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
      aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -18,23 +17,23 @@
             <div class="modal-body">
                 <div class="input-group input-group-lg mt-3">
                     <div class="input-group-prepend">
-                        <span class="input-group-text" id="usernameInputField">Username</span>
+                        <span class="input-group-text" id="emailSignIn">Email</span>
                     </div>
-                    <input type="text" class="form-control" aria-label="Sizing example input"
+                    <input type="text" class="form-control" name="emailSignIn" aria-label="Sizing example input"
                            aria-describedby="inputGroup-sizing-default">
                 </div>
                 <div class="input-group input-group-lg mt-3">
                     <div class="input-group-prepend">
-                        <span class="input-group-text" id="passwordInputField">Password</span>
+                        <span class="input-group-text"  id="passwordSignIn">Password</span>
                     </div>
-                    <input type="text" class="form-control" aria-label="Sizing example input"
+                    <input type="password" class="form-control" name = "passwordSignIn"aria-label="Sizing example input"
                            aria-describedby="inputGroup-sizing-default">
                 </div>
 
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Login</button>
+                <button type="submit" class="btn btn-primary" name="loginButton">Login</button>
             </div>
         </div>
     </div>

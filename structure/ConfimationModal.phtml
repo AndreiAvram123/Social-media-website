@@ -1,4 +1,5 @@
-<div class="modal" tabindex="-1" role="dialog" id="errorModal">
+<form method="post" action="index.php">
+<div class="modal" tabindex="-1" role="dialog" id="ConfirmationModal">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -8,14 +9,13 @@
                 </button>
             </div>
             <div class="modal-body">
-                <?php
-                //actually the variable is declared...
-                echo '<p>'.$errorMessage.'</p>';
-                ?>
+                <p>Do you really want to sign out?</p>
             </div>
-                <div class="modal-footer">
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-danger" name="signOutButton" >Sign out</button>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
 </div>
+</form>

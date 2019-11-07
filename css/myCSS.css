@@ -1,9 +1,26 @@
 .navbar-collapse a{
     font-size: 30px;
 }
-.errorMessage{
-    font-size: 25px;
-    color:red;
-    font-weight: bold;
+.page-title{
+    color:#007BFF;
+}
+.float{
+    position:fixed;
+    width:60px;
+    height:60px;
+    bottom:40px;
+    right:40px;
+    background-color:#007BFF;
+    color:#ffffff;
+    border-radius:50px;
+    text-align:center;
+    box-shadow: 2px 2px 3px #999;
+}
+.float:hover{
+    opacity: 0.5;
 
+}
+
+.add-button{
+    margin-top:23px;
 }

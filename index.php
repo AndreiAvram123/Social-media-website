@@ -1,20 +1,30 @@
 <?php require_once "DB.php";
-  $isUserLoggedIn = false;
-?>
-<?php include "structure/index.phtml";
+session_start();
+global $warningMessage;
+$warningMessage = "";
 
-if(isset($_POST['registerUser'])) {
-    $errorMessage = getErrorMessagesSignUpForm();
-    if ($errorMessage == "") {
-        createUser();
-        $isUserLoggedIn = true;
-
-    } else {
-        include "structure/ErrorModal.phtml";
-        echo '<script>$("#errorModal").modal("show")</script>';
-
-    }
+if(isset($_POST['signOutButton'])){
+    signUserOut();
 }
+
+if(isset($_POST['loginButton'])){
+    loginUser();
+
+}
+
+if (isset($_POST['registerUser'])) {
+    createUser();
+}
+
+include "structure/index.phtml";
+
+
+//
+//function displayWarningModal(){
+//    include "structure/WarningModal.phtml";
+//    echo '<script>$("#warningModal").modal("show")</script>';
+//}
+
 ?>
 
 
