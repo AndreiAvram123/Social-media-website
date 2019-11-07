@@ -4,6 +4,13 @@
 .page-title{
     color:#007BFF;
 }
+.centered-container{
+    width: 60%;
+    margin:auto;
+}
+.text-area{
+    resize: none;
+}
 .float{
     position:fixed;
     width:60px;

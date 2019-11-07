@@ -1,0 +1,31 @@
+<?php include "Header.phtml";
+?>
+
+<h1 class="page-title text-center mt-3">What do you want to include in your post?</h1>
+<div class="centered-container" >
+<form class="mt-5" method="post" action="AddPost.php" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="exampleFormControlSelect1">Select Category</label>
+        <select class="form-control" name="postCategory">
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+            <option>5</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label >Enter some text</label>
+        <textarea class="form-control text-area" name="postText" rows="3" ></textarea>
+    </div>
+
+    <div class="mt-3">
+        <span>Post picture</span>
+        <div class="custom-file mt-2">
+            <input type="file" name="fileToUpload" id="fileToUpload" >
+        </div>
+    </div>
+
+    <button type="submit" name="addPostButton" class="btn btn-primary mt-3">Add post</button>
+</form>
+</div>

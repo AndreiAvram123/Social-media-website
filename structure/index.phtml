@@ -18,6 +18,10 @@
     <h1 class="page-title text-center mb-3">Here are some recent posts</h1>
     <?php
     foreach (getAllPosts() as $post) {
+        //todo
+        //shouldn't be here ....
+        //refactor so that you get the Post.phtml
+        //for each object
         echo '<div class="card" style="width: 50rem;margin: auto">';
         echo '<header class="p-3">';
         echo '<h3 >Author : ' . $post->getAuthorName() . '</h3>';
@@ -33,7 +37,7 @@
     ?>
 
 </div>
-<a href="#"
+<a href="AddPost.php"
 <div class="float" >
     <i  class="fa fa-plus add-button"></i>
 </div></a>
