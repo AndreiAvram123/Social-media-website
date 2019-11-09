@@ -13,7 +13,6 @@
     }
     ?>
 
-
     <!-- Content here -->
     <h1 class="page-title text-center mb-3">Here are some recent posts</h1>
     <?php
@@ -28,7 +27,7 @@
         echo '<h4 class="card-title text-primary">' . $post->getPostTitle() . '</h4>';
         echo '<h5>' . $post->getPostDate() . '</h5>';
         echo '</header>';
-        echo '<img src="images/placeholder.jpg" class="card-img-top" alt="...">';
+        echo '<img src="images/'.$post->getPostImage(). '"class="card-img-top" >';
         echo '<div class="card-body">';
         echo '<p class="card-text">' . $post->getPostContent() . '</p>';
         echo '<a href="structure/Post.phtml" class="btn btn-primary">See post</a>';
@@ -37,11 +36,6 @@
     ?>
 
 </div>
-<a href="AddPost.php"
-<div class="float" >
-    <i  class="fa fa-plus add-button"></i>
-</div></a>
-
 </body>
 
 </html>

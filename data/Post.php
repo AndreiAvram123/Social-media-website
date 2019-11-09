@@ -1,11 +1,12 @@
 <?php
-
 class Post
 {
-  public $authorName;
-  public $postTitle;
-  public $postDate;
-  public $postContent;
+  private $authorName;
+  private $postTitle;
+  private $postDate;
+  private $postContent;
+  private $postImage;
+  private $postCategoryName;
 
     /**
      * Post constructor.
@@ -13,46 +14,60 @@ class Post
      * @param $postTitle
      * @param $postDate
      * @param $postContent
+     * @param $postCategoryName
+     * @param $postImage
      */
-    public function __construct($authorName, $postTitle, $postDate, $postContent)
+    public function __construct($authorName, $postTitle, $postDate, $postContent,$postCategoryName,$postImage)
     {
         $this->authorName = $authorName;
         $this->postTitle = $postTitle;
         $this->postDate = $postDate;
         $this->postContent = $postContent;
+        $this->postCategoryName = $postCategoryName;
+        $this->postImage = $postImage;
+
     }
 
     /**
      * @return mixed
      */
+    public function getPostCategoryName()
+    {
+        return $this->postCategoryName;
+    }
+
+
     public function getAuthorName()
     {
         return $this->authorName;
     }
 
-    /**
-     * @return mixed
-     */
+
     public function getPostTitle()
     {
         return $this->postTitle;
     }
 
-    /**
-     * @return mixed
-     */
+
     public function getPostDate()
     {
         return $this->postDate;
     }
 
-    /**
-     * @return mixed
-     */
+
     public function getPostContent()
     {
         return $this->postContent;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getPostImage()
+    {
+        return $this->postImage;
+    }
+
 
 
 }

@@ -1,6 +1,10 @@
 <?php require_once "DB.php";
 session_start();
 global $warningMessage;
+global $currentPage;
+global $categories;
+$categories = getAllCategories();
+$currentPage = "index.php";
 $warningMessage = "";
 
 if(isset($_POST['signOutButton'])){

@@ -1,4 +1,6 @@
-<?php require "Post.php";
+<?php require "data/Post.php";
+      require "data/Category.php";
+
 $host = 'localhost';
 $username = 'root';
 $password = '';
@@ -13,7 +15,7 @@ function getAllPosts()
     $posts = array();
     while ($row = mysqli_fetch_assoc($result)) {
         $post = new Post($row['post_author'], $row['post_title']
-            , $row['post_date'], $row['post_content']);
+            , $row['post_date'], $row['post_content'],$row['post_category_name'],$row['post_image']);
         $posts[] = $post;
     }
     return $posts;
@@ -49,6 +51,7 @@ function getErrorMessagesSignUpForm()
 
     return "";
 }
+
 function getErrorMessageFromSignIn()
 {
     $username = $_POST['emailSignIn'];
@@ -61,6 +64,7 @@ function getErrorMessageFromSignIn()
     }
     return "";
 }
+
 function createUser()
 {
     global  $warningMessage;
@@ -79,12 +83,13 @@ function createUser()
     }
     return false;
 }
+
 function addUserDataToDatabase($username, $email, $password, $creationDate)
 {
 
-    $QUERY = "INSERT INTO USERS VALUES(NULL,'$username','$email','$password','$creationDate') ";
+    $query = "INSERT INTO USERS VALUES(NULL,'$username','$email','$password','$creationDate') ";
     global $connection;
-    return mysqli_query($connection, $QUERY);
+    return mysqli_query($connection, $query);
 }
 
 function addUserDataToSession($username, $email, $password, $creationDate)
@@ -130,7 +135,6 @@ function loginUser()
     return false;
 }
 
-
 function getUserFromDatabase($email){
    $query = "SELECT * FROM users WHERE email = '$email'";
    global  $connection;
@@ -144,6 +148,32 @@ function getUserFromDatabase($email){
        $warningMessage = "User does not exist.Either your email or password is wrong";
    }
    return null;
+}
+
+function getAllCategories(){
+    global $connection;
+    $query = "SELECT * FROM categories";
+    $categories = array();
+    $result = mysqli_query($connection,$query);
+    while($row = mysqli_fetch_assoc($result)){
+         $category = new Category($row['category_name'],$row['category_image']);
+         $categories[] = $category;
+    }
+    return $categories;
+}
+
+function insertPostToDatabase($post){
+    global $connection;
+    $postAuthor = $post-> getAuthorName();
+    $postTitle = $post ->getPostTitle();
+    $postDate = $post ->getPostDate();
+    $postContent = $post ->getPostContent();
+    $postCategoryName = $post ->getPostCategoryName();
+    $postImage = $post ->getPostImage();
+    $query = "INSERT INTO forum_posts VALUES (NULL,'$postAuthor','$postTitle','$postContent',
+    '$postCategoryName','$postDate','$postImage')";
+     $result  = mysqli_query($connection,$query);
+     return $result;
 }
 
 ?>
