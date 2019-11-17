@@ -1,12 +1,21 @@
 .navbar-collapse a{
-    font-size: 30px;
+    font-size: 25px;
 }
 .page-title{
     color:#007BFF;
 }
+.card-image{
+  max-height: 40vh;
+}
+.image-post-opened{
+    max-width: 70vw;
+}
 .centered-container{
-    width: 60%;
+    width: 90%;
     margin:auto;
+}
+.post-text{
+    font-size: 30px;
 }
 .text-area{
     resize: none;
@@ -30,4 +39,13 @@
 
 .add-button{
     margin-top:23px;
+}
+
+.comment{
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.comment-body{
+  padding:20px;
 }

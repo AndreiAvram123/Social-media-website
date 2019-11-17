@@ -7,30 +7,26 @@ class Post
   private $postContent;
   private $postImage;
   private $postCategoryName;
+  private $postID;
 
-    /**
-     * Post constructor.
-     * @param $authorName
-     * @param $postTitle
-     * @param $postDate
-     * @param $postContent
-     * @param $postCategoryName
-     * @param $postImage
-     */
-    public function __construct($authorName, $postTitle, $postDate, $postContent,$postCategoryName,$postImage)
-    {
-        $this->authorName = $authorName;
-        $this->postTitle = $postTitle;
-        $this->postDate = $postDate;
-        $this->postContent = $postContent;
-        $this->postCategoryName = $postCategoryName;
-        $this->postImage = $postImage;
 
+    public function __construct($db_row){
+        $this->postID = $db_row['post_id'];
+        $this->authorName = $db_row['post_author'];
+        $this->postTitle = $db_row['post_title'];
+        $this->postDate = $db_row['post_date'];
+        $this->postContent = $db_row['post_content'];
+        $this->postCategoryName = $db_row['post_category_name'];
+        $this->postImage = $db_row['post_image'];
     }
 
-    /**
-     * @return mixed
-     */
+    public function getPostID()
+    {
+        return $this->postID;
+    }
+
+
+
     public function getPostCategoryName()
     {
         return $this->postCategoryName;
@@ -60,9 +56,6 @@ class Post
         return $this->postContent;
     }
 
-    /**
-     * @return mixed
-     */
     public function getPostImage()
     {
         return $this->postImage;

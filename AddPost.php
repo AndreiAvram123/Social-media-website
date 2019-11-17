@@ -1,6 +1,7 @@
 <?php
-require "DB.php";
-include "structure/AddPost.phtml";
+require_once('Data/DatabaseHandler.php');
+require_once('Views/AddPost.phtml');
+
 
 if (isset($_POST["addPostButton"])) {
     $postTitle = $_POST["postTitle"];
@@ -8,44 +9,31 @@ if (isset($_POST["addPostButton"])) {
     $postContent = $_POST["postContent"];
     $postDate = date('Y/m/d');
     $postAuthor = "unknown";
-
-    $postImage = $_FILES["fileToUpload"]["name"];
-    $target_dir = "images/";
-    $imageFileType = strtolower(pathinfo($postImage, PATHINFO_EXTENSION));
-
-    if (uploadFile($postImage, $target_dir)) {
-       $post = new Post($postAuthor,$postTitle,$postDate,$postContent,
-           $postCategoryName, md5($postImage) . '.' . $imageFileType);
-       insertPostToDatabase($post);
+     $databaseHandler = DatabaseHandler::getInstance();
+    if(arePostDetailsValid($postTitle,$postContent)) {
+        $serverImageLocation = $databaseHandler->uploadFile($_FILES["fileToUpload"]["name"], "images/");
+        if ($serverImageLocation != "") {
+            $databaseHandler->uploadPost($postAuthor,
+                $postTitle, $postContent, $postCategoryName, $postDate, $serverImageLocation);
+            displayWarningMessage("You successfully added your post:). Go to main page to check it.");
+        }else{
+            displayWarningMessage("Please select a valid image");
+        }
     }
-
 }
 
-function uploadFile($target_file, $target_dir)
+function arePostDetailsValid($postTitle,$postContent)
 {
-    $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
-    $check = getimagesize($_FILES["fileToUpload"]["tmp_name"]);
-    if (!$check) {
-        //fake image
+    if(empty($postTitle)){
+        displayWarningMessage("Please include a title for your post");
         return false;
     }
-
-    if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg") {
+    if(empty($postContent)){
+        displayWarningMessage("Please include a title for your post");
         return false;
     }
-    // Check file size > 5mb
-    if ($_FILES["fileToUpload"]["size"] > 5000000) {
-        echo "Sorry, your file is too large.";
-        return false;
-    }
-    //encrypt the image name and then add the extension
-    $targetLocation = $target_dir . md5($target_file) . '.' . $imageFileType;
-    if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $targetLocation)) {
-        return true;
-    } else {
-        return false;
-    }
-
+    return true;
 }
+
 
 ?>
