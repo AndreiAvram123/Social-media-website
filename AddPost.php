@@ -1,7 +1,6 @@
 <?php
 require_once('Data/DatabaseHandler.php');
 require_once('Views/AddPost.phtml');
-include ("Modals/WarningModal.phtml");
 
 
 if (isset($_POST["addPostButton"])) {
@@ -16,6 +15,7 @@ if (isset($_POST["addPostButton"])) {
         if ($serverImageLocation != "") {
             $databaseHandler->uploadPost($postAuthor,
                 $postTitle, $postContent, $postCategoryName, $postDate, $serverImageLocation);
+            displayWarningMessage("You successfully added your post:). Go to main page to check it.");
         }else{
             displayWarningMessage("Please select a valid image");
         }

@@ -1,9 +1,7 @@
 <?php
 session_start();
-
 require ("SessionHandler.php");
-include ("Views/index.phtml");
-
+require ("Views/index.phtml");
 
 if (isset($_POST['signOutButton'])) {
     signUserOut();

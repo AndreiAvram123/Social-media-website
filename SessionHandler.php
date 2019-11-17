@@ -5,6 +5,12 @@ require_once "Data/DatabaseHandler.php";
 function signUserOut()
 {
     unset($_SESSION['user_email']);
+    
+}
+
+function addUserDataToSession($email)
+{
+    $_SESSION['user_email'] = $email;
 }
 
 function loginUser()
@@ -24,11 +30,6 @@ function loginUser()
     }
 
 }
-}
-
-function addUserDataToSession($email)
-{
-    $_SESSION['user_email'] = $email;
 }
 
 function areLoginCredentialsValid($email, $password)

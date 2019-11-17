@@ -18,7 +18,8 @@ class DatabaseHandler
 
     public function getAllPosts()
     {
-        $query = "SELECT * FROM forum_posts";
+        //Get the posts in chronological order
+        $query = "SELECT * FROM forum_posts ORDER BY post_date DESC";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         $posts = [];
@@ -93,9 +94,28 @@ class DatabaseHandler
     {
         $encryptedPassword = md5($password);
         $query = "INSERT INTO users VALUES (NULL,'$username','$email','$encryptedPassword','$creationDate')";
-        $result = $this ->_dbHandler->prepare($query);
-        $result ->execute();
+        $result = $this->_dbHandler->prepare($query);
+        $result->execute();
     }
 
+    public function getAllPostsIDs()
+    {
+        $query = "SELECT post_id FROM forum_posts";
+        $result = $this->_dbHandler->prepare($query);
+        $result->execute();
+        $ids = [];
+        while ($row = $result->fetch()) {
+            $ids[] = $row['post_id'];
+        }
+        return $ids;
+    }
+
+    public function getPostById($postId)
+    {
+        $query = "SELECT * FROM forum_posts WHERE post_id ='$postId'";
+        $result = $this->_dbHandler->prepare($query);
+        $result->execute();
+        return $result->fetch();
+    }
 
 }

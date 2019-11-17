@@ -1,0 +1,22 @@
+<?php require "Views/pageElements/Header.phtml";
+
+?>
+<div class="centered-container mt-4">
+
+    <h1 > <?php echo $openedPost->getPostTitle() ?></h1>
+    <img src="<?php echo $openedPost->getPostImage()?>" class="image-post-opened">
+    <p class="post-text mt-5"> <?php echo $openedPost->getPostContent();?> </p>
+
+    <div class="comments-area mt-5">
+        <h2>Comments</h2>
+        <div class="comment card">
+            <div class="comment-body">
+                <h3>Simple man</h3>
+                <p>This is a simple text from a simple man</p>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block btn-lg" name="writeReview">Write review</button>
+    </div>
+
+</div>
