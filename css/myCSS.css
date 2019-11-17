@@ -1,12 +1,19 @@
 .navbar-collapse a{
-    font-size: 30px;
+    font-size: 25px;
 }
 .page-title{
     color:#007BFF;
 }
+.image-post{
+    max-width: 50vw;
+    max-height:40vh;
+}
 .centered-container{
     width: 60%;
     margin:auto;
+}
+.post-text{
+    font-size: 20px;
 }
 .text-area{
     resize: none;
@@ -30,4 +37,13 @@
 
 .add-button{
     margin-top:23px;
+}
+
+.comment{
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.comment-body{
+  padding:20px;
 }

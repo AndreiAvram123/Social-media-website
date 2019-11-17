@@ -1,0 +1,17 @@
+<form action="OpenedPost.php" method="post">
+    <div class="card mt-3" style="width: 50rem;margin: auto">
+        <header class="p-3">
+            <h3>Author : <?php echo $post->getAuthorName() ?></h3>
+            <h4 class="card-title text-primary">  <?php echo $post->getPostTitle() ?></h4>
+            <h5> <?php echo $post->getPostTitle() ?></h5>
+        </header>
+        <img src="<?php echo $post->getPostImage()?>" class="card-img-top">
+
+        <div class="card-body">
+            <p class="card-text"> <?php echo $post->getPostContent()?></p>
+            <button type="submit" class="btn btn-primary " name="<?php echo $post->getPostID()?>">See post.</button>
+        </div>
+
+    </div>
+</form>
+

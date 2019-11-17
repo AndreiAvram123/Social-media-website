@@ -1,0 +1,23 @@
+<?php require_once "Data/DatabaseHandler.php";
+require "Views/pageElements/Header.phtml";
+?>
+
+<!-- Content here -->
+<h1 class="page-title text-center mb-3">Here are some recent posts</h1>
+<?php
+$databaseHandler = new DatabaseHandler();
+foreach ($databaseHandler->getAllPosts() as $post) {
+    include "PostCard.phtml";
+}
+
+if (!$isUserLoggedIn) {
+    ?>
+    <a href="AddPost.php">
+    <div class="float"><i class="fa fa-plus add-button"></i></div></a>
+    <?php
+}
+?>
+<!--Close the elements opened in header -->
+</div>
+</body>
+</html>
