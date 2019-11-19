@@ -1,23 +1,44 @@
-<?php require_once "Data/DatabaseHandler.php";
-   require "Views/pageElements/Header.phtml";
-?>
-
-<!-- Content here -->
-<h1 class="page-title text-center mb-3">Here are some recent posts</h1>
 <?php
-$databaseHandler = new DatabaseHandler();
-foreach ($databaseHandler->getAllPosts() as $post) {
-    include "PostCard.phtml";
-}
-
-if (!$isUserLoggedIn) {
-    ?>
-    <a href="AddPost.php">
-    <div class="float"><i class="fa fa-plus add-button"></i></div></a>
-    <?php
-}
+require "Views/pageElements/Header.phtml";
 ?>
+<!-- Content here -->
+
+<div class="row">
+<div class="col-1 mr-5">
+    <table>
+        <tr>
+            <th>Friends</th>
+        </tr>
+        <tr>
+            <td>Jill</td>
+          </tr>
+        <tr>
+            <td>Eve</td>
+          </tr>
+    </table>
+</div>
+    <div class="col">
+        <h1 class="page-title text-center mb-3">Here are some recent posts</h1>
+    <?php
+    foreach ($view->posts as $post) {
+        include "PostCard.phtml";
+    }
+    //only show the add post button if the user is logged in
+    if ($view->isUserLoggedIn) {
+        ?>
+        <a href="AddPost.php">
+            <div class="float"><i class="fa fa-plus add-button"></i></div>
+        </a>
+        <?php
+    }
+    ?>
+
+    </div>
+    <!-- Close the row div here-->
+</div>
 <!--Close the elements opened in header -->
 </div>
+<!--Friends panel goes here-->
+
 </body>
 </html>

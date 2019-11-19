@@ -1,10 +1,12 @@
 <?php
-require_once("Data/Database.php");
-require_once("Data/Post.php");
+require_once"Data/Database.php";
+require_once "Data/Comment.php";
+require_once "Data/Post.php";
 
 class DatabaseHandler
 {
     protected $_dbHandler;
+    protected $_dbIntance;
 
     public static function getInstance()
     {
@@ -13,13 +15,14 @@ class DatabaseHandler
 
     public function __construct()
     {
-        $this->_dbHandler = Database::getInstance()->getDatabaseConnection();
+        $this->_dbIntance =Database::getInstance();
+        $this->_dbHandler = $this->_dbIntance->getDatabaseConnection();
     }
 
-    public function getAllPosts()
+    public function fetchMostRecentPosts()
     {
         //Get the posts in chronological order
-        $query = "SELECT * FROM forum_posts ORDER BY post_date DESC";
+        $query = "SELECT * FROM forum_posts ORDER BY post_date DESC ";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         $posts = [];
@@ -116,6 +119,47 @@ class DatabaseHandler
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         return $result->fetch();
+    }
+
+    public function uploadComment($comment_user_id, $comment_post_id, $comment_text, $comment_date, $comment_likes)
+    {
+        $query = "INSERT INTO comments VALUES(NULL,'$comment_user_id','$comment_post_id'
+,'$comment_text','$comment_date','$comment_likes')";
+        $result = $this->_dbHandler->prepare($query);
+        $result->execute();
+    }
+
+    public function getCommentsForPost($postID){
+        $query = "SELECT * FROM comments WHERE comment_post_id = '$postID'";
+        $result = $this->_dbHandler->prepare($query);
+        $result->execute();
+        $comments = [];
+        while($row = $result->fetch()){
+            //get the other from the users table using the id key
+            //this way if the use changes his username we get the updated version
+            $author = $this->getUsernameFromUserID($row['comment_user_id']);
+            $comments[] = new Comment($row,$author);
+        }
+        return $comments;
+    }
+
+    public function getUsernameFromUserID($user_id)
+    {
+        $query = "SELECT username FROM users WHERE user_id = '$user_id'";
+        $result = $this ->_dbHandler->prepare($query);
+        $result->execute();
+        $row = $result ->fetch();
+        return $row['username'];
+    }
+
+    public function getUserIDFromEmail($email)
+    {
+        $query ="SELECT user_id FROM  users WHERE email = '$email'";
+        $result = $this->_dbHandler ->prepare($query);
+        $result -> execute();
+        $row = $result->fetch();
+
+        return $row['user_id'];
     }
 
 }
