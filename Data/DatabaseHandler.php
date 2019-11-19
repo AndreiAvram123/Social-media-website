@@ -1,10 +1,11 @@
 <?php
 require_once("Data/Database.php");
-require_once("Data/Post.php");
+require_once ("Data/Comment.php");
 
 class DatabaseHandler
 {
     protected $_dbHandler;
+    protected $_dbIntance;
 
     public static function getInstance()
     {
@@ -13,18 +14,19 @@ class DatabaseHandler
 
     public function __construct()
     {
-        $this->_dbHandler = Database::getInstance()->getDatabaseConnection();
+        $this->_dbIntance =Database::getInstance();
+        $this->_dbHandler = $this->_dbIntance->getDatabaseConnection();
     }
 
-    public function getAllPosts()
+    public function fetchMostRecentPosts()
     {
         //Get the posts in chronological order
-        $query = "SELECT * FROM forum_posts ORDER BY post_date DESC";
+        $query = "SELECT * FROM forum_posts ORDER BY post_date DESC ";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         $posts = [];
         while ($row = $result->fetch()) {
-            $posts[] = new Post($row);
+            $posts[] = $row;
         }
         return $posts;
     }
@@ -116,6 +118,25 @@ class DatabaseHandler
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         return $result->fetch();
+    }
+
+    public function uploadComment($comment_user_id, $comment_post_id, $comment_text, $comment_date, $comment_likes)
+    {
+        $query = "INSERT INTO comments VALUES(NULL,'$comment_user_id','$comment_post_id'
+,'$comment_text','$comment_date','$comment_likes')";
+        $result = $this->_dbHandler->prepare($query);
+        $result->execute();
+    }
+
+    public function getCommentsForPost($postID){
+        $query = "SELECT * FROM comments WHERE comment_post_id = '$postID'";
+        $result = $this->_dbHandler->prepare($query);
+        $result->execute();
+        $comments = [];
+        while($row = $result->fetch()){
+            $comments[] = new Comment($row);
+        }
+        return $comments;
     }
 
 }

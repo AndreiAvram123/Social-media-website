@@ -1,0 +1,25 @@
+<form method="post">
+    <div class="modal fade" id="writeReviewModal" tabindex="-1" role="dialog" aria-labelledby="writeReviewModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="writeReviewModalLabel">What do you think about this post?</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="comment_text">Enter some text</label>
+                        <textarea id="comment_text" class="form-control text-area" name="comment_text" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" name="postReviewButton"class="btn btn-primary">Post</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

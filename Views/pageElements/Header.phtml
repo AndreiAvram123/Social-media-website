@@ -3,7 +3,12 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="refresh" content="<?php
+     //redirect user to home screen if the login has just happened
+    if(isset($view->userJustLoggedIn))echo 0?>; URL='index.php'" />
+
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
@@ -17,6 +22,7 @@
             integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
             crossorigin="anonymous"></script>
     <link rel="stylesheet" href="css/myCSS.css">
+    <title><?php $view->pageTitle?></title>
 
 </head>
 
@@ -28,54 +34,43 @@
         <span class="navbar-toggler-icon"></span>
     </button>
 
-    <?php
-    if (isset($_SESSION['user_email'])) {
-        $isUserLoggedIn = true;
-    } else {
-        $isUserLoggedIn = false;
-    }
-    ?>
-
     <div class="collapse navbar-collapse">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item">
                 <a class="nav-link" href="index.php" id="home">Home <span class="sr-only">(current)</span></a>
             </li>
             <?php
-            if ($isUserLoggedIn) {
+            //include options for the profile if the user is logged in
+            if ($view->isUserLoggedIn) {
                 include "profileOptions.html";
             }
             ?>
         </ul>
+
     </div>
     <?php
-       if(!$isUserLoggedIn) {
-           ?>
+    if (!$view->isUserLoggedIn) {
+        ?>
+        <a class="btn btn-primary mr-3" href="Login.php" role="button">Sign in</a>
+        <a class="btn btn-primary" href="Register.php" role="button">Register</a>
+        <?php
+    } else {
 
-    <button type="button" class="btn btn-primary mr-4" data-toggle="modal" data-target="#loginModal">
-        Login
-    </button>
+        ?>
+        <form action="index.php" method="post">
+            <button type="submit" name="signOutButton" class="btn btn-primary mr-4">
+                Sign out
+            </button>
+        </form>
+        <?php
 
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#signUpModal">
-        Register
-    </button>
-           <?php
-       }else {
-
-           ?>
-           <form action="index.php" method="post">
-           <button type="submit" name="signOutButton" class="btn btn-primary mr-4" >
-               Sign out
-           </button>
-           </form>
-           <?php
-
-       }
+    }
     ?>
 </nav>
-<?php
- include "Container.phtml";
-?>
+<div class="container mt-3">
+    <?php
+    include ("Modals/WarningModal.phtml");
+    ?>
 
 
 

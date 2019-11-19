@@ -1,13 +1,10 @@
 <?php
-
 require_once "Data/DatabaseHandler.php";
-
 function signUserOut()
 {
     unset($_SESSION['user_email']);
     
 }
-
 function addUserDataToSession($email)
 {
     $_SESSION['user_email'] = $email;
@@ -24,11 +21,12 @@ function loginUser()
     if (!empty($userPasswordDB)) {
         if (md5($enteredPassword) == $userPasswordDB) {
             addUserDataToSession($email);
+            return true;
         }
     }else{
         displayWarningMessage("Hmm...It seems like your account does not exist");
     }
-
+return false;
 }
 }
 
@@ -45,16 +43,9 @@ function areLoginCredentialsValid($email, $password)
     return true;
 }
 
-function createUser(){
+function createUser($username,$email,$password,$image,$creationDate){
     $databaseHandler = DatabaseHandler::getInstance();
-    $username = $_POST['usernameInput'];
-    $email = $_POST['emailInput'];
-    $password = $_POST['passwordInput'];
-    $reenteredPassword = $_POST['confirmedPasswordInput'];
-    $reenteredPassword = $databaseHandler->uploadFile($_FILES["profilePicture"]["name"], "images/");
-    $creationDate = date('Y/m/d');
-    //verify details
-
+    $databaseHandler->uploadFile($image, "images/");
     $databaseHandler->createUser($username,$email,$password,$creationDate);
 
 }

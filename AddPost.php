@@ -1,8 +1,12 @@
 <?php
 require_once('Data/DatabaseHandler.php');
-require_once('Views/AddPost.phtml');
+$view = new stdClass();
+$view->pageTitle = "Register";
+$view ->isUserLoggedIn = isset($_SESSION['user_email']);
 
+include "Views/AddPost.phtml";
 
+//handle added post
 if (isset($_POST["addPostButton"])) {
     $postTitle = $_POST["postTitle"];
     $postCategoryName = $_POST["postCategory"];
