@@ -9,16 +9,32 @@ class Comment
     private $comment_text;
     private $comment_date;
     private $comment_likes;
+    private $author;
 
-    public function __construct($row)
+    /**
+     * Comment constructor.
+     * @param $databaseRow - a comment row from the database
+     * @param $author - the author of the Comment
+     */
+    public function __construct($databaseRow, $author)
     {
-      $this->comment_id = $row['comment_id'];
-      $this->comment_user_id = $row['comment_user_id'];
-      $this->comment_post_id = $row['comment_post_id'];
-      $this->comment_text = $row['comment_text'];
-      $this->comment_date = $row['comment_date'];
-      $this->comment_likes = $row['comment_likes'];
+      $this->comment_id = $databaseRow['comment_id'];
+      $this->comment_user_id = $databaseRow['comment_user_id'];
+      $this->comment_post_id = $databaseRow['comment_post_id'];
+      $this->comment_text = $databaseRow['comment_text'];
+      $this->comment_date = $databaseRow['comment_date'];
+      $this->comment_likes = $databaseRow['comment_likes'];
+      $this->author = $author;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getAuthor()
+    {
+        return $this->author;
+    }
+
 
 
     public function getCommentId()

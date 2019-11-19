@@ -4,12 +4,12 @@ include "SessionHandler.php";
 
 $view = new stdClass();
 $view->pageTitle = "Login";
-$view->isUserLoggedIn = isset($_SESSION['user_email']);
+$view->isUserLoggedIn = false;
 
 
 if (isset($_POST['loginButton'])) {
    if(loginUser()){
-      $view->userJustLoggedIn = true;
+      $view->redirectHome = true;
    }
 }
 include "Views/Login.phtml";

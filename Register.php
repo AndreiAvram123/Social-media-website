@@ -3,7 +3,7 @@ require_once "SessionHandler.php";
 
 $view = new stdClass();
 $view->pageTitle = "Register";
-
+$view ->isUserLoggedIn =false;
 include "Views/Register.phtml";
 
 if (isset($_POST['registerButton'])) {

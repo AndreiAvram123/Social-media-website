@@ -2,7 +2,7 @@
 require_once('Data/DatabaseHandler.php');
 $view = new stdClass();
 $view->pageTitle = "Register";
-$view ->isUserLoggedIn = isset($_SESSION['user_email']);
+$view ->isUserLoggedIn = true;
 
 include "Views/AddPost.phtml";
 

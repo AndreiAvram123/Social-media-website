@@ -1,6 +1,7 @@
 <?php
-require_once("Data/Database.php");
-require_once ("Data/Comment.php");
+require_once"Data/Database.php";
+require_once "Data/Comment.php";
+require_once "Data/Post.php";
 
 class DatabaseHandler
 {
@@ -26,7 +27,7 @@ class DatabaseHandler
         $result->execute();
         $posts = [];
         while ($row = $result->fetch()) {
-            $posts[] = $row;
+            $posts[] = new Post($row);
         }
         return $posts;
     }
@@ -134,9 +135,31 @@ class DatabaseHandler
         $result->execute();
         $comments = [];
         while($row = $result->fetch()){
-            $comments[] = new Comment($row);
+            //get the other from the users table using the id key
+            //this way if the use changes his username we get the updated version
+            $author = $this->getUsernameFromUserID($row['comment_user_id']);
+            $comments[] = new Comment($row,$author);
         }
         return $comments;
+    }
+
+    public function getUsernameFromUserID($user_id)
+    {
+        $query = "SELECT username FROM users WHERE user_id = '$user_id'";
+        $result = $this ->_dbHandler->prepare($query);
+        $result->execute();
+        $row = $result ->fetch();
+        return $row['username'];
+    }
+
+    public function getUserIDFromEmail($email)
+    {
+        $query ="SELECT user_id FROM  users WHERE email = '$email'";
+        $result = $this->_dbHandler ->prepare($query);
+        $result -> execute();
+        $row = $result->fetch();
+
+        return $row['user_id'];
     }
 
 }

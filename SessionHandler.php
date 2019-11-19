@@ -2,12 +2,12 @@
 require_once "Data/DatabaseHandler.php";
 function signUserOut()
 {
-    unset($_SESSION['user_email']);
+    unset($_SESSION['user_id']);
     
 }
-function addUserDataToSession($email)
+function addUserDataToSession($userId)
 {
-    $_SESSION['user_email'] = $email;
+    $_SESSION['user_id'] = $userId;
 }
 
 function loginUser()
@@ -20,7 +20,7 @@ function loginUser()
     $userPasswordDB = $databaseHandler->getUserPasswordFromDB($email);
     if (!empty($userPasswordDB)) {
         if (md5($enteredPassword) == $userPasswordDB) {
-            addUserDataToSession($email);
+            addUserDataToSession($databaseHandler->getUserIDFromEmail($email));
             return true;
         }
     }else{

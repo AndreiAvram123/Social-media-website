@@ -1,32 +1,35 @@
 <?php include "Views/pageElements/Header.phtml";
 require_once "Modals/WriteReviewModal.phtml";
+$currentPost = $view->currentPost;
+$currentPostComments = $view->currentPostComments;
 ?>
 <div class="centered-container mt-4 mb-5">
 
-    <h1> <?php echo $openedPost->getPostTitle() ?></h1>
-    <img src="<?php echo $openedPost->getPostImage() ?>" class="image-post-opened">
-    <p class="post-text mt-5"> <?php echo $openedPost->getPostContent(); ?> </p>
-
+    <h1> <?php echo $currentPost->getPostTitle() ?></h1>
+    <img src="<?php echo $currentPost->getPostImage() ?>" class="image-post-opened">
+    <p class="post-text mt-5"> <?php echo $currentPost->getPostContent(); ?> </p>
     <div class="comments-area mt-5">
         <h2>Comments</h2>
         <?php
 
-        foreach ($dbHandler->getCommentsForPost($_SESSION['currentPostId']) as $comment) {
-
+        foreach ($currentPostComments as $comment) {
             ?>
             <div class="comment card">
                 <div class="comment-body">
-                    <h3>another Greg</h3>
+                    <h3><?php echo $comment->getAuthor()?></h3>
                     <p><?php echo $comment->getCommentText(); ?></p>
                 </div>
             </div>
             <?php
-
         }
+         if($view->isUserLoggedIn){
         ?>
         <button type="button" class="btn btn-primary btn" data-toggle="modal" data-target="#writeReviewModal">Write
             comment
         </button>
     </div>
+    <?php
+      }
+    ?>
 
 </div>
