@@ -11,7 +11,7 @@ if (isset($_POST["addPostButton"])) {
     $postTitle = $_POST["postTitle"];
     $postCategoryName = $_POST["postCategory"];
     $postContent = $_POST["postContent"];
-    $postDate = date('Y/m/d');
+    $postDate = date('Y/m/d/G/i');
     $postAuthor = "unknown";
      $databaseHandler = DatabaseHandler::getInstance();
     if(arePostDetailsValid($postTitle,$postContent)) {

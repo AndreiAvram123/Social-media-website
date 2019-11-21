@@ -8,16 +8,17 @@ class Post
   private $postImage;
   private $postCategoryName;
   private $postID;
+  private $isFavorite;
 
-
-    public function __construct($db_row){
+    public function __construct($db_row,$authorName){
         $this->postID = $db_row['post_id'];
-        $this->authorName = $db_row['post_author'];
         $this->postTitle = $db_row['post_title'];
         $this->postDate = $db_row['post_date'];
         $this->postContent = $db_row['post_content'];
         $this->postCategoryName = $db_row['post_category_name'];
         $this->postImage = $db_row['post_image'];
+        $this->isFavorite = false;
+        $this->authorName= $authorName;
     }
 
     public function getPostID()
@@ -61,6 +62,21 @@ class Post
         return $this->postImage;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getIsFavorite()
+    {
+        return $this->isFavorite;
+    }
+
+    /**
+     * @param mixed $isFavorite
+     */
+    public function setIsFavorite($isFavorite)
+    {
+        $this->isFavorite = $isFavorite;
+    }
 
 
 }

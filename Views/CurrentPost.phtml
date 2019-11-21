@@ -2,12 +2,25 @@
 require_once "Modals/WriteReviewModal.phtml";
 $currentPost = $view->currentPost;
 $currentPostComments = $view->currentPostComments;
+
 ?>
 <div class="centered-container mt-4 mb-5">
 
     <h1> <?php echo $currentPost->getPostTitle() ?></h1>
     <img src="<?php echo $currentPost->getPostImage() ?>" class="image-post-opened">
     <p class="post-text mt-5"> <?php echo $currentPost->getPostContent(); ?> </p>
+    <?php
+    if ($view->isUserLoggedIn && isset($view->isPostFavorite)) {
+        if ($view->isPostFavorite) {
+
+            ?>
+            <form action="CurrentPost.php" method="post">
+                <button type="submit" class="btn btn-primary btn" name="addToFavoriteButton">Add to favorites</button>
+            </form>
+            <?php
+        }
+    }
+    ?>
     <div class="comments-area mt-5">
         <h2>Comments</h2>
         <?php
@@ -16,20 +29,20 @@ $currentPostComments = $view->currentPostComments;
             ?>
             <div class="comment card">
                 <div class="comment-body">
-                    <h3><?php echo $comment->getAuthor()?></h3>
+                    <span><?php echo $comment->getAuthor() ?></span>
                     <p><?php echo $comment->getCommentText(); ?></p>
                 </div>
             </div>
             <?php
         }
-         if($view->isUserLoggedIn){
+        if ($view->isUserLoggedIn){
         ?>
         <button type="button" class="btn btn-primary btn" data-toggle="modal" data-target="#writeReviewModal">Write
             comment
         </button>
     </div>
-    <?php
-      }
-    ?>
+<?php
+}
+?>
 
 </div>

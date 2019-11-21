@@ -1,9 +1,9 @@
 .navbar-collapse a{
     font-size: 25px;
 }
-.container{
-    margin-left: 20px !important;
-}
+/*.container{*/
+/*    margin-left: 20px !important;*/
+/*}*/
 .page-title{
     color:#007BFF;
 }
@@ -16,6 +16,10 @@
 .centered-container{
     width: 90%;
     margin:auto;
+}
+.container-form{
+    width : 40vw;
+    margin: 0 auto;
 }
 .post-text{
     font-size: 30px;
