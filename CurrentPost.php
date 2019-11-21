@@ -1,17 +1,14 @@
 <?php
 require_once "Data/DatabaseHandler.php";
-require_once "Data/Post.php";
 require_once "SessionHandler.php";
 session_start();
 
 $_dbHandler = new DatabaseHandler();
 $view = new stdClass();
-$view->pageTitle = "Home";
+$view->pageTitle = "Post";
 $view -> posts = $_dbHandler->fetchMostRecentPosts();
-
 $view ->isUserLoggedIn = isset($_SESSION['user_id']);
 $dbHandler = DatabaseHandler::getInstance();
-
 
 //find the post that was clicked
 foreach ($dbHandler->getAllPostsIDs() as $buttonId) {
@@ -20,9 +17,11 @@ foreach ($dbHandler->getAllPostsIDs() as $buttonId) {
     }
 }
 $currentPostID = $_SESSION['currentPostId'];
-$view ->currentPost =new Post($dbHandler->getPostByID($currentPostID));
+$view ->currentPost =$_dbHandler->getPostById($currentPostID);
 $view -> currentPostComments = $dbHandler->getCommentsForPost($currentPostID);
-
+if(isset($_SESSION['user_id'])) {
+    $view->isPostFavorite = $dbHandler->isPostAddedToFavorite($currentPostID, $_SESSION['user_id']);
+}
 
 //handle the new post
 if (isset($_POST['postReviewButton'])) {
@@ -37,6 +36,14 @@ if (isset($_POST['postReviewButton'])) {
         $comment_post_id, $comment_text, $comment_date, $comment_likes);
 
 }
+
+if(isset($_POST['addToFavoriteButton'])){
+    //if the user has pressed this button it means that it is logged in
+    $userId =$_SESSION['user_id'];
+    $dbHandler->addPostToFavorite($currentPostID,$userId);
+
+}
+
 
 require_once("Views/CurrentPost.phtml");
 

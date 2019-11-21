@@ -23,8 +23,6 @@ function loginUser()
             addUserDataToSession($databaseHandler->getUserIDFromEmail($email));
             return true;
         }
-    }else{
-        displayWarningMessage("Hmm...It seems like your account does not exist");
     }
 return false;
 }

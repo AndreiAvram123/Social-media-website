@@ -1,0 +1,12 @@
+<?php
+include "Views/pageElements/Header.phtml";
+$favoritePosts = $view->favoritePosts;
+foreach ($favoritePosts as $post) {
+    include "Views/PostCard.phtml";
+}
+?>
+
+
+</div>
+</body>
+</html>

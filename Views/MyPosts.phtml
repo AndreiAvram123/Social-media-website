@@ -1,7 +1,13 @@
 <?php
 include "Views/pageElements/Header.phtml";
-$results = $view-> searchResults;
-foreach ($results as $post) {
+
+$myPosts = $view->myPosts;
+foreach ($myPosts as $post){
     include "Views/PostCard.phtml";
+
 }
-    ?>
+
+?>
+</div>
+</body>
+</html>

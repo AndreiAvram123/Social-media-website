@@ -1,17 +1,36 @@
-<form action="CurrentPost.php" method="post">
-    <div class="card mt-3" style="width: 50rem;margin: auto">
-        <header class="p-3">
-            <h3 class="card-title text-primary">  <?php echo $post->getPostTitle() ?></h3>
-            <h4>Author : <?php echo $post->getAuthorName() ?></h4>
+<div class="card mt-3" style="width: 50rem;margin: auto">
+    <header class="p-3">
+        <h3 class="card-title text-primary">  <?php echo $post->getPostTitle() ?></h3>
+        <h4>Author : <?php echo $post->getAuthorName() ?></h4>
 
-        </header>
-        <img src="<?php echo $post->getPostImage()?>" class="card-img-top card-image">
+    </header>
+    <img src="<?php echo $post->getPostImage() ?>" class="card-img-top card-image">
 
-        <div class="card-body">
-            <p class="card-text"> <?php echo $post->getPostContent()?></p>
-            <button type="submit" class="btn btn-primary " name="<?php echo $post->getPostID()?>">See post.</button>
-        </div>
+    <div class="card-body">
+        <p class="card-text"> <?php echo $post->getPostContent() ?></p>
+        <form action="CurrentPost.php" method="post">
+            <button type="submit" class="btn btn-primary " name="<?php echo $post->getPostID() ?>">See post.</button>
+        </form>
+        <?php
+        //only show the remove from favorite button if the post is added to favorites
+        //we don't want to show this button on specific pages such as the home page
+        if ($view->displayRemoveButton) {
 
+            ?>
+            <!--The method post should point to the php script in which it was called-->
+            <!-- Different php files have different implementation of this call
+                 In the Favorites.php files once the user presses this button, the post will
+                 be removed from favorites
+            -->
+            <form method="post">
+                <button type="submit" class="btn btn-danger mt-3" name="<?php echo $post->getPostID() ?>">Remove</button>
+            </form>
+            <?php
+        }
+        ?>
     </div>
-</form>
+
+
+</div>
+
 
