@@ -3,7 +3,7 @@ require_once "Data/Database.php";
 require_once "Data/Comment.php";
 require_once "Data/Post.php";
 
-class DatabaseHandler
+class DataManager
 {
     protected $_dbHandler;
     protected $_dbInstance;
@@ -58,44 +58,49 @@ class DatabaseHandler
         return $categories;
     }
 
-    public function uploadPost($postAuthor, $postTitle, $postContent, $postCategoryName, $postDate, $serverImageLocation)
+    public function uploadPost($postAuthorId, $postTitle, $postContent, $postCategoryName, $postDate, $serverImageLocation)
     {
-        $query = "INSERT INTO forum_posts VALUES (NULL,'$postAuthor','$postTitle',
+        //todo
+        //bind parameters
+        $query = "INSERT INTO forum_posts VALUES (NULL,'$postAuthorId','$postTitle',
         '$postContent','$postCategoryName','$postDate','$serverImageLocation')";
+        echo $query;
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
     }
 
-    public function uploadFile($target_file, $target_dir)
+    //todo
+    //include error messages
+    public function uploadImage($target_file, $target_dir)
     {
-        if (empty($target_file)) {
-            return "";
-        }
-        $fileValid = true;
-        $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
-        //use the function getimagesize() to check if the image is real or not
-        $check = getimagesize($_FILES["fileToUpload"]["tmp_name"]);
-        if ($check === false) {
-            return "";
-        }
+//        if (!isset($target_file)) {
+//            $fileValid = true;
+//            $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+//            //use the function getimagesize() to check if the image is real or not
+//            $check = getimagesize($_FILES["fileToUpload"]["tmp_name"]);
+//            if ($check === false) {
+//                return "";
+//            }
+//
+//            if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg") {
+//                return "";
+//            }
+//            // Check file size > 5mb
+//            if ($_FILES["fileToUpload"]["size"] > 5000000) {
+//                return "";
+//
+//            }
+                 $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+                //once you encrypt the image, the algorithm will also encrypt
+                //the file extension. That's why I need to add it as well
+                $targetLocation = $target_dir . md5($target_file) . '.' . $imageFileType;
+                move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $targetLocation);
+                return $targetLocation;
 
-        if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg") {
-            return "";
-        }
-        // Check file size > 5mb
-        if ($_FILES["fileToUpload"]["size"] > 5000000) {
-            return "";
-
-        }
-        if ($fileValid) {
-            //once you encrypt the image, the algorithm will also encrypt
-            //the file extension. That's why I need to add it as well
-            $targetLocation = $target_dir . md5($target_file) . '.' . $imageFileType;
-            move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $targetLocation);
-            return $targetLocation;
-        }
-        return "";
+//        }
+//        return "";
     }
+
 
     public function createUser($username, $email, $password, $creationDate)
     {
@@ -174,6 +179,8 @@ class DatabaseHandler
      * for specific posts in the database
      * for a given query
      *
+     * @param $searchQuery
+     * @return array
      */
     public function getSearchResult($searchQuery)
     {
@@ -206,16 +213,15 @@ class DatabaseHandler
 
     }
 
-    public function isPostAddedToFavorite($post_id, $user_id)
+    public function isPostAddedToFavorite($post_id,$user_id)
     {
-        //should return 1 if the post is found
-        $query = "SELECT $post_id from favorite_posts WHERE user_id = $user_id";
+        $query = "SELECT * from favorite_posts WHERE user_id = '$user_id' AND post_id = '$post_id'";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         $row = $result->fetch();
-        if ($row) {
+        if($row){
             return true;
-        } else {
+        }else{
             return false;
         }
     }
@@ -242,13 +248,13 @@ class DatabaseHandler
     }
 
     /**
-     * @param $user_id
      * @param $postID
      * Use this function in order to remove a specific
      * post from the favorite list of a specific
      * user
+     * @param $user_id
      */
-    public function removePostFromFavorites($user_id, $postID)
+    public function removePostFromFavorites($postID, $user_id)
     {
         $query = "DELETE FROM favorite_posts WHERE user_id = '$user_id' AND 
         post_id = '$postID'";
@@ -277,6 +283,14 @@ class DatabaseHandler
         $result->execute();
 
     }
+    public function usernameExists($username){
+        $query = "SELECT user_id FROM users WHERE username = :username";
+        $result = $this->_dbHandler->prepare($query);
+        $result->bindValue(':username', $username);
+        $result->execute();
+        $row = $result->fetch();
+        return is_null($row);
+      }
 
 
 }

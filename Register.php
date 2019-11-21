@@ -4,6 +4,7 @@ require_once "SessionHandler.php";
 $view = new stdClass();
 $view->pageTitle = "Register";
 $view ->isUserLoggedIn =false;
+
 include "Views/Register.phtml";
 
 if (isset($_POST['registerButton'])) {
@@ -12,8 +13,14 @@ if (isset($_POST['registerButton'])) {
     $password = $_POST['passwordInput'];
     $reenteredPassword = $_POST['confirmedPasswordInput'];
     $creationDate = date('Y/m/d');
-    $image = $_FILES["profilePicture"]["name"];
-    $creationDate = date('Y/m/d');
-    createUser($username, $email, $password, $image,$creationDate);
+    if(isset($_FILES["profilePicture"]["name"])){
+        $image = $_FILES["profilePicture"]["name"];
+    }else{
+        $image = null;
+    }
+    $result =  createUser($username, $email, $password, $image,$creationDate);
+    if($result!== true){
+        $view->errorMessage = $result;
+    }
 }
 ?>

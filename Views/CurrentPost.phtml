@@ -10,9 +10,10 @@ $currentPostComments = $view->currentPostComments;
     <img src="<?php echo $currentPost->getPostImage() ?>" class="image-post-opened">
     <p class="post-text mt-5"> <?php echo $currentPost->getPostContent(); ?> </p>
     <?php
-    if ($view->isUserLoggedIn && isset($view->isPostFavorite)) {
-        if ($view->isPostFavorite) {
-
+     //check if the user is logged in and if the post belong to him
+    if ($view->isUserLoggedIn && !$view->postBelongsToUser) {
+        if ($currentPost->getIsFavorite() == false ) {
+            //if the user is logged in but the post is not added to favorite
             ?>
             <form action="CurrentPost.php" method="post">
                 <button type="submit" class="btn btn-primary btn" name="addToFavoriteButton">Add to favorites</button>

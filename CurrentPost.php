@@ -1,29 +1,43 @@
 <?php
-require_once "Data/DatabaseHandler.php";
-require_once "SessionHandler.php";
-session_start();
+require_once "Data/DataManager.php";
 
-$_dbHandler = new DatabaseHandler();
+session_start();
 $view = new stdClass();
 $view->pageTitle = "Post";
-$view -> posts = $_dbHandler->fetchMostRecentPosts();
 $view ->isUserLoggedIn = isset($_SESSION['user_id']);
-$dbHandler = DatabaseHandler::getInstance();
+$dbHandler = DataManager::getInstance();
 
-//find the post that was clicked
 foreach ($dbHandler->getAllPostsIDs() as $buttonId) {
     if (isset($_POST[$buttonId])) {
-        $_SESSION['currentPostId'] = $buttonId;
+         $_SESSION['currentPostId'] = $buttonId;
     }
 }
-$currentPostID = $_SESSION['currentPostId'];
-$view ->currentPost =$_dbHandler->getPostById($currentPostID);
-$view -> currentPostComments = $dbHandler->getCommentsForPost($currentPostID);
-if(isset($_SESSION['user_id'])) {
-    $view->isPostFavorite = $dbHandler->isPostAddedToFavorite($currentPostID, $_SESSION['user_id']);
-}
 
-//handle the new post
+$currentPostID = $_SESSION['currentPostId'];
+$view ->currentPost =$dbHandler->getPostById($currentPostID);
+
+//check if the user has pressed the add to favorite button
+if(isset($_POST['addToFavoriteButton'])){
+    //if the user has pressed this button it means that it is logged in
+    $userId =$_SESSION['user_id'];
+    $dbHandler->addPostToFavorite($currentPostID,$userId);
+}
+if(isset($_POST['removeFromFavoriteButton'])){
+    $userId = $_SESSION['user_id'];
+    $dbHandler->removePostFromFavorites($currentPostID, $userId);
+}
+$view->postBelongsToUser = true;
+//first check if the post belongs to the user
+if($view->isUserLoggedIn &&
+    $dbHandler->getUsernameFromUserID($_SESSION['user_id']) !==$view->currentPost->getAuthorName()) {
+$view->postBelongsToUser = false;
+//if the user is logged in also check if the post clicked is added to favorites
+    if (isset($_SESSION['user_id'])) {
+        $isPostFavorite = $dbHandler->isPostAddedToFavorite($currentPostID, $_SESSION['user_id']);
+        $view->currentPost->setIsFavorite($isPostFavorite);
+    }
+}
+//handle the new comment
 if (isset($_POST['postReviewButton'])) {
     //the post review button is only shown if the user is logged
     //so, we will have an user id in our database
@@ -37,12 +51,8 @@ if (isset($_POST['postReviewButton'])) {
 
 }
 
-if(isset($_POST['addToFavoriteButton'])){
-    //if the user has pressed this button it means that it is logged in
-    $userId =$_SESSION['user_id'];
-    $dbHandler->addPostToFavorite($currentPostID,$userId);
-
-}
+//get the comments for the post
+$view -> currentPostComments = $dbHandler->getCommentsForPost($currentPostID);
 
 
 require_once("Views/CurrentPost.phtml");

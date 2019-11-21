@@ -14,8 +14,19 @@
                    placeholder="Password">
         </div>
         <button type="submit" class="btn btn-primary" name="loginButton">Log in</button>
+         <?php if(isset($view->errorMessage)) {
+
+             ?>
+             <div class="alert alert-danger mt-3" role="alert">
+                <?php echo $view->errorMessage?>
+             </div>
+
+             <?php
+         }
+        ?>
     </div>
 </form>
+
 </div>
 </body>
 </html>

@@ -1,6 +1,6 @@
 <?php
 require_once("Views/pageElements/Header.phtml");
-require_once("Data/DatabaseHandler.php");
+require_once("Data/DataManager.php");
 ?>
 
 <h1 class="page-title text-center mt-3">What do you want to include in your post?</h1>
@@ -19,7 +19,7 @@ require_once("Data/DatabaseHandler.php");
             <label for="postCategorySelector">Select Category</label>
             <select class="form-control" name="postCategory" id="postCategorySelector">
                 <?php
-                $databaseHandler = new DatabaseHandler();
+                $databaseHandler = new DataManager();
                 foreach ($databaseHandler->getAllCategories() as $categoryName) {
                     echo '<option>' . $categoryName . '</option>';
                 }

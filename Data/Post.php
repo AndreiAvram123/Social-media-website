@@ -17,8 +17,8 @@ class Post
         $this->postContent = $db_row['post_content'];
         $this->postCategoryName = $db_row['post_category_name'];
         $this->postImage = $db_row['post_image'];
-        $this->isFavorite = false;
         $this->authorName= $authorName;
+        $this->isFavorite = FALSE;
     }
 
     public function getPostID()

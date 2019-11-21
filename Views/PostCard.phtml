@@ -14,7 +14,7 @@
         <?php
         //only show the remove from favorite button if the post is added to favorites
         //we don't want to show this button on specific pages such as the home page
-        if ($view->displayRemoveButton) {
+        if (isset($view->displayRemoveButton)) {
 
             ?>
             <!--The method post should point to the php script in which it was called-->

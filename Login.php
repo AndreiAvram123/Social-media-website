@@ -4,11 +4,16 @@ include "SessionHandler.php";
 
 $view = new stdClass();
 $view->pageTitle = "Login";
-$view->isUserLoggedIn = false;
-include "Views/Login.phtml";
+$view->isUserLoggedIn = isset($_SESSION['user_id']);
 
 if (isset($_POST['loginButton'])) {
-   if(loginUser()){
-      $view->redirectHome = true;
-   }
+    $loginResult = loginUser();
+    if($loginResult === true){
+        $view->redirectHome = true;
+    }else{
+        //show user and error message
+        $view -> errorMessage = $loginResult;
+    }
 }
+include "Views/Login.phtml";
+

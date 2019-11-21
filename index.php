@@ -1,13 +1,12 @@
 <?php
 session_start();
 require_once "SessionHandler.php";
-require_once  "Data/DatabaseHandler.php";
+require_once "Data/DataManager.php";
 $view = new stdClass();
 $view->pageTitle = "Home";
 
-$dbHandle = new DatabaseHandler();
+$dbHandle = new DataManager();
 $view -> posts = $dbHandle->fetchMostRecentPosts();
-$view ->displayRemoveButton = false;
 
 if (isset($_POST['signOutButton'])) {
     signUserOut();
