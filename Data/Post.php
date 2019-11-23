@@ -1,18 +1,20 @@
 <?php
+
 class Post
 {
-  private $authorName;
-  private $authorID;
-  private $postTitle;
-  private $postDate;
-  private $postContent;
-  private $postImage;
-  private $postCategoryName;
-  private $postID;
-  private $isFavorite;
+    private $authorName;
+    private $authorID;
+    private $postTitle;
+    private $postDate;
+    private $postContent;
+    private $postImage;
+    private $postCategoryName;
+    private $postID;
+    private $isFavorite;
 
 
-    public function __construct($db_row,$authorName){
+    public function __construct($db_row, $authorName)
+    {
         $this->postID = $db_row['post_id'];
         $this->postTitle = $db_row['post_title'];
         $this->postDate = $db_row['post_date'];
@@ -20,7 +22,7 @@ class Post
         $this->postCategoryName = $db_row['post_category_name'];
         $this->authorID = $db_row['post_author_id'];
         $this->postImage = $db_row['post_image'];
-        $this->authorName= $authorName;
+        $this->authorName = $authorName;
         $this->isFavorite = FALSE;
     }
 
@@ -36,8 +38,6 @@ class Post
     {
         return $this->authorID;
     }
-
-
 
 
     public function getPostCategoryName()
