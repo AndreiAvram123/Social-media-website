@@ -12,10 +12,8 @@ function addUserDataToSession($userId)
     $_SESSION['user_id'] = $userId;
 }
 
-function loginUser()
+function loginUser($email,$enteredPassword)
 {
-    $email = $_POST['emailSignIn'];
-    $enteredPassword = $_POST['passwordSignIn'];
     $databaseHandler = new DataManager();
     $check = areLoginCredentialsValid($email, $enteredPassword);
     if ($check === true) {
@@ -49,18 +47,16 @@ function areLoginCredentialsValid($email, $password)
 function createUser($username, $email, $password, $image, $creationDate)
 {
     $databaseHandler = DataManager::getInstance();
-    $check = checkRegisterCredentials($username,$email,$password);
+    $check = checkRegisterCredentials($username, $email, $password, $image);
     if($check === true) {
-         //todo
-        //should add the option for the user to upload a profile picture
-        //$imageLocation = $databaseHandler->uploadFile($image, "images/");
-        $databaseHandler->createUser($username, $email, $password, $creationDate);
+        $imageLocation = $databaseHandler->uploadImage($image, "images/");
+        $databaseHandler->createUser($username, $email, $password, $creationDate,$imageLocation);
         return true;
     }else {
         return $check;
     }
 }
-function checkRegisterCredentials($username,$email,$password){
+function checkRegisterCredentials($username,$email,$password,$image){
     if (empty($username)) {
         return "You have not entered an email";
     }
@@ -70,8 +66,37 @@ function checkRegisterCredentials($username,$email,$password){
     if (empty($password)) {
         return "You have not entered a password";
     }
+    if(strlen($password) <7){
+        return "Your password is not strong enough";
+    }
     if(DataManager::getInstance()->usernameExists($username)){
        return "The username already exists";
+    }
+    if(!is_null($image)){
+        return isImageValid($image);
+    }
+    return true;
+
+}
+
+function isImageValid($image)
+{
+
+    $imageFileType = strtolower(pathinfo($image, PATHINFO_EXTENSION));
+    //use the function getimagesize() to check if the image is real or not
+    $check = getimagesize($_FILES["profilePicture"]["tmp_name"]);
+    if ($check === false) {
+        //image not real
+        return "Please select an image";
+    }
+
+    if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg") {
+        return "Please select a valid image type from : jpg, png or jpeg";
+    }
+    // Check file size > 5mb
+    if ($_FILES["profilePicture"]["size"] > 5000000) {
+        return "The size of your image should not be bigger than 5mb";
+
     }
     return true;
 

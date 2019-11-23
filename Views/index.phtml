@@ -1,13 +1,14 @@
 <?php
-require "Views/pageElements/Header.phtml";
+include "Views/pageElements/Header.phtml";
 ?>
-<!-- Content here -->
 
+<!-- Content here -->
 <div class="row">
     <div class="col">
         <h1 class="page-title text-center mb-3">Here are some recent posts</h1>
         <?php
         foreach ($view->posts as $post) {
+            $view ->post = $post;
             include "PostCard.phtml";
         }
         //only show the add post button if the user is logged in
@@ -22,10 +23,11 @@ require "Views/pageElements/Header.phtml";
 
     </div>
     <!-- Close the row div here-->
-</div>
-<!--Close the elements opened in header -->
-</div>
-<!--Friends panel goes here-->
 
+</div>
+
+</div>
 </body>
 </html>
+
+

@@ -7,7 +7,9 @@ $view->pageTitle = "Login";
 $view->isUserLoggedIn = isset($_SESSION['user_id']);
 
 if (isset($_POST['loginButton'])) {
-    $loginResult = loginUser();
+    $email = htmlentities($_POST['emailSignIn']);
+    $enteredPassword = htmlentities($_POST['passwordSignIn']);
+    $loginResult = loginUser($email,$enteredPassword);
     if($loginResult === true){
         $view->redirectHome = true;
     }else{

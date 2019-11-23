@@ -6,8 +6,9 @@ $view->isUserLoggedIn = isset($_SESSION['user_id']);
 $view->pageTitle = "Search result";
 $dbHandler = new DataManager();
 
-if(isset($_POST['search-button'])){
-   $view -> searchResults =$dbHandler->getSearchResult($_POST['search-text']);
+if (isset($_POST['search-button'])) {
+    $searchQuery = htmlentities($_POST['search-text']);
+    $view->searchResults = $dbHandler->getSearchResult($searchQuery);
 }
 
 include "Views/Search.phtml";

@@ -4,7 +4,6 @@ require_once "SessionHandler.php";
 require_once "Data/DataManager.php";
 $view = new stdClass();
 $view->pageTitle = "Home";
-
 $dbHandle = new DataManager();
 $view -> posts = $dbHandle->fetchMostRecentPosts();
 

@@ -2,6 +2,7 @@
 include "Views/pageElements/Header.phtml";
 $favoritePosts = $view->favoritePosts;
 foreach ($favoritePosts as $post) {
+    $view ->post = $post;
     include "Views/PostCard.phtml";
 }
 ?>

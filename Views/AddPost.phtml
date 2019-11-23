@@ -1,8 +1,7 @@
 <?php
-require_once("Views/pageElements/Header.phtml");
-require_once("Data/DataManager.php");
+include "Views/pageElements/Header.phtml";
+require_once "Data/DataManager.php";
 ?>
-
 <h1 class="page-title text-center mt-3">What do you want to include in your post?</h1>
 <div class="centered-container">
     <form class="mt-5" method="post" action="AddPost.php" enctype="multipart/form-data">
@@ -41,3 +40,7 @@ require_once("Data/DataManager.php");
         <button type="submit" name="addPostButton" class="btn btn-primary mt-3">Add post</button>
     </form>
 </div>
+
+</div>
+</body>
+</html>

@@ -23,4 +23,5 @@ if (isset($_POST['registerButton'])) {
         $view->errorMessage = $result;
     }
 }
+
 ?>

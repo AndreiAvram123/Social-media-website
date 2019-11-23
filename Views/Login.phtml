@@ -1,4 +1,8 @@
 <?php include "Views/pageElements/Header.phtml";
+ if(isset($view->redirectHome)){
+    echo  '<meta http-equiv="refresh"
+   content="0; url=index.php">';
+ }
 ?>
 <form method="post" action="Login.php">
     <div class ="container-form">

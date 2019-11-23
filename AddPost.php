@@ -15,7 +15,7 @@ if (isset($_POST["addPostButton"])) {
     $postCategoryName = $_POST["postCategory"];
     $postContent = $_POST["postContent"];
     $postDate = date('Y-m-d H:i:s');
-    if(arePostDetailsValid($postTitle,$postContent,$_FILES["fileToUpload"]["name"])) {
+    if(arePostDetailsValid()) {
             $serverImageLocation = $databaseHandler->uploadImage($_FILES["fileToUpload"]["name"], "images/");
             $databaseHandler->uploadPost($_SESSION['user_id'],
                 $postTitle, $postContent, $postCategoryName, $postDate, $serverImageLocation);
@@ -23,7 +23,7 @@ if (isset($_POST["addPostButton"])) {
         }
 }
 
-function arePostDetailsValid($postTitle,$postContent,$postImage)
+function arePostDetailsValid()
 {
     if(empty($postTitle)){
         displayAlertMessage("Please include a title for your post");
@@ -33,19 +33,18 @@ function arePostDetailsValid($postTitle,$postContent,$postImage)
         displayAlertMessage("Please include a title for your post");
         return false;
     }
-    $imageCheck = isImageValid($postImage);
+    $imageCheck = isImageValid();
     if($imageCheck !==true){
        displayAlertMessage($imageCheck);
        return false;
     }
     return true;
 }
-function isImageValid($image_path)
+function isImageValid()
 {
     if (empty($image_path)) {
         return "Please select an image";
     }
-        $fileValid = true;
         $imageFileType = strtolower(pathinfo($image_path, PATHINFO_EXTENSION));
         //use the function getimagesize() to check if the image is real or not
         $check = getimagesize($_FILES["fileToUpload"]["tmp_name"]);

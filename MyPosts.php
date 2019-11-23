@@ -6,8 +6,9 @@ $view->pageTitle = "My posts";
 $view->isUserLoggedIn = isset($_SESSION['user_id']);
 $dbHandler = new DataManager();
 $view ->displayRemoveButton = true;
+
 foreach ($dbHandler ->getAllPostsIDs() as $postsID){
-    if(isset($_POST[$postsID])){
+    if(isset($_POST['removePost'])){
         //display danger message
         //and wait confirmation from user
         $dbHandler ->removePost($postsID);

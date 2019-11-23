@@ -1,12 +1,12 @@
 <?php
 include "Views/pageElements/Header.phtml";
-
+include "Modals/ConfirmRemoveModal.phtml";
 $myPosts = $view->myPosts;
 foreach ($myPosts as $post){
+    $view->post = $post;
     include "Views/PostCard.phtml";
 
 }
-
 ?>
 </div>
 </body>

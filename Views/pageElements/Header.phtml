@@ -2,10 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" ckontent="IE=edge">
-    <meta http-equiv="refresh" content="<?php
-    //redirect user to home screen if the login has just happened
-    if (isset($view->redirectHome)) echo 0 ?>; URL='index.php'"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
@@ -79,13 +76,12 @@
 
 <div class="container mt-3">
     <?php
-    //the warning modal is used on different page to show a warning message
-    include "Modals/WarningModal.phtml";
     //the confirmation modal is mainly used to ask the user
     //for confirmation for certain actions such as signing out
+    //As the sign out button is displayed
+    //on all pages, it makes sense to include the ConfirmationModal in the header
     include "Modals/ConfimationModal.phtml"
     ?>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
@@ -97,6 +93,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
             integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
             crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/1766dfddfd.js" crossorigin="anonymous"></script>
 
 
 

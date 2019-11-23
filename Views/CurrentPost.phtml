@@ -1,8 +1,12 @@
 <?php include "Views/pageElements/Header.phtml";
-require_once "Modals/WriteReviewModal.phtml";
+include "Modals/WriteReviewModal.phtml";
+
 $currentPost = $view->currentPost;
 $currentPostComments = $view->currentPostComments;
 
+if (isset($view->warningMessage)) {
+    include "Modals/WarningModal.phtml";
+}
 ?>
 <div class="centered-container mt-4 mb-5">
 
@@ -10,9 +14,9 @@ $currentPostComments = $view->currentPostComments;
     <img src="<?php echo $currentPost->getPostImage() ?>" class="image-post-opened">
     <p class="post-text mt-5"> <?php echo $currentPost->getPostContent(); ?> </p>
     <?php
-     //check if the user is logged in and if the post belong to him
+    //check if the user is logged in and if the post belong to him
     if ($view->isUserLoggedIn && !$view->postBelongsToUser) {
-        if ($currentPost->getIsFavorite() == false ) {
+        if ($currentPost->getIsFavorite() == false) {
             //if the user is logged in but the post is not added to favorite
             ?>
             <form action="CurrentPost.php" method="post">
@@ -25,13 +29,23 @@ $currentPostComments = $view->currentPostComments;
     <div class="comments-area mt-5">
         <h2>Comments</h2>
         <?php
-
         foreach ($currentPostComments as $comment) {
             ?>
             <div class="comment card">
                 <div class="comment-body">
                     <span><?php echo $comment->getAuthor() ?></span>
                     <p><?php echo $comment->getCommentText(); ?></p>
+                    <?php
+                    //allow the user to remove a comment directly from teh post
+                    if (isset($_SESSION['user_id']) && $comment->getCommentUserID() === $_SESSION['user_id']) {
+                        ?>
+                        <form method="post">
+                        <button type="submit" name ="removeCommentButton<?php echo $comment->getCommentId()?>"><i class="fas fa-trash-alt"></i></button>
+                        </form>
+                        <?php
+
+                    }
+                    ?>
                 </div>
             </div>
             <?php
@@ -45,5 +59,8 @@ $currentPostComments = $view->currentPostComments;
 <?php
 }
 ?>
-
 </div>
+<!--Close the elements opened in the header-->
+</div>
+</body>
+</html>
