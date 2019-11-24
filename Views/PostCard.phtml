@@ -1,7 +1,7 @@
 <?php
  $post = $view->post;
 ?>
-<div class="card mt-3" style="width: 50rem;margin: auto">
+<div class="card mt-3">
     <header class="p-3">
         <h3 class="card-title text-primary">  <?php echo $post->getPostTitle() ?></h3>
         <h4>Author : <?php echo $post->getAuthorName() ?></h4>
@@ -26,7 +26,7 @@
                  be removed from favorites
             -->
             <form method="post">
-                <button type="submit" class="btn btn-danger mt-3" name="<?php echo "Attempt" . $post->getPostID() ?>">Remove</button>
+                <button type="submit" class="btn btn-danger mt-3" name = "Attempt<?php echo $post->getPostID()?>">Remove</button>
             </form>
 
             <?php
@@ -37,7 +37,4 @@
 
 </div>
 
-</div>
-</body>
-</html>
 

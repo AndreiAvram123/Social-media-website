@@ -31,19 +31,18 @@
                 //include options for the profile if the user is logged in
                 if ($view->isUserLoggedIn) {
 
-                    ?>
-                    <!--List items that should be shown if the user is logged in -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="MyPosts.php">My Posts <span class="sr-only"></span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="Favorites.php">Favorites <span class="sr-only"></span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link">All Friends <span class="sr-only"></span></a>
-                    </li>
-                    <?php
-                    include "profileOptions.html";
+                ?>
+                <!--List items that should be shown if the user is logged in -->
+                <li class="nav-item">
+                    <a class="nav-link" href="MyPosts.php">My Posts <span class="sr-only"></span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="WatchList.php">Watch list <span class="sr-only"></span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link">All Friends <span class="sr-only"></span></a>
+                </li>
+                <?php
                 }
                 ?>
 
@@ -74,7 +73,7 @@
     </nav>
 </header>
 
-<div class="container mt-3">
+<div class="container mt-3 mb-3">
     <?php
     //the confirmation modal is mainly used to ask the user
     //for confirmation for certain actions such as signing out

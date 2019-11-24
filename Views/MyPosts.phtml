@@ -9,10 +9,26 @@ if (isset($view->postIdToRemove)) {
 
 foreach ($myPosts as $post) {
     $view->post = $post;
-    include "Views/PostCard.phtml";
 
+    ?>
+    <div class="row">
+        <div class="col">
+            <?php include "Views/PostCard.phtml"; ?>
+        </div>
+    </div>
+    <?php
 }
 ?>
+
+<?php
+if (sizeof($myPosts) == 0) { ?>
+    <div class="alert alert-warning mt-3" role="alert">
+        You do not have any posts on the forum. Go to the main page and create one.
+    </div>
+    <?php
+}
+?>
+
 </div>
 </body>
 </html>

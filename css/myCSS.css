@@ -1,9 +1,6 @@
 .navbar-collapse a{
-    font-size: 25px;
+    font-size: 20px;
 }
-/*.container{*/
-/*    margin-left: 20px !important;*/
-/*}*/
 .page-title{
     color:#007BFF;
 }
@@ -12,10 +9,6 @@
 }
 .image-post-opened{
     max-width: 70vw;
-}
-.centered-container{
-    width: 90%;
-    margin:auto;
 }
 .container-form{
     width : 40vw;
@@ -48,12 +41,17 @@
     margin-top:23px;
 }
 
-.comment{
-    margin-top: 20px;
-    margin-bottom: 20px;
-}
 
 .comment-body{
   padding:20px;
 
+}
+.card {
+    width: 80vw;
+    margin: auto;
+}
+@media (min-width: 992px) {
+    .card{
+        width:50vw;
+    }
 }

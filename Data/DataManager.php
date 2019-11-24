@@ -31,6 +31,8 @@ class DataManager
         $posts = [];
         while ($row = $result->fetch()) {
             $author_name = $this->getUsernameFromUserID($row['post_author_id']);
+            //limit the amount of text on the main page
+            $row['post_content'] = substr($row['post_content'],1,700);
             $posts[] = new Post($row, $author_name);
         }
         return $posts;

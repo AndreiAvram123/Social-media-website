@@ -17,5 +17,5 @@ foreach ($dbHandle->getAllPostsIDs() as $postsID) {
 }
 $view->favoritePosts = $dbHandle->getFavoritePosts($userId);
 
-include "Views/Favorites.phtml";
+include "Views/WatchList.phtml";
 ?>
