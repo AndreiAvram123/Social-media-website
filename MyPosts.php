@@ -4,19 +4,17 @@ require_once "Data/DataManager.php";
 $view = new stdClass();
 $view->pageTitle = "My posts";
 $view->isUserLoggedIn = isset($_SESSION['user_id']);
-$dbHandler = new DataManager();
+$dbHandler = DataManager::getInstance();
 $view->displayRemoveButton = true;
 
-$postIDs= $dbHandler->getAllPostsIDs();
 
-foreach ($postIDs as $postID) {
-    if (isset($_POST["Attempt". $postID])) {
-        $view -> postIdToRemove = $postID;
-    }
-}
-foreach ($postIDs as $postID) {
-    if (isset($_POST["Remove". $postID])) {
-        $dbHandler->removePost($postID);
+$postIDs= $dbHandler->getAllPostsIDs();
+if(isset($_POST['removeButton'])){
+    $encryptedPostId = $_POST['removeValue'];
+    foreach($postIDs as $postId){
+        if($encryptedPostId === md5($postId)){
+            $dbHandler ->removePost($postId);
+        }
     }
 }
 

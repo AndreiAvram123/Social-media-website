@@ -6,6 +6,7 @@ $view = new stdClass();
 $view->pageTitle = "Home";
 $dbHandle = new DataManager();
 $view -> posts = $dbHandle->fetchMostRecentPosts();
+$view -> numberOfPages = $dbHandle->getNumberOfPages();
 
 if (isset($_POST['signOutButton'])) {
     signUserOut();

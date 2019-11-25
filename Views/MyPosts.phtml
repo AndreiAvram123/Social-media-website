@@ -2,14 +2,8 @@
 include "Views/pageElements/Header.phtml";
 $myPosts = $view->myPosts;
 
-if (isset($view->postIdToRemove)) {
-    include "Modals/ConfirmRemoveModal.phtml";
-    echo '<script>$("#confirmRemoveModal").modal("show")</script>';
-}
-
 foreach ($myPosts as $post) {
     $view->post = $post;
-
     ?>
     <div class="row">
         <div class="col">

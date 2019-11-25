@@ -22,7 +22,6 @@ foreach ($view->posts as $post) {
 }
 ?>
 
-
     <?php
     //only show the add post button if the user is logged in
     if ($view->isUserLoggedIn) {
@@ -33,7 +32,19 @@ foreach ($view->posts as $post) {
 <?php
 }
 ?>
+<div class="row mt-4">
+    <div class="col text-center">
+        <?php
+            for($i = 1;$i<=$view->numberOfPages;$i++) {
 
+                ?>
+                <a href="#"><span class="page-index"><?php echo $i
+                        ?></span></a>
+                <?php
+            }
+        ?>
+    </div>
+</div>
 
 </div>
 </body>

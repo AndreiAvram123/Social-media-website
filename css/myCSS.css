@@ -7,9 +7,9 @@
 .card-image{
   max-height: 40vh;
 }
-.image-post-opened{
-    max-width: 70vw;
-}
+/*.image-post-opened{*/
+/*    max-width: 70vw;*/
+/*}*/
 .container-form{
     width : 40vw;
     margin: 0 auto;
@@ -36,6 +36,11 @@
     opacity: 0.5;
 
 }
+
+.page-index{
+    font-size: 20px;
+}
+
 
 .add-button{
     margin-top:23px;
