@@ -2,8 +2,7 @@
 
 class Database
 {
-    //initialize the SINGLETON pattern
-    //due to static
+    //create singletonPattern
     protected static $_dbInstance = null;
     protected $_dbHandle;
 

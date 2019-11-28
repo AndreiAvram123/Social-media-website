@@ -16,11 +16,6 @@ if ($currentPost != null) {
         <div class="col">
             <h1 class="text-center"> <?php echo $currentPost->getPostTitle() ?></h1>
             <img src="<?php echo $currentPost->getPostImage() ?>" class="img-fluid mx-auto d-block">
-        </div>
-    </div>
-
-    <div class="row mt-4">
-        <div class="col">
             <p class="post-text mt-5"> <?php echo $currentPost->getPostContent(); ?> </p>
             <?php
             //check if the user is logged in and if the post belong to him

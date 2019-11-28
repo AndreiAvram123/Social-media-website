@@ -7,10 +7,22 @@ class DataManager
 {
     protected $_dbHandler;
     protected $_dbInstance;
+    //create a singleton pattern for this as well
+    private static $dataManager;
+    //this variable is used to keep track
+    //of the last post's row index in order
+    //to get the next 10 posts on demand
+    private $currentRowIndex;
 
     public static function getInstance()
     {
-        return new self();
+        if(self::$dataManager !==null){
+            return self::$dataManager;
+        }else{
+            self::$dataManager = new self();
+            return self::$dataManager;
+        }
+
     }
 
     public function __construct()
@@ -19,13 +31,11 @@ class DataManager
         $this->_dbHandler = $this->_dbInstance->getDatabaseConnection();
     }
 
-    /**
-     * Return an array of 10 most recent posts
-     */
-    public function fetchMostRecentPosts()
+    public function getPosts($offset)
     {
         //Get the posts in chronological order
-        $query = "SELECT * FROM forum_posts ORDER BY post_date DESC LIMIT 10";
+        //and in order of pagination
+        $query = "SELECT * FROM forum_posts ORDER BY post_date DESC  LIMIT 10  OFFSET $offset";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         $posts = [];
@@ -37,6 +47,7 @@ class DataManager
         }
         return $posts;
     }
+
 
     public function getUserPasswordFromDB($email)
     {
@@ -198,17 +209,18 @@ function getUserIDFromEmail($email)
  * @param $searchQuery
  * @return array
  */
-public
-function getSearchResult($searchQuery)
+public function getSearchResult($searchQuery)
 {
     //limit the number of search result
     //if the user pressed for example the search button
     //without entering any text we should return
     //a limited number of results
-    $query = "SELECT * FROM forum_posts WHERE post_title LIKE :searchQuery LIMIT 15";
+    $query = "SELECT * FROM forum_posts WHERE post_title LIKE :searchQueryTitle 
+    OR post_content LIKE :searchQueryContent  LIMIT 15 ";
     $result = $this->_dbHandler->prepare($query);
     //use parameterized query to avoid sql injection
-    $result->bindValue(':searchQuery', '%' . $searchQuery . '%');
+    $result->bindValue(':searchQueryTitle', '%' . $searchQuery . '%');
+    $result->bindValue(':searchQueryContent', '%' . $searchQuery . '%');
     $result->execute();
     $posts = [];
     while ($row = $result->fetch()) {
@@ -351,5 +363,6 @@ function getNumberOfPages()
         return $totalPosts / 10 + 1;
     }
 }
+
 
 }

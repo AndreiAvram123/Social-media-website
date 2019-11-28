@@ -1,22 +1,20 @@
 <?php
- $post = $view->post;
+$post = $view->post;
 ?>
-<div class="card mt-3">
-    <header class="p-3">
-        <h3 class="card-title text-primary">  <?php echo $post->getPostTitle() ?></h3>
-        <h4>Author : <?php echo $post->getAuthorName() ?></h4>
+<div class="card mt-3 p-3">
 
-    </header>
+    <h3 class="card-title text-primary">  <?php echo $post->getPostTitle() ?></h3>
+    <h4>Author : <?php echo $post->getAuthorName() ?></h4>
     <img src="<?php echo $post->getPostImage() ?>" class="card-img-top card-image">
 
     <div class="card-body">
         <p class="card-text"> <?php echo $post->getPostContent() ?></p>
         <form action="CurrentPost.php" method="post">
             <button type="submit" class="btn btn-primary" name="OpenPostButton">See post</button>
-            <input type="hidden"  name="valuePostID" value="<?php
+            <input type="hidden" name="valuePostID" value="<?php
             //it is better for security if we encrypt the post id, so
             // users cannot change it in the inspector
-            echo md5($post->getPostID())?>">
+            echo md5($post->getPostID()) ?>">
         </form>
         <?php
         //only show the remove from favorite button if the post is added to favorites
@@ -30,8 +28,8 @@
                  be removed from favorites
             -->
             <form method="post">
-                <button type="submit" class="btn btn-danger mt-3"  name ="removeButton">Remove</button>
-                <input type="hidden"  name="removeValue" value="<?php echo md5($post->getPostID())?>">
+                <button type="submit" class="btn btn-danger mt-3" name="removeButton">Remove</button>
+                <input type="hidden" name="removeValue" value="<?php echo md5($post->getPostID()) ?>">
             </form>
 
             <?php

@@ -2,12 +2,11 @@
 include "Views/pageElements/Header.phtml";
 ?>
 
-
-    <div class="row">
-        <div class="col">
-            <h1 class="page-title text-center mb-3">Here are some recent posts</h1>
-        </div>
+<div class="row">
+    <div class="col">
+        <h1 class="page-title text-center mb-3">Here are some recent posts</h1>
     </div>
+</div>
 
 <?php
 foreach ($view->posts as $post) {
@@ -15,36 +14,36 @@ foreach ($view->posts as $post) {
     ?>
     <div class="row">
         <div class="col">
-           <?php include "PostCard.phtml"; ?>
+            <?php include "PostCard.phtml"; ?>
         </div>
     </div>
     <?php
 }
 ?>
 
-    <?php
-    //only show the add post button if the user is logged in
-    if ($view->isUserLoggedIn) {
+<?php
+//only show the add post button if the user is logged in
+if ($view->isUserLoggedIn) {
     ?>
     <a href="AddPost.php">
         <div class="float"><i class="fa fa-plus add-button"></i></div>
     </a>
-<?php
+    <?php
 }
 ?>
+<form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
 <div class="row mt-4">
     <div class="col text-center">
         <?php
-            for($i = 1;$i<=$view->numberOfPages;$i++) {
-
-                ?>
-                <a href="#"><span class="page-index"><?php echo $i
-                        ?></span></a>
-                <?php
-            }
+        for($i = 1;$i<=$view->numberOfPages;$i++) {
+            ?>
+            <button class="btn btn-primary" type="submit" name="<?php echo md5($i) ?>"><?php echo $i ?></button>
+            <?php
+        }
         ?>
     </div>
 </div>
+</form>
 
 </div>
 </body>

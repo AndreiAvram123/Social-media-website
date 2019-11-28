@@ -1,6 +1,7 @@
-<?php include "Views/pageElements/Header.phtml";
+<?php include_once "Views/pageElements/Header.phtml";
+     include_once  "Data/SpamSystem.php";
 ?>
-<form method="post">
+<form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
     <!-- Username field -->
     <div class ="container-form">
     <div class="mt-3">
@@ -52,15 +53,17 @@
         <?php if(isset($view->errorMessage)) {
             ?>
             <div class="alert alert-danger mt-3" role="alert">
-                <?php echo $view->errorMessage?>
+                <?php echo $view->errorMessage ?>
             </div>
             <?php
         }else{
-            ?>
-            <div class="alert alert-primary mt-3" role="alert">
-                You have successfully create your account! Go to login page now.
-            </div>
-            <?php
+            if(isset($view->showSuccessAlert)) {
+                ?>
+                <div class="alert alert-primary mt-3" role="alert">
+                    You have successfully create your account! Go to login page now.
+                </div>
+                <?php
+            }
         }
         ?>
 

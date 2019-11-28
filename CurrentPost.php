@@ -3,7 +3,7 @@ require_once "Data/DataManager.php";
 
 session_start();
 $view = new stdClass();
-$view->pageTitle = "Post";
+$view->pageTitle = "OpenedPost ";
 $view->isUserLoggedIn = isset($_SESSION['user_id']);
 $dbHandler = DataManager::getInstance();
 

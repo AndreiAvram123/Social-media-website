@@ -1,9 +1,11 @@
 <?php
-require_once "SessionHandler.php";
-
+require_once "Data/SessionManager.php";
+require_once "Data/SpamSystem.php";
 $view = new stdClass();
 $view->pageTitle = "Register";
-$view ->isUserLoggedIn =false;
+$view ->isUserLoggedIn =isset($_SESSION['user_id']);
+$spamSystem = new SpamSystem();
+$spamSystem->generateImage();
 
 include "Views/Register.phtml";
 
@@ -18,9 +20,11 @@ if (isset($_POST['registerButton'])) {
     }else{
         $image = null;
     }
-    $result =  createUser($username, $email, $password, $image,$creationDate);
+    $result = SessionManager::getInstance()->createUser($username, $email, $password, $image,$creationDate);
     if($result!== true){
         $view->errorMessage = $result;
+    }else{
+        $view->showSuccessAlert = true;
     }
 }
 
