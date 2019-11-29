@@ -4,7 +4,10 @@ $post = $view->post;
 <div class="card mt-3 p-3">
 
     <h3 class="card-title text-primary">  <?php echo $post->getPostTitle() ?></h3>
-    <h4>Author : <?php echo $post->getAuthorName() ?></h4>
+    <form method="post" action="ProfilePage.php">
+        <button type="submit" class="link-button" name ="authorNameButton">Author : <?php echo $post->getAuthorName()?></button>
+        <input type="hidden" name ="authorIDValue" value="<?php echo md5($post->getAuthorID()) ?>">
+    </form>
     <img src="<?php echo $post->getPostImage() ?>" class="card-img-top card-image">
 
     <div class="card-body">

@@ -37,7 +37,7 @@ if ($view->isUserLoggedIn) {
         <?php
         for($i = 1;$i<=$view->numberOfPages;$i++) {
             ?>
-            <button class="btn btn-primary" type="submit" name="<?php echo md5($i) ?>"><?php echo $i ?></button>
+            <input class="btn btn-primary" type="submit" name="<?php echo md5($i) ?>" value="<?php echo $i ?>">
             <?php
         }
         ?>

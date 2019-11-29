@@ -2,6 +2,7 @@
 require_once "Data/Database.php";
 require_once "Data/Comment.php";
 require_once "Data/Post.php";
+require_once "Data/User.php";
 
 class DataManager
 {
@@ -9,11 +10,6 @@ class DataManager
     protected $_dbInstance;
     //create a singleton pattern for this as well
     private static $dataManager;
-    //this variable is used to keep track
-    //of the last post's row index in order
-    //to get the next 10 posts on demand
-    private $currentRowIndex;
-
     public static function getInstance()
     {
         if(self::$dataManager !==null){
@@ -346,23 +342,44 @@ function deleteComment($commentID)
     $result->execute();
 }
 
-public
-function getNumberOfPages()
-{
-    $query = "SELECT COUNT(post_id) FROM forum_posts";
-    $result = $this->_dbHandler->prepare($query);
-    $result->execute();
-    $row = $result->fetch();
-    $totalPosts = $row['COUNT(post_id)'];
-    //I chose to display 10 posts per page
-    //If the number is multiple of 10 just return the value
-    //Otherwise divide it by 10 and then add 1
-    if ($totalPosts % 10 == 0) {
-        return $totalPosts / 10;
-    } else {
-        return $totalPosts / 10 + 1;
+    public function getNumberOfPages()
+    {
+        $query = "SELECT COUNT(post_id) FROM forum_posts";
+        $result = $this->_dbHandler->prepare($query);
+        $result->execute();
+        $row = $result->fetch();
+        $totalPosts = $row['COUNT(post_id)'];
+        //I chose to display 10 posts per page
+        //If the number is multiple of 10 just return the value
+        //Otherwise divide it by 10 and then add 1
+        if ($totalPosts % 10 == 0) {
+            return $totalPosts / 10;
+        } else {
+            return $totalPosts / 10 + 1;
+        }
     }
-}
+
+    public function getAllUsersId()
+    {
+        $query = "SELECT user_id FROM users";
+        $result = $this->_dbHandler->prepare($query);
+        $result->execute();
+        $userIds=[];
+        while($row = $result->fetch()){
+            $userIds[] = $row['user_id'];
+        }
+        return $userIds;
+    }
+
+    public function getUserById($userId)
+    {
+        $query = "SELECT * from users WHERE user_id = '$userId'";
+        $result = $this->_dbHandler->prepare($query);
+        $result->execute();
+        $row = $result->fetch();
+
+        return new User($row);
+    }
 
 
 }

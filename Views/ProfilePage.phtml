@@ -1,0 +1,17 @@
+<?php
+include_once "Views/pageElements/Header.phtml";
+$currentUser = $view->currentUser;
+?>
+    <div class="row">
+        <div class="col">
+            <img class="rounded image-profile" src="images/nela.jpg">
+        </div>
+
+        <div class="col">
+            <h1><?php echo $currentUser ->getUsername()      ?></h1>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
