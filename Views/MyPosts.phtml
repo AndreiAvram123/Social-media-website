@@ -1,24 +1,16 @@
 <?php
 include "Views/pageElements/Header.phtml";
 $myPosts = $view->myPosts;
-
-if (isset($view->postIdToRemove)) {
-    include "Modals/ConfirmRemoveModal.phtml";
-    echo '<script>$("#confirmRemoveModal").modal("show")</script>';
-}
-
-foreach ($myPosts as $post) {
-    $view->post = $post;
-
-    ?>
+?>
     <div class="row">
         <div class="col">
-            <?php include "Views/PostCard.phtml"; ?>
+            <?php
+        foreach ($myPosts as $post) {
+            $view->post = $post;
+            include "Views/PostCard.phtml";
+        }?>
         </div>
     </div>
-    <?php
-}
-?>
 
 <?php
 if (sizeof($myPosts) == 0) { ?>

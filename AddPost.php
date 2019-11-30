@@ -1,12 +1,12 @@
 <?php
 session_start();
+require_once "Data/DataManager.php";
 
-require_once('Data/DataManager.php');
 $view = new stdClass();
-$view->pageTitle = "Register";
+$view->pageTitle = "AddPost";
 $view ->isUserLoggedIn = isset($_SESSION['user_id']);
-
-include "Views/AddPost.phtml";
+$dbManager = DataManager::getInstance();
+$view->categories = $dbManager->getAllCategories();
 
 //handle added post
 if (isset($_POST["addPostButton"])) {
@@ -15,30 +15,28 @@ if (isset($_POST["addPostButton"])) {
     $postCategoryName = $_POST["postCategory"];
     $postContent = $_POST["postContent"];
     $postDate = date('Y-m-d H:i:s');
-    if(arePostDetailsValid()) {
+    //returns true if valid
+    //else returns error message
+    $result = arePostDetailsValid();
+    if($result === true) {
             $serverImageLocation = $databaseHandler->uploadImage($_FILES["fileToUpload"]["name"], "images/");
             $databaseHandler->uploadPost($_SESSION['user_id'],
                 $postTitle, $postContent, $postCategoryName, $postDate, $serverImageLocation);
-            displayAlertMessage("You successfully added your post :). Go to main page to check it.");
-        }
+            $view->warningMessage = "You successfully added your post :). Go to main page to check it.";
+    }else{
+        $view->warningMessage = $result;
+    }
 }
 
 function arePostDetailsValid()
 {
     if(empty($postTitle)){
-        displayAlertMessage("Please include a title for your post");
-        return false;
+        return "Please include a title for your post";
     }
     if(empty($postContent)){
-        displayAlertMessage("Please include a title for your post");
-        return false;
+        return "Please include a title for your post";
     }
-    $imageCheck = isImageValid();
-    if($imageCheck !==true){
-       displayAlertMessage($imageCheck);
-       return false;
-    }
-    return true;
+    return isImageValid();
 }
 function isImageValid()
 {
@@ -64,4 +62,5 @@ function isImageValid()
         return true;
 
 }
+include "Views/AddPost.phtml";
 ?>

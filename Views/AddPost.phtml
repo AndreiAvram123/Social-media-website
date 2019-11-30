@@ -1,16 +1,17 @@
 <?php
-include "Views/pageElements/Header.phtml";
-require_once "Data/DataManager.php";
+include_once "Views/pageElements/Header.phtml";
+
+if (isset($view->warningMessage)) {
+    include "Modals/WarningModal.phtml";
+    echo "<script>$('#warningModal').modal('show')</script>";
+}
 ?>
-<div class="row">
-    <div class="col">
-        <h1 class="page-title text-center mt-3">What do you want to include in your post?</h1>
-    </div>
-</div>
+
 <div class="row">
     <div class="col">
         <div class="centered-container">
-            <form class="mt-5" method="post" action="AddPost.php" enctype="multipart/form-data">
+            <form class="mt-5" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>" enctype="multipart/form-data">
+                <h1 class="page-title text-center mt-3">What do you want to include in your post?</h1>
                 <div class="mt-3">
                     <label>Title</label>
                     <div class="input-group ">
@@ -23,9 +24,8 @@ require_once "Data/DataManager.php";
                     <label for="postCategorySelector">Select Category</label>
                     <select class="form-control" name="postCategory" id="postCategorySelector">
                         <?php
-                        $databaseHandler = new DataManager();
-                        foreach ($databaseHandler->getAllCategories() as $categoryName) {
-                            echo '<option>' . $categoryName . '</option>';
+                        foreach ($view->categories as $category) {
+                            echo '<option>' . $category . '</option>';
                         }
                         ?>
                     </select>

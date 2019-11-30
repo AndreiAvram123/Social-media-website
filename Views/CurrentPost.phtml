@@ -2,88 +2,92 @@
 include "Modals/WriteReviewModal.phtml";
 
 $currentPost = $view->currentPost;
-$currentPostComments = $view->currentPostComments;
 
 if (isset($view->warningMessage)) {
     include "Modals/WarningModal.phtml";
 }
-?>
-<div class="row mt-4">
-    <div class="col">
-        <h1 class="text-center"> <?php echo $currentPost->getPostTitle() ?></h1>
-        <img src="<?php echo $currentPost->getPostImage() ?>" class="image-post-opened">
-    </div>
-</div>
-
-<div class="row mt-4">
-    <div class="col">
-        <p class="post-text mt-5"> <?php echo $currentPost->getPostContent(); ?> </p>
-        <?php
-        //check if the user is logged in and if the post belong to him
-        if ($view->isUserLoggedIn && !$view->postBelongsToUser) {
-            if ($currentPost->getIsFavorite() === false) {
-                //if the user is logged in but the post is not added to favorite
-                ?>
-                <form action="CurrentPost.php" method="post">
-                    <button type="submit" class="btn btn-primary btn" name="addToFavoriteButton">Add to favorites
-                    </button>
-                </form>
-                <?php
-            }
-        }
-        ?>
-    </div>
-</div>
-
-<div class="row mt-3">
-    <div class="col">
-        <h2 class="text-center">Comments</h2>
-    </div>
-</div>
-
-<?php
-foreach ($currentPostComments as $comment) {
+//if the currentPost is null
+//then the user must have modified a value in the inspector
+if ($currentPost != null) {
+    $currentPostComments = $view->currentPostComments;
     ?>
-    <div class="row mt-3">
+
+    <div class="row mt-4">
         <div class="col">
-            <div class="comment">
-                <div class="comment-body">
-                    <span><?php echo $comment->getAuthor() ?></span>
-                    <p><?php echo $comment->getCommentText(); ?></p>
-                    <?php
-                    //allow the user to remove a comment directly from teh post
-                    if (isset($_SESSION['user_id']) && $comment->getCommentUserID() === $_SESSION['user_id']) {
-                        ?>
-                        <form method="post">
-                            <button type="submit" name="removeCommentButton<?php echo $comment->getCommentId() ?>"><i
-                                        class="fas fa-trash-alt"></i></button>
-                        </form>
-                        <?php
-                    }
+            <h1 class="text-center"> <?php echo $currentPost->getPostTitle() ?></h1>
+            <img src="<?php echo $currentPost->getPostImage() ?>" class="img-fluid mx-auto d-block">
+            <p class="post-text mt-5"> <?php echo $currentPost->getPostContent(); ?> </p>
+            <?php
+            //check if the user is logged in and if the post belong to him
+            if ($view->isUserLoggedIn && !$view->postBelongsToUser) {
+                if ($currentPost->getIsFavorite() === false) {
+                    //if the user is logged in but the post is not added to favorite
                     ?>
-                </div>
-            </div>
+                    <form action="CurrentPost.php" method="post">
+                        <button type="submit" class="btn btn-primary btn" name="addToFavoriteButton">Add to favorites
+                        </button>
+                    </form>
+                    <?php
+                }
+            }
+            ?>
         </div>
     </div>
 
+    <div class="row mt-3">
+        <div class="col">
+            <h2 class="text-center">Comments</h2>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col">
+            <?php
+            foreach ($currentPostComments as $comment) {
+                ?>
+                <div class="comment">
+                    <div class="comment-body">
+                        <span><?php echo $comment->getAuthor() ?></span>
+                        <p><?php echo $comment->getCommentText(); ?></p>
+                        <?php
+                        //allow the user to remove a comment directly from the post
+                        if (isset($_SESSION['user_id']) && $comment->getCommentUserID() === $_SESSION['user_id']) {
+                            ?>
+                            <form method="post">
+                                <button type="submit" name="removeCommentButton">
+                                    <i class="fas fa-trash-alt"></i></button>
+                                <input type="hidden" name="valueCommentID"
+                                       value="<?php echo md5($comment->getCommentID()) ?>"
+                            </form>
+                            <?php
+                        }
+                        ?>
+                    </div>
+                </div>
+                <?php
+            }
+            ?>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col">
+            <?php
+            if ($view->isUserLoggedIn) {
+                ?>
+                <button type="button" class="btn btn-primary btn" data-toggle="modal" data-target="#writeReviewModal">
+                    Write
+                    comment
+                </button>
+                <?php
+            }
+            ?>
+        </div>
+    </div>
 
     <?php
 }
 ?>
-<div class="row mt-4">
-    <div class="col">
-        <?php
-        if ($view->isUserLoggedIn) {
-            ?>
-            <button type="button" class="btn btn-primary btn" data-toggle="modal" data-target="#writeReviewModal">Write
-                comment
-            </button>
-            <?php
-        }
-        ?>
-    </div>
-</div>
-
 </div>
 </body>
 </html>

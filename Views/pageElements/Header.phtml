@@ -7,8 +7,9 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="css/myCSS.css">
+    <meta name="description" content="Assassins'creed forum. Post tutorials on missions or hidden locations"
+    <meta name="keywords" content="Assassin's creed , forum, tutorials"
 
-    <title><?php $view->pageTitle ?></title>
 
 </head>
 
@@ -40,7 +41,7 @@
                     <a class="nav-link" href="WatchList.php">Watch list <span class="sr-only"></span></a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link">All Friends <span class="sr-only"></span></a>
+                    <a class="nav-link" href="Friends.php">All Friends <span class="sr-only"></span></a>
                 </li>
                 <?php
                 }
@@ -77,8 +78,6 @@
     <?php
     //the confirmation modal is mainly used to ask the user
     //for confirmation for certain actions such as signing out
-    //As the sign out button is displayed
-    //on all pages, it makes sense to include the ConfirmationModal in the header
     include "Modals/ConfimationModal.phtml"
     ?>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"

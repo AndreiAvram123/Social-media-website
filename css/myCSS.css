@@ -7,11 +7,9 @@
 .card-image{
   max-height: 40vh;
 }
-.image-post-opened{
-    max-width: 70vw;
-}
+
 .container-form{
-    width : 40vw;
+    width : 70vw;
     margin: 0 auto;
 }
 .post-text{
@@ -37,6 +35,11 @@
 
 }
 
+.page-index{
+    font-size: 20px;
+}
+
+
 .add-button{
     margin-top:23px;
 }
@@ -50,8 +53,28 @@
     width: 80vw;
     margin: auto;
 }
+.link-button {
+    background: none!important;
+    border: none;
+    padding: 0!important;
+    font-size: 20px ;
+    /*optional*/
+    font-family: arial, sans-serif;
+    /*input has OS specific font-family*/
+    color: #069;
+    text-decoration: underline;
+    cursor: pointer;
+}
+.image-profile{
+    max-width: 40vw;
+    max-height: 40vh;
+}
+
 @media (min-width: 992px) {
     .card{
         width:50vw;
+    }
+    .container-form{
+        width : 40vw;
     }
 }
