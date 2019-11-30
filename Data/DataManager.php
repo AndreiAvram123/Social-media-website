@@ -44,7 +44,6 @@ class DataManager
         return $posts;
     }
 
-
     public function getUserPasswordFromDB($email)
     {
         $query = "SELECT password FROM users WHERE email = :email";

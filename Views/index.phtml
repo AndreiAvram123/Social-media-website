@@ -8,18 +8,17 @@ include "Views/pageElements/Header.phtml";
     </div>
 </div>
 
-<?php
-foreach ($view->posts as $post) {
-    $view->post = $post;
-    ?>
     <div class="row">
         <div class="col">
-            <?php include "PostCard.phtml"; ?>
+            <?php
+            foreach ($view->posts as $post) {
+                $view->post = $post;
+                include "PostCard.phtml";
+            }
+            ?>
         </div>
     </div>
-    <?php
-}
-?>
+
 
 <?php
 //only show the add post button if the user is logged in

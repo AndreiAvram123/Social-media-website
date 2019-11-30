@@ -1,4 +1,5 @@
 <?php
+session_start();
 require_once "Data/DataManager.php";
 $view = new stdClass();
 $view->pageTitle = "Profile";
@@ -9,7 +10,9 @@ if(isset($_POST['authorNameButton'])){
     $encryptedUserID = $_POST['authorIDValue'];
     foreach ($dbManger ->getAllUsersId() as $userId){
         if($encryptedUserID === md5($userId)){
+            //store the user id
             $view->currentUser = $dbManger->getUserById($userId);
+            $view->userPosts = $dbManger ->getAllUserPosts($userId);
         }
     }
 }else {

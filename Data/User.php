@@ -5,7 +5,7 @@ class User
 {
    private $userId;
    private $username;
-   private $profilePicture;
+   private $email;
    private $joinDate;
 
 
@@ -13,8 +13,14 @@ class User
     {
         $this->userId = $db_row['user_id'];
         $this->username = $db_row['username'];
-        $this->profilePicture = $db_row['email'];
+        $this->email = $db_row['email'];
         $this->joinDate =$db_row['creation_date'];
+    }
+
+
+    public function getUserId()
+    {
+        return $this->userId;
     }
 
 
@@ -36,5 +42,12 @@ class User
     {
         return $this->joinDate;
     }
+
+
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
 
 }

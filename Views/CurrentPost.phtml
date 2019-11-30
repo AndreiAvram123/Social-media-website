@@ -40,11 +40,11 @@ if ($currentPost != null) {
         </div>
     </div>
 
-    <?php
-    foreach ($currentPostComments as $comment) {
-        ?>
-        <div class="row mt-3">
-            <div class="col">
+    <div class="row mt-3">
+        <div class="col">
+            <?php
+            foreach ($currentPostComments as $comment) {
+                ?>
                 <div class="comment">
                     <div class="comment-body">
                         <span><?php echo $comment->getAuthor() ?></span>
@@ -56,20 +56,20 @@ if ($currentPost != null) {
                             <form method="post">
                                 <button type="submit" name="removeCommentButton">
                                     <i class="fas fa-trash-alt"></i></button>
-                                    <input type="hidden" name = "valueCommentID" value="<?php echo md5($comment->getCommentID()) ?>"
+                                <input type="hidden" name="valueCommentID"
+                                       value="<?php echo md5($comment->getCommentID()) ?>"
                             </form>
                             <?php
                         }
                         ?>
                     </div>
                 </div>
-            </div>
+                <?php
+            }
+            ?>
         </div>
+    </div>
 
-
-        <?php
-    }
-    ?>
     <div class="row mt-4">
         <div class="col">
             <?php

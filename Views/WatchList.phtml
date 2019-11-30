@@ -2,19 +2,19 @@
 include "Views/pageElements/Header.phtml";
 $favoritePosts = $view->favoritePosts;
 ?>
-<?php
-foreach ($favoritePosts as $post) {
-    $view->post = $post;
-    ?>
+
 
     <div class="row">
         <div class="col">
-            <?php include "Views/PostCard.phtml"; ?>
+            <?php
+            foreach ($favoritePosts as $post) {
+            $view->post = $post;
+            include "Views/PostCard.phtml";
+            }?>
         </div>
     </div>
 
     <?php
-}
  if(sizeof($favoritePosts) ==0) {
 
     ?>
