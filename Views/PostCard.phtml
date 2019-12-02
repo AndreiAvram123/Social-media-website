@@ -2,11 +2,28 @@
 $post = $view->post;
 ?>
 <div class="card mt-3 p-3">
-
+    <div>
     <h3 class="card-title text-primary">  <?php echo $post->getPostTitle() ?></h3>
+    <?php
+     //if the user is logged in and the post belongs to him
+    //let him him edit the post no matter where in the forum
+    if(isset($view->isUserLoggedIn) && $_SESSION['user_id'] === $post->getAuthorID()){
+    ?>
+    <form method="post" class="float-right">
+        <button class="icon-button"><i class="edit-icon"></i></button>
+        <input type="hidden" name="valuePostID" value="<?php
+        //it is better for security if we encrypt the post id, so
+        // users cannot change it in the inspector
+        echo md5($post->getPostID()) ?>">
+    </form>
+    <?php
+    }
+    ?>
+    </div>
     <form method="post" action="ProfilePage.php">
-        <button type="submit" class="link-button" name ="authorNameButton">Author : <?php echo $post->getAuthorName()?></button>
-        <input type="hidden" name ="authorIDValue" value="<?php echo md5($post->getAuthorID()) ?>">
+        <button type="submit" class="link-button" name="authorNameButton">Author
+            : <?php echo $post->getAuthorName() ?></button>
+        <input type="hidden" name="authorIDValue" value="<?php echo md5($post->getAuthorID()) ?>">
     </form>
     <img src="<?php echo $post->getPostImage() ?>" class="card-img-top card-image">
 

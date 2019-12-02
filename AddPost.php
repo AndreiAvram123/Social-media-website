@@ -54,9 +54,9 @@ function isImageValid()
         if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg") {
             return "Please select a valid image type from : jpg, png or jpeg";
         }
-        // Check file size > 5mb
-        if ($_FILES["fileToUpload"]["size"] > 5000000) {
-            return "The size of your image should not be bigger than 5mb";
+        // Check file size > 3mb
+        if ($_FILES["fileToUpload"]["size"] > 3000000) {
+            return "The size of your image should not be bigger than 3mb";
 
         }
         return true;

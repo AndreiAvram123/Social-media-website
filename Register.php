@@ -1,11 +1,9 @@
 <?php
 require_once "Data/SessionManager.php";
-require_once "Data/SpamSystem.php";
 $view = new stdClass();
 $view->pageTitle = "Register";
 $view ->isUserLoggedIn =isset($_SESSION['user_id']);
-$spamSystem = new SpamSystem();
-$spamSystem->generateImage();
+
 
 include "Views/Register.phtml";
 
@@ -15,6 +13,8 @@ if (isset($_POST['registerButton'])) {
     $password = $_POST['passwordInput'];
     $reenteredPassword = $_POST['confirmedPasswordInput'];
     $creationDate = date('Y/m/d');
+    //the user may not want to include a profile picture
+    //but to have a default one
     if(isset($_FILES["profilePicture"]["name"])){
         $image = $_FILES["profilePicture"]["name"];
     }else{

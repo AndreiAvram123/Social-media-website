@@ -23,7 +23,7 @@ if ($currentPost != null) {
                 if ($currentPost->getIsFavorite() === false) {
                     //if the user is logged in but the post is not added to favorite
                     ?>
-                    <form action="CurrentPost.php" method="post">
+                    <form  method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
                         <button type="submit" class="btn btn-primary btn" name="addToFavoriteButton">Add to favorites
                         </button>
                     </form>
@@ -45,25 +45,25 @@ if ($currentPost != null) {
             <?php
             foreach ($currentPostComments as $comment) {
                 ?>
-                <div class="comment">
-                    <div class="comment-body">
-                        <span><?php echo $comment->getAuthor() ?></span>
-                        <p><?php echo $comment->getCommentText(); ?></p>
-                        <?php
-                        //allow the user to remove a comment directly from the post
-                        if (isset($_SESSION['user_id']) && $comment->getCommentUserID() === $_SESSION['user_id']) {
-                            ?>
-                            <form method="post">
-                                <button type="submit" name="removeCommentButton">
-                                    <i class="fas fa-trash-alt"></i></button>
-                                <input type="hidden" name="valueCommentID"
-                                       value="<?php echo md5($comment->getCommentID()) ?>"
-                            </form>
-                            <?php
-                        }
+                <div class="comment-body mt-3">
+                    <span><strong><?php echo $comment->getAuthor() ?></strong></span>
+                    <p><?php echo $comment->getCommentText(); ?></p>
+                    <?php
+                    //allow the user to remove a comment directly from the post
+                    //but check if the user of the comment is the user logged in
+                    if (isset($_SESSION['user_id']) && $comment->getCommentUserID() === $_SESSION['user_id']) {
                         ?>
-                    </div>
+                        <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+                            <button type="submit" name="removeCommentButton" class="button-icon">
+                                <i class="delete-icon"></i></button>
+                            <input type="hidden" name="valueCommentID"
+                                   value="<?php echo md5($comment->getCommentID()) ?>">
+                        </form>
+                        <?php
+                    }
+                    ?>
                 </div>
+
                 <?php
             }
             ?>

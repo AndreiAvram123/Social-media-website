@@ -59,6 +59,9 @@ class SessionManager
         if (empty($email)) {
             return "You have not entered an email";
         }
+        if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
+            return "Your email is not valid";
+        }
         if (empty($password)) {
             return "You have not entered a password";
         }
@@ -83,12 +86,19 @@ class SessionManager
         if (empty($username)) {
             return "You have not entered an email";
         }
+        if (strlen($email) < 5) {
+            return "Your email is not long enough";
+        }
         if (empty($email)) {
             return "You have not entered an email";
+        }
+        if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
+            return "Your email is not valid";
         }
         if (empty($password)) {
             return "You have not entered a password";
         }
+        if($email)
         if (strlen($password) < 7) {
             return "Your password is not strong enough";
         }

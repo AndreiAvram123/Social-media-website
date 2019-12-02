@@ -10,11 +10,12 @@ class DataManager
     protected $_dbInstance;
     //create a singleton pattern for this as well
     private static $dataManager;
+
     public static function getInstance()
     {
-        if(self::$dataManager !==null){
+        if (self::$dataManager !== null) {
             return self::$dataManager;
-        }else{
+        } else {
             self::$dataManager = new self();
             return self::$dataManager;
         }
@@ -175,171 +176,176 @@ class DataManager
         return $commentsId;
     }
 
-public
-function getUsernameFromUserID($user_id)
-{
-    $query = "SELECT username FROM users WHERE user_id = '$user_id'";
-    $result = $this->_dbHandler->prepare($query);
-    $result->execute();
-    $row = $result->fetch();
-    return $row['username'];
-}
-
-public
-function getUserIDFromEmail($email)
-{
-    $query = "SELECT user_id FROM  users WHERE email = :email";
-    $result = $this->_dbHandler->prepare($query);
-    $result->bindValue(':email', $email);
-    $result->execute();
-    $row = $result->fetch();
-    return $row['user_id'];
-}
-
-/**
- * This function is used to search
- * for specific posts in the database
- * for a given query
- *
- * @param $searchQuery
- * @return array
- */
-public function getSearchResult($searchQuery)
-{
-    //limit the number of search result
-    //if the user pressed for example the search button
-    //without entering any text we should return
-    //a limited number of results
-    $query = "SELECT * FROM forum_posts WHERE post_title LIKE :searchQueryTitle 
-    OR post_content LIKE :searchQueryContent  LIMIT 15 ";
-    $result = $this->_dbHandler->prepare($query);
-    //use parameterized query to avoid sql injection
-    $result->bindValue(':searchQueryTitle', '%' . $searchQuery . '%');
-    $result->bindValue(':searchQueryContent', '%' . $searchQuery . '%');
-    $result->execute();
-    $posts = [];
-    while ($row = $result->fetch()) {
-        $post_author = $this->getUsernameFromUserID($row['post_author_id']);
-        $posts[] = new Post($row, $post_author);
+    public
+    function getUsernameFromUserID($user_id)
+    {
+        $query = "SELECT username FROM users WHERE user_id = '$user_id'";
+        $result = $this->_dbHandler->prepare($query);
+        $result->execute();
+        $row = $result->fetch();
+        return $row['username'];
     }
-    return $posts;
-}
 
-/**
- * This function adds a post to the favorite list
- * of a specific user
- * @param $post_id
- * @param $user_id
- */
-public
-function addPostToFavorite($post_id, $user_id)
-{
-    $query = "INSERT INTO favorite_posts VALUES (:post_id,:user_id)";
-    $result = $this->_dbHandler->prepare($query);
-    $result->bindValue(':post_id', $post_id);
-    $result->bindValue(':user_id', $user_id);
-    $result->execute();
-
-}
-
-public
-function isPostAddedToFavorite($post_id, $user_id)
-{
-    $query = "SELECT * from favorite_posts WHERE user_id = '$user_id' AND post_id = '$post_id'";
-    $result = $this->_dbHandler->prepare($query);
-    $result->execute();
-    $row = $result->fetch();
-    if ($row) {
-        return true;
-    } else {
-        return false;
+    public
+    function getUserIDFromEmail($email)
+    {
+        $query = "SELECT user_id FROM  users WHERE email = :email";
+        $result = $this->_dbHandler->prepare($query);
+        $result->bindValue(':email', $email);
+        $result->execute();
+        $row = $result->fetch();
+        return $row['user_id'];
     }
-}
+
+    /**
+     * This function is used to search
+     * for specific posts in the database
+     * for a given query
+     *
+     * @param $searchQuery
+     * @return array
+     */
+    public function getSearchResult($searchQuery)
+    {
+        //compose a query in order to search by the title, content or category
+        //the query searches in order of priorities
+        //post_title,post_content,author_name and post_category_name
+        //due to the fact that in a post we store a post_author_id
+        //we need to execute a subquery to get the authors name
+        $query = "SELECT * FROM forum_posts WHERE post_title LIKE :searchQueryTitle 
+     OR post_content LIKE :searchQueryContent OR post_author_id IN (SELECT user_id FROM users WHERE username LIKE :searchQueryAuthor)
+     OR post_category_name LIKE :searchQueryCategory LIMIT 15 ";
+
+        $result = $this->_dbHandler->prepare($query);
+        //use parameterized query to avoid sql injection
+        $result->bindValue(':searchQueryTitle', '%' . $searchQuery . '%');
+        $result->bindValue(':searchQueryContent', '%' . $searchQuery . '%');
+        $result->bindValue(':searchQueryAuthor', '%' . $searchQuery . '%');
+        $result->bindValue(':searchQueryCategory', '%' . $searchQuery . '%');
+        $result->execute();
+        $posts = [];
+        while ($row = $result->fetch()) {
+            $post_author = $this->getUsernameFromUserID($row['post_author_id']);
+            $posts[] = new Post($row, $post_author);
+        }
+        return $posts;
+    }
+
+    /**
+     * This function adds a post to the favorite list
+     * of a specific user
+     * @param $post_id
+     * @param $user_id
+     */
+    public
+    function addPostToFavorite($post_id, $user_id)
+    {
+        $query = "INSERT INTO favorite_posts VALUES (:post_id,:user_id)";
+        $result = $this->_dbHandler->prepare($query);
+        $result->bindValue(':post_id', $post_id);
+        $result->bindValue(':user_id', $user_id);
+        $result->execute();
+
+    }
+
+    public
+    function isPostAddedToFavorite($post_id, $user_id)
+    {
+        $query = "SELECT * from favorite_posts WHERE user_id = '$user_id' AND post_id = '$post_id'";
+        $result = $this->_dbHandler->prepare($query);
+        $result->execute();
+        $row = $result->fetch();
+        if ($row) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
 
-public
-function getFavoritePosts($userId)
-{
-    //get the post ids from the favorite table and then select
-    //all the posts from the posts table that have
-    //that specific id
-    $query = "SELECT * FROM forum_posts WHERE post_id IN 
+    public
+    function getFavoritePosts($userId)
+    {
+        //get the post ids from the favorite table and then select
+        //all the posts from the posts table that have
+        //that specific id
+        $query = "SELECT * FROM forum_posts WHERE post_id IN 
         (SELECT post_id from favorite_posts WHERE user_id = :userId)";
-    $result = $this->_dbHandler->prepare($query);
-    $result->bindValue(':userId', $userId);
-    $result->execute();
-    $posts = [];
-    while ($row = $result->fetch()) {
-        $username = $this->getUsernameFromUserID($row['post_author_id']);
-        $post = new Post($row, $username);
-        $post->setIsFavorite(true);
-        $posts[] = $post;
+        $result = $this->_dbHandler->prepare($query);
+        $result->bindValue(':userId', $userId);
+        $result->execute();
+        $posts = [];
+        while ($row = $result->fetch()) {
+            $username = $this->getUsernameFromUserID($row['post_author_id']);
+            $post = new Post($row, $username);
+            $post->setIsFavorite(true);
+            $posts[] = $post;
+        }
+        return $posts;
     }
-    return $posts;
-}
 
-/**
- * @param $postID
- * Use this function in order to remove a specific
- * post from the favorite list of a specific
- * user
- * @param $user_id
- */
-public
-function removePostFromFavorites($postID, $user_id)
-{
-    $query = "DELETE FROM favorite_posts WHERE user_id = '$user_id' AND 
+    /**
+     * @param $postID
+     * Use this function in order to remove a specific
+     * post from the favorite list of a specific
+     * user
+     * @param $user_id
+     */
+    public
+    function removePostFromFavorites($postID, $user_id)
+    {
+        $query = "DELETE FROM favorite_posts WHERE user_id = '$user_id' AND 
         post_id = '$postID'";
-    $result = $this->_dbHandler->prepare($query);
-    $result->execute();
-}
-
-
-public
-function getAllUserPosts($user_id)
-{
-    $query = "SELECT * FROM forum_posts WHERE post_author_id = '$user_id' LIMIT 10";
-    $result = $this->_dbHandler->prepare($query);
-    $result->execute();
-    $posts = [];
-    while ($row = $result->fetch()) {
-        $username = $this->getUsernameFromUserID($user_id);
-        $posts[] = new Post($row, $username);
+        $result = $this->_dbHandler->prepare($query);
+        $result->execute();
     }
-    return $posts;
-}
 
-public
-function removePost($postsID)
-{
-    $query = "DELETE FROM forum_posts WHERE post_id = $postsID";
-    $result = $this->_dbHandler->prepare($query);
-    $result->execute();
 
-}
-
-public
-function usernameExists($username)
-{
-    $query = "SELECT user_id FROM users WHERE username = :username";
-    $result = $this->_dbHandler->prepare($query);
-    $result->bindValue(':username', $username);
-    $result->execute();
-    $row = $result->fetch();
-    if ($row) {
-        return true;
-    } else {
-        return false;
+    public
+    function getAllUserPosts($user_id)
+    {
+        $query = "SELECT * FROM forum_posts WHERE post_author_id = '$user_id' LIMIT 10";
+        $result = $this->_dbHandler->prepare($query);
+        $result->execute();
+        $posts = [];
+        while ($row = $result->fetch()) {
+            $username = $this->getUsernameFromUserID($user_id);
+            $posts[] = new Post($row, $username);
+        }
+        return $posts;
     }
-}
 
-public
-function deleteComment($commentID)
-{
-    $query = "DELETE FROM comments WHERE comment_id = '$commentID'";
-    $result = $this->_dbHandler->prepare($query);
-    $result->execute();
-}
+    public
+    function removePost($postsID)
+    {
+        $query = "DELETE FROM forum_posts WHERE post_id = $postsID";
+        $result = $this->_dbHandler->prepare($query);
+        $result->execute();
+
+    }
+
+    public
+    function usernameExists($username)
+    {
+        $query = "SELECT user_id FROM users WHERE username = :username";
+        $result = $this->_dbHandler->prepare($query);
+        $result->bindValue(':username', $username);
+        $result->execute();
+        $row = $result->fetch();
+        if ($row) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public
+    function deleteComment($commentID)
+    {
+        $query = "DELETE FROM comments WHERE comment_id = '$commentID'";
+        $result = $this->_dbHandler->prepare($query);
+        $result->execute();
+    }
 
     public function getNumberOfPages()
     {
@@ -363,8 +369,8 @@ function deleteComment($commentID)
         $query = "SELECT user_id FROM users";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
-        $userIds=[];
-        while($row = $result->fetch()){
+        $userIds = [];
+        while ($row = $result->fetch()) {
             $userIds[] = $row['user_id'];
         }
         return $userIds;
@@ -376,8 +382,35 @@ function deleteComment($commentID)
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         $row = $result->fetch();
-
         return new User($row);
+    }
+
+    public function addToFriendList($currentUserId, $userId)
+    {
+        $query = "INSERT INTO friends VALUES ('$currentUserId','$userId')";
+        $result = $this->_dbHandler->prepare($query);
+        $result->execute();
+    }
+
+    public function getAllFriends($user_id)
+    {
+        $query = "SELECT * FROM users WHERE user_id IN 
+        (SELECT user2_id from friends WHERE user1_id = '$user_id')";
+        $result = $this->_dbHandler->prepare($query);
+        $result->execute();
+        $friends = [];
+        while ($row = $result->fetch()) {
+            $friends[] = new User($row);
+        }
+        return $friends;
+    }
+
+    public function removeFriend($user_id, $friendId)
+    {
+        $query = "DELETE FROM friends WHERE user1_id ='$user_id' AND user2_id = '$friendId'";
+        $result = $this->_dbHandler->prepare($query);
+        $result->execute();
+
     }
 
 
