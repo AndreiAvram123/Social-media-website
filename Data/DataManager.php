@@ -82,8 +82,9 @@ class DataManager
         $result->execute();
     }
 
-    public function uploadImage($target_file, $target_dir)
+    public function uploadImageToServer($target_file)
     {
+        $target_dir = "images/";
         $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
         //once you encrypt the image, the algorithm will also encrypt
         //the file extension. That's why I need to add it as well
@@ -413,5 +414,39 @@ class DataManager
 
     }
 
+    public function changePostTitle($postID,$postTitle)
+    {
+        $query = "UPDATE forum_posts SET post_title = :postTitle WHERE post_id = :postId";
+        $result = $this->_dbHandler->prepare($query);
+        $result->bindValue(':postTitle', $postTitle);
+        $result->bindValue(':postId',$postID);
+        $result->execute();
+    }
+    public function changePostContent($postID,$postContent)
+    {
+        $query = "UPDATE forum_posts SET post_content = :postContent WHERE post_id = :postId";
+        $result = $this->_dbHandler->prepare($query);
+        $result->bindValue(':postContent', $postContent);
+        $result->bindValue(':postId',$postID);
+        $result->execute();
+    }
+    public function changePostCategory($postID,$postCategory)
+    {
+        $query = "UPDATE forum_posts SET post_category_name = :postCategoryName WHERE post_id = :postId";
+        $result = $this->_dbHandler->prepare($query);
+        $result->bindValue('postCategoryName', $postCategory);
+        $result->bindValue(':postId',$postID);
+        $result->execute();
+    }
+    public function changePostImage($postID,$postImage,$oldPostImage)
+    {
+        $query = "UPDATE forum_posts SET post_image = :postImage WHERE post_id = :postId";
+        $result = $this->_dbHandler->prepare($query);
+        $result->bindValue('postImage', $postImage);
+        $result->bindValue(':postId',$postID);
+        $result->execute();
+        //delete old image from the server
+        //todo
+    }
 
 }

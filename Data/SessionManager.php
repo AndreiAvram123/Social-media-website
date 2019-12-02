@@ -73,7 +73,7 @@ class SessionManager
         $databaseHandler = DataManager::getInstance();
         $check = $this->checkRegisterCredentials($username, $email, $password, $image);
         if ($check === true) {
-            $imageLocation = $databaseHandler->uploadImage($image, "images/");
+            $imageLocation = $databaseHandler->uploadImageToServer($image, "images/");
             $databaseHandler->createUser($username, $email, $password, $creationDate, $imageLocation);
             return true;
         } else {

@@ -49,8 +49,7 @@ if($currentPostID==null) {
     from the forum!!!";
 }else {
     $view->currentPost = $dbHandler->getPostById($currentPostID);
-
-    $view->postBelongsToUser = true;
+ //   $view->postBelongsToUser = true;
 
     if ($view->isUserLoggedIn) {
         if ($_SESSION['user_id'] !== $view->currentPost->getAuthorID()) {

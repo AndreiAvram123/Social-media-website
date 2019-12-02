@@ -9,8 +9,8 @@ $post = $view->post;
     //let him him edit the post no matter where in the forum
     if(isset($view->isUserLoggedIn) && $_SESSION['user_id'] === $post->getAuthorID()){
     ?>
-    <form method="post" class="float-right">
-        <button class="icon-button"><i class="edit-icon"></i></button>
+    <form method="get" action="EditPost.php" class="float-right" >
+        <button class="icon-button" type="submit"><i class="edit-icon"></i></button>
         <input type="hidden" name="valuePostID" value="<?php
         //it is better for security if we encrypt the post id, so
         // users cannot change it in the inspector

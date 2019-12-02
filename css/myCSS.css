@@ -114,6 +114,7 @@
     cursor: pointer; /* Mouse pointer on hover */
 }
 
+
 @media (min-width: 992px) {
     .card {
         width: 50vw;

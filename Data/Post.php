@@ -40,7 +40,7 @@ class Post
     }
 
 
-    public function getPostCategoryName()
+    public function getCategoryName()
     {
         return $this->postCategoryName;
     }

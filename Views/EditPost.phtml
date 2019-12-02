@@ -1,0 +1,73 @@
+<?php include "Views/pageElements/Header.phtml";
+
+$currentPost = $view->currentPost;
+
+if (isset($view->warningMessage)) {
+    include "Modals/WarningModal.phtml";
+    echo "<script>$('#warningModal').modal('show')</script>";
+}
+if($currentPost!==null) {
+    ?>
+    <div class="row mt-4">
+        <div class="col">
+            <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>" enctype="multipart/form-data">
+                <input type="hidden" name="postID" value="<?php echo md5($currentPost->getPostID()) ?>">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Title</span>
+                    </div>
+                    <input type="text" class="form-control" name="postTitle"
+                           value="<?php echo $currentPost->getPostTitle() ?>"
+                           aria-label="post-title" aria-describedby="basic-addon1">
+                </div>
+                <div>
+                    <img src="<?php echo $currentPost->getPostImage() ?>" class="card-img-top">
+                    <div class="mt-5">
+                        <label>Select another picture</label>
+                        <div class="custom-file mt-2">
+                            <input type="file" name="fileToUpload" id="fileToUpload">
+                        </div>
+                    </div>
+                </div>
+                <div class="input-group mt-4">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Category</span>
+                    </div>
+                    <select class="custom-select" name="postCategory">
+                        <?php
+                        foreach ($view->categories as $category) {
+                            if ($category === $currentPost->getCategoryName()) {
+                                echo '<option selected="selected">' . $category . '</option>';
+                            } else {
+                                echo '<option>' . $category . '</option>';
+                            }
+                        }
+                        ?>
+                    </select>
+                </div>
+
+                <div class="input-group mt-5">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Content</span>
+                    </div>
+                    <textarea class="form-control" rows="8" name="postContent"
+                              aria-label="With textarea"><?php echo $currentPost->getPostContent() ?></textarea>
+                </div>
+
+                <div class="mt-5 mb-4">
+                    <button type="submit" name="saveChangesButton" class="btn btn-success btn-block">Save changes
+                    </button>
+                    <button type="submit" name="cancelChangesButton" class="btn btn-danger btn-block">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+
+    </div>
+    <?php
+}
+?>
+
+</div>
+</body>
+</html>

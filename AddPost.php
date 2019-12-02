@@ -1,11 +1,12 @@
 <?php
 session_start();
 require_once "Data/DataManager.php";
-
+require_once "Data/Validator.php";
 $view = new stdClass();
 $view->pageTitle = "AddPost";
 $view ->isUserLoggedIn = isset($_SESSION['user_id']);
 $dbManager = DataManager::getInstance();
+$validator = new Validator();
 $view->categories = $dbManager->getAllCategories();
 
 //handle added post
@@ -15,11 +16,12 @@ if (isset($_POST["addPostButton"])) {
     $postCategoryName = $_POST["postCategory"];
     $postContent = $_POST["postContent"];
     $postDate = date('Y-m-d H:i:s');
+    $postImage = $_FILES["fileToUpload"]["name"];
     //returns true if valid
     //else returns error message
-    $result = arePostDetailsValid();
+    $result = $validator->arePostDetailsValid($postTitle,$postContent,$postImage);
     if($result === true) {
-            $serverImageLocation = $databaseHandler->uploadImage($_FILES["fileToUpload"]["name"], "images/");
+            $serverImageLocation = $databaseHandler->uploadImageToServer($postImage);
             $databaseHandler->uploadPost($_SESSION['user_id'],
                 $postTitle, $postContent, $postCategoryName, $postDate, $serverImageLocation);
             $view->warningMessage = "You successfully added your post :). Go to main page to check it.";
@@ -28,39 +30,5 @@ if (isset($_POST["addPostButton"])) {
     }
 }
 
-function arePostDetailsValid()
-{
-    if(empty($postTitle)){
-        return "Please include a title for your post";
-    }
-    if(empty($postContent)){
-        return "Please include a title for your post";
-    }
-    return isImageValid();
-}
-function isImageValid()
-{
-    if (empty($image_path)) {
-        return "Please select an image";
-    }
-        $imageFileType = strtolower(pathinfo($image_path, PATHINFO_EXTENSION));
-        //use the function getimagesize() to check if the image is real or not
-        $check = getimagesize($_FILES["fileToUpload"]["tmp_name"]);
-        if ($check === false) {
-            //image not real
-            return "Please select an image";
-        }
-
-        if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg") {
-            return "Please select a valid image type from : jpg, png or jpeg";
-        }
-        // Check file size > 3mb
-        if ($_FILES["fileToUpload"]["size"] > 3000000) {
-            return "The size of your image should not be bigger than 3mb";
-
-        }
-        return true;
-
-}
 include "Views/AddPost.phtml";
 ?>
