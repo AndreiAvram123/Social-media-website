@@ -15,7 +15,8 @@ if ($currentPost != null) {
 
     <div class="row mt-4">
         <div class="col">
-            <h1 class="text-center"> <?php echo $currentPost->getPostTitle() ?></h1>
+            <h1 class="text-center title-post"> <?php echo $currentPost->getPostTitle() ?></h1>
+            <h3 class="text-center">Category : <?php echo $currentPost-> getCategoryName()?></h3>
             <img src="<?php echo $currentPost->getPostImage() ?>" class="img-fluid mx-auto d-block">
             <p class="post-text mt-5"> <?php echo $currentPost->getPostContent(); ?> </p>
             <?php
@@ -46,10 +47,13 @@ if ($currentPost != null) {
             <?php
             foreach ($currentPostComments as $comment) {
                 ?>
-                <div class="comment-body mt-3">
-                    <span><strong><?php echo $comment->getAuthor() ?></strong></span>
+                <div class="comment-body mt-3 clearfix">
+                    <span><?php echo $comment->getAuthor() ?></span>
                     <p><?php echo $comment->getCommentText(); ?></p>
-                    <?php
+                    <div>
+                    <span class="float-right"><?php echo $comment->getCommentDate() ?></span>
+                    </div>
+                        <?php
                     //allow the user to remove a comment directly from the post
                     //but check if the user of the comment is the user logged in
                     if (isset($_SESSION['user_id']) && $comment->getCommentUserID() === $_SESSION['user_id']) {

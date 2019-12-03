@@ -74,8 +74,8 @@ class SessionManager
         $check = $this->checkRegisterCredentials($username, $email, $password, $image);
         if ($check === true) {
             $imageLocation = null;
-            if($image!==null) {
-                $imageLocation = $databaseHandler->uploadImageToServer($imageLocation, "images/users/");
+            if(!empty($image)) {
+                $imageLocation = $databaseHandler->uploadImageToServer($image, $_FILES["profilePicture"]["tmp_name"],"images/users/");
             }
             //the user will have a default image is he does not choose one
             $databaseHandler->createUser($username, $email, $password, $creationDate, $imageLocation);

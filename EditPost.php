@@ -57,8 +57,8 @@ if (isset($_POST['saveChangesButton'])) {
             if($postImage ===null) {
                 $valid = $validator->isImageValid($_FILES["fileToUpload"]["name"]);
                 if ($valid === true) {
-                    $imageLocation = $dataManager->uploadImageToServer($_FILES["fileToUpload"]["name"]);
-                    $dataManager->changePostImage($post->getPostID(), $imageLocation, $post->getPostImage());
+                    $imageLocation = $dataManager->uploadImageToServer($_FILES["fileToUpload"]["name"],$_FILES["fileToUpload"]["tmp"],"images/posts");
+                    $dataManager->changePostImage($post->getPostID(), $imageLocation);
                 }
             }
         }

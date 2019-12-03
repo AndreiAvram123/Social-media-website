@@ -20,7 +20,7 @@ for ($i=1;$i<= $view ->numberOfPages;$i++){
         if($i>=1 && $i<=$view->numberOfPages){
             //as an example ,for the first
             //page we will have an offset of 0 posts
-          $postsOffset = ($i-1)*10;
+          $postsOffset = ($i-1)*DataManager::$postPerPage;
         }
     }
 }

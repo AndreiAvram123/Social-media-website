@@ -13,11 +13,7 @@ if (isset($_POST['registerButton'])) {
     $creationDate = date('Y-m-d H:i:s');
     //the user may not want to include a profile picture
     //but to have a default one
-    if (!empty($_FILES["profilePicture"]["name"])) {
-        $image = $_FILES["profilePicture"]["name"];
-    } else {
-        $image = null;
-    }
+    $image = $_FILES["profilePicture"]["name"];
     $result = SessionManager::getInstance()->createUser($username, $email, $password, $image, $creationDate);
     if ($result === true) {
         $view->warningMessage = "You successfully created your account ! Go to login page now.";

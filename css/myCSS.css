@@ -25,7 +25,9 @@
 .text-area {
     resize: none;
 }
-
+.title-post{
+    color:#007BFF;
+}
 .float {
     position: fixed;
     width: 60px;
@@ -55,9 +57,16 @@
 
 
 .comment-body {
-    padding: 20px;
+    padding: 10px 20px;
     background: #F1EEEE;
 
+}
+.comment-body p{
+    margin-top: 10px;
+}
+.comment-body span{
+    color: #0079BF;
+    font-weight: bold;
 }
 
 .card {

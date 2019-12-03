@@ -6,11 +6,11 @@ $view->pageTitle = "Profile";
 $view ->isUserLoggedIn = isset($_SESSION['user_id']);
 $dbManger = DataManager::getInstance();
 
-if(isset($_POST['authorNameButton'])){
-    $encryptedUserID = $_POST['authorIDValue'];
+if(isset($_GET['profileButton'])){
+    $encryptedUserID = $_GET['authorIDValue'];
     foreach ($dbManger ->getAllUsersId() as $userId){
         if($encryptedUserID === md5($userId)){
-            //store the user id
+
             $view->currentUser = $dbManger->getUserById($userId);
             $view->userPosts = $dbManger ->getAllUserPosts($userId);
         }

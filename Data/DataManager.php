@@ -10,6 +10,7 @@ class DataManager
     protected $_dbInstance;
     //create a singleton pattern for this as well
     private static $dataManager;
+    public static $postPerPage = 10;
 
     public static function getInstance()
     {
@@ -32,7 +33,8 @@ class DataManager
     {
         //Get the posts in chronological order
         //and in order of pagination
-        $query = "SELECT * FROM forum_posts ORDER BY post_date DESC  LIMIT 10  OFFSET $offset";
+        $postPerPage = self::$postPerPage;
+        $query = "SELECT * FROM forum_posts ORDER BY post_date DESC  LIMIT $postPerPage  OFFSET $offset";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         $posts = [];
@@ -82,29 +84,37 @@ class DataManager
         $result->execute();
     }
 
-    public function createUser($username, $email, $password, $creationDate, $image)
+    public function createUser($username, $email, $password, $creationDate, $imageLocation)
     {
         $encryptedPassword = md5($password);
-//        $query = "INSERT INTO users (user_id,username, email, password, creation_date)
-//VALUES (NULL,'$username','$email','$encryptedPassword','$creationDate')";
-        $query = "INSERT INTO users (user_id,username, email, password, creation_date)
+        if ($imageLocation === null) {
+            $query = "INSERT INTO users (user_id,username, email, password, creation_date)
 VALUES (NULL,?,?,?,?)";
+        } else {
+            $query = "INSERT INTO users (user_id,username, email, password, creation_date,profile_picture)
+VALUES (NULL,?,?,?,?,?)";
+
+        }
         $result = $this->_dbHandler->prepare($query);
-        $result->bindParam(1,$username);
-        $result->bindParam(2,$email);
-        $result->bindParam(3,$encryptedPassword);
-        $result->bindParam(4,$creationDate);
+        $result->bindParam(1, $username);
+        $result->bindParam(2, $email);
+        $result->bindParam(3, $encryptedPassword);
+        $result->bindParam(4, $creationDate);
+        if($imageLocation!==null){
+            $result->bindParam(5,$imageLocation);
+        }
         $result->execute();
 
     }
 
-    public function uploadImageToServer($target_file, $target_dir)
+    public function uploadImageToServer($target_file,$tempName, $target_dir)
     {
         $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
         //once you encrypt the image, the algorithm will also encrypt
         //the file extension. That's why I need to add it as well
         $targetLocation = $target_dir . md5($target_file) . '.' . $imageFileType;
-        move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $targetLocation);
+        //$_FILES["fileToUpload"]["tmp_name"]
+        move_uploaded_file($tempName, $targetLocation);
         return $targetLocation;
     }
 
@@ -131,16 +141,15 @@ VALUES (NULL,?,?,?,?)";
         return new Post($row, $username);
     }
 
-    public function uploadComment($comment_user_id, $comment_post_id, $comment_text, $comment_date, $comment_likes)
+    public function uploadComment($comment_user_id, $comment_post_id, $comment_text, $comment_date)
     {
         $query = "INSERT INTO comments VALUES(NULL,:commentUserID,:commentPostID
-,:commentText,:commentDate,:commentLikes)";
+,:commentText,:commentDate)";
         $result = $this->_dbHandler->prepare($query);
         $result->bindValue(':commentUserID', $comment_user_id);
         $result->bindValue(':commentPostID', $comment_post_id);
         $result->bindValue(':commentText', $comment_text);
         $result->bindValue(':commentDate', $comment_date);
-        $result->bindValue(':commentLikes', $comment_likes);
         $result->execute();
     }
 
@@ -181,8 +190,7 @@ VALUES (NULL,?,?,?,?)";
         return $row['username'];
     }
 
-    public
-    function getUserIDFromEmail($email)
+    public function getUserIDFromEmail($email)
     {
         $query = "SELECT user_id FROM  users WHERE email = :email";
         $result = $this->_dbHandler->prepare($query);
@@ -243,18 +251,13 @@ VALUES (NULL,?,?,?,?)";
 
     }
 
-    public
-    function isPostAddedToFavorite($post_id, $user_id)
+    public function isPostAddedToFavorite($post_id, $user_id)
     {
         $query = "SELECT * from favorite_posts WHERE user_id = '$user_id' AND post_id = '$post_id'";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         $row = $result->fetch();
-        if ($row) {
-            return true;
-        } else {
-            return false;
-        }
+        return $row!=null;
     }
 
 
@@ -327,11 +330,7 @@ VALUES (NULL,?,?,?,?)";
         $result->bindValue(':username', $username);
         $result->execute();
         $row = $result->fetch();
-        if ($row) {
-            return true;
-        } else {
-            return false;
-        }
+        return $row!=null;
     }
 
     public
@@ -352,10 +351,10 @@ VALUES (NULL,?,?,?,?)";
         //I chose to display 10 posts per page
         //If the number is multiple of 10 just return the value
         //Otherwise divide it by 10 and then add 1
-        if ($totalPosts % 10 == 0) {
-            return $totalPosts / 10;
+        if ($totalPosts % self::$postPerPage == 0) {
+            return $totalPosts / self::$postPerPage;
         } else {
-            return $totalPosts / 10 + 1;
+            return $totalPosts / self::$postPerPage + 1;
         }
     }
 
@@ -435,7 +434,7 @@ VALUES (NULL,?,?,?,?)";
         $result->execute();
     }
 
-    public function changePostImage($postID, $postImage, $oldPostImage)
+    public function changePostImage($postID, $postImage)
     {
         $query = "UPDATE forum_posts SET post_image = :postImage WHERE post_id = :postId";
         $result = $this->_dbHandler->prepare($query);
@@ -452,11 +451,7 @@ VALUES (NULL,?,?,?,?)";
         $result->bindValue(':email', $email);
         $result->execute();
         $row = $result->fetch();
-        if ($row) {
-            return true;
-        } else {
-            return false;
-        }
+        return $row!=null;
     }
 
 }

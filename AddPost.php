@@ -21,7 +21,7 @@ if (isset($_POST["addPostButton"])) {
     //else returns error message
     $result = $validator->arePostDetailsValid($postTitle,$postContent,$postImage);
     if($result === true) {
-            $serverImageLocation = $databaseHandler->uploadImageToServer($postImage,"images/posts/");
+            $serverImageLocation = $databaseHandler->uploadImageToServer($postImage,$_FILES["fileToUpload"]["tmp_name"],"images/posts/");
             $databaseHandler->uploadPost($_SESSION['user_id'],
                 $postTitle, $postContent, $postCategoryName, $postDate, $serverImageLocation);
             $view->warningMessage = "You successfully added your post :). Go to main page to check it.";
