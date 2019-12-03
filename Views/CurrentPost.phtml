@@ -5,6 +5,7 @@ $currentPost = $view->currentPost;
 
 if (isset($view->warningMessage)) {
     include "Modals/WarningModal.phtml";
+    echo "<script>$('#warningModal').modal('show')</script>";
 }
 //if the currentPost is null
 //then the user must have modified a value in the inspector

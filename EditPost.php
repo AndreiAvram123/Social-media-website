@@ -51,10 +51,16 @@ if (isset($_POST['saveChangesButton'])) {
     }
     if ($valid === true) {
         $postImage = $_FILES["fileToUpload"]["name"];
-        $valid = $validator->isImageValid($_FILES["fileToUpload"]["name"]);
-        if ($valid === true) {
-            $imageLocation = $dataManager->uploadImageToServer($_FILES["fileToUpload"]["name"]);
-            $dataManager->changePostImage($post->getPostID(), $imageLocation, $post->getPostImage());
+        if(!empty($postImage)){
+
+            //check if the user selected an image
+            if($postImage ===null) {
+                $valid = $validator->isImageValid($_FILES["fileToUpload"]["name"]);
+                if ($valid === true) {
+                    $imageLocation = $dataManager->uploadImageToServer($_FILES["fileToUpload"]["name"]);
+                    $dataManager->changePostImage($post->getPostID(), $imageLocation, $post->getPostImage());
+                }
+            }
         }
 
 

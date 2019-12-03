@@ -7,7 +7,7 @@ class User
    private $username;
    private $email;
    private $joinDate;
-
+   private $profilePicture;
 
     public function __construct($db_row)
     {
@@ -15,6 +15,7 @@ class User
         $this->username = $db_row['username'];
         $this->email = $db_row['email'];
         $this->joinDate =$db_row['creation_date'];
+        $this->profilePicture = $db_row['profile_picture'];
     }
 
 
@@ -23,7 +24,9 @@ class User
         return $this->userId;
     }
 
-
+    public function getProfilePicture(){
+        return $this->profilePicture;
+    }
 
 
     public function getUsername()
@@ -31,11 +34,6 @@ class User
         return $this->username;
     }
 
-
-    public function getProfilePicture()
-    {
-        return $this->profilePicture;
-    }
 
 
     public function getJoinDate()

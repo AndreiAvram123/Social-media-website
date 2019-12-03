@@ -1,5 +1,4 @@
 <?php include_once "Views/pageElements/Header.phtml";
-     include_once  "Data/SpamSystem.php";
 ?>
 <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
     <!-- Username field -->
@@ -57,12 +56,9 @@
             </div>
             <?php
         }else{
-            if(isset($view->showSuccessAlert)) {
-                ?>
-                <div class="alert alert-primary mt-3" role="alert">
-                    You have successfully create your account! Go to login page now.
-                </div>
-                <?php
+            if(isset($view->warningMessage)){
+                include_once "Modals/WarningModal.phtml";
+                echo "<script>$('#warningModal').modal('show')</script>";
             }
         }
         ?>

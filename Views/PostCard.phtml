@@ -7,7 +7,7 @@ $post = $view->post;
     <?php
      //if the user is logged in and the post belongs to him
     //let him him edit the post no matter where in the forum
-    if(isset($view->isUserLoggedIn) && $_SESSION['user_id'] === $post->getAuthorID()){
+    if($view->isUserLoggedIn && $_SESSION['user_id'] === $post->getAuthorID()){
     ?>
     <form method="get" action="EditPost.php" class="float-right" >
         <button class="icon-button" type="submit"><i class="edit-icon"></i></button>

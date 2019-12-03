@@ -8,7 +8,6 @@ class Comment
     private $comment_post_id;
     private $comment_text;
     private $comment_date;
-    private $comment_likes;
     private $author;
 
     /**
@@ -23,7 +22,6 @@ class Comment
       $this->comment_post_id = $databaseRow['comment_post_id'];
       $this->comment_text = $databaseRow['comment_text'];
       $this->comment_date = $databaseRow['comment_date'];
-      $this->comment_likes = $databaseRow['comment_likes'];
       $this->author = $author;
     }
 
@@ -65,11 +63,6 @@ class Comment
         return $this->comment_date;
     }
 
-
-    public function getCommentLikes()
-    {
-        return $this->comment_likes;
-    }
 
 
 }

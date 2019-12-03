@@ -73,7 +73,11 @@ class SessionManager
         $databaseHandler = DataManager::getInstance();
         $check = $this->checkRegisterCredentials($username, $email, $password, $image);
         if ($check === true) {
-            $imageLocation = $databaseHandler->uploadImageToServer($image, "images/");
+            $imageLocation = null;
+            if($image!==null) {
+                $imageLocation = $databaseHandler->uploadImageToServer($imageLocation, "images/users/");
+            }
+            //the user will have a default image is he does not choose one
             $databaseHandler->createUser($username, $email, $password, $creationDate, $imageLocation);
             return true;
         } else {
@@ -104,6 +108,9 @@ class SessionManager
         }
         if ($this->_dbManager->usernameExists($username)) {
             return "The username already exists";
+        }
+        if($this->_dbManager->emailExists($email)){
+            return "Email already used";
         }
         if (!is_null($image)) {
             return $this->isImageValid($image);

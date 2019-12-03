@@ -78,13 +78,28 @@ class DataManager
         $result->bindValue(':postContent', $postContent);
         $result->bindValue(':postCategoryName', $postCategoryName);
         $result->bindValue(':postDate', $postDate);
-        $result->bindValue(':serverImageLocation', $serverImageLocation);
+        $result->bindValue(':imageLocation', $serverImageLocation);
         $result->execute();
     }
 
-    public function uploadImageToServer($target_file)
+    public function createUser($username, $email, $password, $creationDate, $image)
     {
-        $target_dir = "images/";
+        $encryptedPassword = md5($password);
+//        $query = "INSERT INTO users (user_id,username, email, password, creation_date)
+//VALUES (NULL,'$username','$email','$encryptedPassword','$creationDate')";
+        $query = "INSERT INTO users (user_id,username, email, password, creation_date)
+VALUES (NULL,?,?,?,?)";
+        $result = $this->_dbHandler->prepare($query);
+        $result->bindParam(1,$username);
+        $result->bindParam(2,$email);
+        $result->bindParam(3,$encryptedPassword);
+        $result->bindParam(4,$creationDate);
+        $result->execute();
+
+    }
+
+    public function uploadImageToServer($target_file, $target_dir)
+    {
         $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
         //once you encrypt the image, the algorithm will also encrypt
         //the file extension. That's why I need to add it as well
@@ -93,27 +108,6 @@ class DataManager
         return $targetLocation;
     }
 
-
-    public function createUser($username, $email, $password, $creationDate, $image)
-    {
-        $encryptedPassword = md5($password);
-        if (!is_null($image)) {
-            $query = "INSERT INTO users VALUES (NULL,:username,:email,:encryptedPassword,:creationDate,:profilePicture)";
-        } else {
-            $query = "INSERT INTO users VALUES (NULL,:username,:email,:encryptedPassword,:creationDate)";
-        }
-        $result = $this->_dbHandler->prepare($query);
-        $result->bindValue(':username', $username);
-        $result->bindValue(':email', $email);
-        $result->bindValue(':encryptedPassword', $encryptedPassword);
-        $result->bindValue(':creationDate', $creationDate);
-        if (!is_null()) {
-            $result->bindValue(':profilePicture', $image);
-        }
-        $result->execute();
-
-        $result->execute();
-    }
 
     public function getAllPostsIDs()
     {
@@ -414,39 +408,55 @@ class DataManager
 
     }
 
-    public function changePostTitle($postID,$postTitle)
+    public function changePostTitle($postID, $postTitle)
     {
         $query = "UPDATE forum_posts SET post_title = :postTitle WHERE post_id = :postId";
         $result = $this->_dbHandler->prepare($query);
         $result->bindValue(':postTitle', $postTitle);
-        $result->bindValue(':postId',$postID);
+        $result->bindValue(':postId', $postID);
         $result->execute();
     }
-    public function changePostContent($postID,$postContent)
+
+    public function changePostContent($postID, $postContent)
     {
         $query = "UPDATE forum_posts SET post_content = :postContent WHERE post_id = :postId";
         $result = $this->_dbHandler->prepare($query);
         $result->bindValue(':postContent', $postContent);
-        $result->bindValue(':postId',$postID);
+        $result->bindValue(':postId', $postID);
         $result->execute();
     }
-    public function changePostCategory($postID,$postCategory)
+
+    public function changePostCategory($postID, $postCategory)
     {
         $query = "UPDATE forum_posts SET post_category_name = :postCategoryName WHERE post_id = :postId";
         $result = $this->_dbHandler->prepare($query);
         $result->bindValue('postCategoryName', $postCategory);
-        $result->bindValue(':postId',$postID);
+        $result->bindValue(':postId', $postID);
         $result->execute();
     }
-    public function changePostImage($postID,$postImage,$oldPostImage)
+
+    public function changePostImage($postID, $postImage, $oldPostImage)
     {
         $query = "UPDATE forum_posts SET post_image = :postImage WHERE post_id = :postId";
         $result = $this->_dbHandler->prepare($query);
         $result->bindValue('postImage', $postImage);
-        $result->bindValue(':postId',$postID);
+        $result->bindValue(':postId', $postID);
         $result->execute();
-        //delete old image from the server
-        //todo
+
+    }
+
+    public function emailExists($email)
+    {
+        $query = "SELECT user_id FROM users WHERE email = :email";
+        $result = $this->_dbHandler->prepare($query);
+        $result->bindValue(':email', $email);
+        $result->execute();
+        $row = $result->fetch();
+        if ($row) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }
