@@ -6,7 +6,7 @@ $view = new stdClass();
 $view->isUserLoggedIn = isset($_SESSION['user_id']);
 $view->pageTitle = "Edit post";
 $dataManager = DataManager::getInstance();
-
+$view->categories = $dataManager->getAllCategories();
 $currentPostID = null;
 //handle the situation when an user presses save changes button
 if (isset($_POST['saveChangesButton'])) {
@@ -92,7 +92,6 @@ if (isset($_GET['valuePostID'])) {
 
 if ($currentPostID != null) {
     $view->currentPost = $dataManager->getPostById($currentPostID);
-    $view->categories = $dataManager->getAllCategories();
 } else {
     //the $currentPostID will only be null if the
     //use changed values in the inspector

@@ -3,8 +3,8 @@ session_start();
 require_once "Data/DataManager.php";
 $view = new stdClass();
 $view->pageTitle = "Home";
-$view ->isUserLoggedIn = isset($_SESSION['user_id']);
 $dbManager = DataManager::getInstance();
+$view->categories = $dbManager->getAllCategories();
 if(isset($_POST['addToFriendsButton'])){
     $userIDEncrypted = $_POST['userIdValue'];
     foreach ($dbManager->getAllUsersId() as $userID){

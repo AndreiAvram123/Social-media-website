@@ -5,7 +5,7 @@ $view = new stdClass();
 $view->pageTitle = "OpenedPost";
 $view->isUserLoggedIn = isset($_SESSION['user_id']);
 $dbHandler = DataManager::getInstance();
-
+$view->categories = $dbHandler->getAllCategories();
 
 //check if the user has pressed the add to favorite button
 if (isset($_POST['addToFavoriteButton'])) {

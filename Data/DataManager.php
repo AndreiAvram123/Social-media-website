@@ -29,20 +29,22 @@ class DataManager
         $this->_dbHandler = $this->_dbInstance->getDatabaseConnection();
     }
 
-    public function getPosts($offset)
-    {
+    public function getPosts($page)
+    {     $offset = ($page-1) * self::$postPerPage;
         //Get the posts in chronological order
         //and in order of pagination
-        $postPerPage = self::$postPerPage;
-        $query = "SELECT * FROM forum_posts ORDER BY post_date DESC  LIMIT $postPerPage  OFFSET $offset";
+          $postPerPage = self::$postPerPage;
+        //get the username dynamically from the user id using a join
+        $query = "SELECT forum_posts.post_id, post_author_id, post_title, post_content, post_category_name, post_date, post_image, username
+ FROM forum_posts INNER JOIN users ON users.user_id = forum_posts.post_author_id 
+ ORDER BY post_date DESC LIMIT $postPerPage OFFSET $offset";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         $posts = [];
         while ($row = $result->fetch()) {
-            $author_name = $this->getUsernameFromUserID($row['post_author_id']);
             //limit the amount of text on the main page
             $row['post_content'] = substr($row['post_content'], 1, 700);
-            $posts[] = new Post($row, $author_name);
+            $posts[] = new Post($row);
         }
         return $posts;
     }
@@ -100,14 +102,14 @@ VALUES (NULL,?,?,?,?,?)";
         $result->bindParam(2, $email);
         $result->bindParam(3, $encryptedPassword);
         $result->bindParam(4, $creationDate);
-        if($imageLocation!==null){
-            $result->bindParam(5,$imageLocation);
+        if ($imageLocation !== null) {
+            $result->bindParam(5, $imageLocation);
         }
         $result->execute();
 
     }
 
-    public function uploadImageToServer($target_file,$tempName, $target_dir)
+    public function uploadImageToServer($target_file, $tempName, $target_dir)
     {
         $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
         //once you encrypt the image, the algorithm will also encrypt
@@ -133,12 +135,14 @@ VALUES (NULL,?,?,?,?,?)";
 
     public function getPostById($postId)
     {
-        $query = "SELECT * FROM forum_posts WHERE post_id ='$postId'";
+         $query = "SELECT post_id, post_author_id, post_title, post_content, post_category_name, post_date, post_image,users.username
+         FROM forum_posts
+         INNER JOIN users ON user_id = post_author_id
+         WHERE post_id ='$postId'";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         $row = $result->fetch();
-        $username = $this->getUsernameFromUserID($row['post_author_id']);
-        return new Post($row, $username);
+        return new Post($row);
     }
 
     public function uploadComment($comment_user_id, $comment_post_id, $comment_text, $comment_date)
@@ -155,15 +159,14 @@ VALUES (NULL,?,?,?,?,?)";
 
     public function getCommentsForPost($postID)
     {
-        $query = "SELECT * FROM comments WHERE comment_post_id = '$postID'";
+        $query = "SELECT comment_id, comment_user_id, comment_post_id, comment_text, comment_date, user_id, username, email, password, creation_date, profile_picture ,username
+FROM comments  INNER JOIN users ON users.user_id = comments.comment_user_id
+WHERE comment_post_id = '$postID'";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         $comments = [];
         while ($row = $result->fetch()) {
-            //get the other from the users table using the id key
-            //this way if the use changes his username we get the updated version
-            $author = $this->getUsernameFromUserID($row['comment_user_id']);
-            $comments[] = new Comment($row, $author);
+            $comments[] = new Comment($row);
         }
         return $comments;
     }
@@ -180,16 +183,6 @@ VALUES (NULL,?,?,?,?,?)";
         return $commentsId;
     }
 
-    public
-    function getUsernameFromUserID($user_id)
-    {
-        $query = "SELECT username FROM users WHERE user_id = '$user_id'";
-        $result = $this->_dbHandler->prepare($query);
-        $result->execute();
-        $row = $result->fetch();
-        return $row['username'];
-    }
-
     public function getUserIDFromEmail($email)
     {
         $query = "SELECT user_id FROM  users WHERE email = :email";
@@ -204,32 +197,55 @@ VALUES (NULL,?,?,?,?,?)";
      * This function is used to search
      * for specific posts in the database
      * for a given query
-     *
      * @param $searchQuery
+     * @param $category
+     * @param $order
      * @return array
      */
-    public function getSearchResult($searchQuery)
+    public function getSearchResult($searchQuery, $category, $order,$maxNumberOfResults)
     {
         //compose a query in order to search by the title, content or category
         //the query searches in order of priorities
-        //post_title,post_content,author_name and post_category_name
-        //due to the fact that in a post we store a post_author_id
-        //we need to execute a subquery to get the authors name
-        $query = "SELECT * FROM forum_posts WHERE post_title LIKE :searchQueryTitle 
-     OR post_content LIKE :searchQueryContent OR post_author_id IN (SELECT user_id FROM users WHERE username LIKE :searchQueryAuthor)
-     OR post_category_name LIKE :searchQueryCategory LIMIT 15 ";
+        //due to the fact that in a post has the user id
+        //we need to execute a subquery to get the username
+
+        $query = "SELECT post_id, post_author_id, post_title, post_content, post_category_name, post_date, post_image,username FROM forum_posts 
+        INNER JOIN users ON users.user_id = forum_posts.post_author_id";
+
+        //add search filters
+        if ($category !== "All") {
+            $query = $query . " WHERE post_category_name = $category";
+        }
+        //define what to search for
+        $query = $query . " WHERE post_title LIKE :searchQueryTitle 
+         OR post_content LIKE :searchQueryContent OR 
+         post_author_id IN (SELECT user_id FROM users WHERE username LIKE :searchQueryAuthor)";
+
+        //sort
+        switch ($order) {
+            case "Newest posts first":
+                $query = $query . " ORDER BY post_date DESC";
+                break;
+            case "Oldest posts first":
+                $query = $query . " ORDER BY post_date ASC";
+                break;
+
+        }
+
+        if($maxNumberOfResults!=="All"){
+         $query = $query . "LIMIT $maxNumberOfResults";
+        }
+
 
         $result = $this->_dbHandler->prepare($query);
         //use parameterized query to avoid sql injection
         $result->bindValue(':searchQueryTitle', '%' . $searchQuery . '%');
         $result->bindValue(':searchQueryContent', '%' . $searchQuery . '%');
         $result->bindValue(':searchQueryAuthor', '%' . $searchQuery . '%');
-        $result->bindValue(':searchQueryCategory', '%' . $searchQuery . '%');
         $result->execute();
         $posts = [];
         while ($row = $result->fetch()) {
-            $post_author = $this->getUsernameFromUserID($row['post_author_id']);
-            $posts[] = new Post($row, $post_author);
+            $posts[] = new Post($row);
         }
         return $posts;
     }
@@ -257,7 +273,7 @@ VALUES (NULL,?,?,?,?,?)";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         $row = $result->fetch();
-        return $row!=null;
+        return $row != null;
     }
 
 
@@ -267,15 +283,17 @@ VALUES (NULL,?,?,?,?,?)";
         //get the post ids from the favorite table and then select
         //all the posts from the posts table that have
         //that specific id
-        $query = "SELECT * FROM forum_posts WHERE post_id IN 
+        $query = "SELECT  post_id, post_author_id, post_title, post_content, post_category_name, post_date, post_image,username
+         FROM forum_posts
+         INNER JOIN users ON user_id = post_author_id
+         WHERE post_id IN 
         (SELECT post_id from favorite_posts WHERE user_id = :userId)";
         $result = $this->_dbHandler->prepare($query);
         $result->bindValue(':userId', $userId);
         $result->execute();
         $posts = [];
         while ($row = $result->fetch()) {
-            $username = $this->getUsernameFromUserID($row['post_author_id']);
-            $post = new Post($row, $username);
+            $post = new Post($row);
             $post->setIsFavorite(true);
             $posts[] = $post;
         }
@@ -302,12 +320,14 @@ VALUES (NULL,?,?,?,?,?)";
     public
     function getAllUserPosts($user_id)
     {
-        $query = "SELECT * FROM forum_posts WHERE post_author_id = '$user_id' LIMIT 10";
+        $query = "SELECT  post_id, post_author_id, post_title, post_content, post_category_name, post_date, post_image,username
+        INNER JOIN users ON user_id = post_author_id
+        FROM forum_posts WHERE post_author_id = '$user_id' LIMIT 10";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         $posts = [];
         while ($row = $result->fetch()) {
-            $username = $this->getUsernameFromUserID($user_id);
+
             $posts[] = new Post($row, $username);
         }
         return $posts;
@@ -330,7 +350,7 @@ VALUES (NULL,?,?,?,?,?)";
         $result->bindValue(':username', $username);
         $result->execute();
         $row = $result->fetch();
-        return $row!=null;
+        return $row != null;
     }
 
     public
@@ -451,7 +471,7 @@ VALUES (NULL,?,?,?,?,?)";
         $result->bindValue(':email', $email);
         $result->execute();
         $row = $result->fetch();
-        return $row!=null;
+        return $row != null;
     }
 
 }

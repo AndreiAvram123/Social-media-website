@@ -112,14 +112,14 @@ class SessionManager
         if($this->_dbManager->emailExists($email)){
             return "Email already used";
         }
-        if (!is_null($image)) {
-            return $this->isImageValid($image);
+        if (!empty($image)) {
+            return $this->isProfileImageValid($image);
         }
         return true;
 
     }
 
-    private function isImageValid($image)
+    private function isProfileImageValid($image)
     {
 
         $imageFileType = strtolower(pathinfo($image, PATHINFO_EXTENSION));

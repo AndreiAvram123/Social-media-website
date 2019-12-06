@@ -15,14 +15,14 @@ class Comment
      * @param $databaseRow - a comment row from the database
      * @param $author - the author of the Comment
      */
-    public function __construct($databaseRow, $author)
+    public function __construct($databaseRow)
     {
       $this->comment_id = $databaseRow['comment_id'];
       $this->comment_user_id = $databaseRow['comment_user_id'];
       $this->comment_post_id = $databaseRow['comment_post_id'];
       $this->comment_text = $databaseRow['comment_text'];
       $this->comment_date = $databaseRow['comment_date'];
-      $this->author = $author;
+      $this->author = $databaseRow['username'];
     }
 
     /**

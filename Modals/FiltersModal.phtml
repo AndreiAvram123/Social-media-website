@@ -1,0 +1,52 @@
+<!-- Modal used in order to filter results-->
+<div class="modal fade" id="filtersModal" tabindex="-1" role="dialog" aria-labelledby="filtersModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="filtersModalLabel">Filters</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <label for="postCategorySelector" class="col-sm-2 col-form-label">Category</label>
+                    <div>
+                        <select class="form-control" name="postCategoryFilter" id="postCategorySelector">
+                            <option>All</option>
+                            <?php
+                            foreach ($view->categories as $category) {
+                                echo '<option>' . $category . '</option>';
+                            }
+                            ?>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row mt-3">
+                    <label for="postOrder" class="col-sm-2 col-form-label">Sort by</label>
+                    <div>
+                        <select class="form-control" name="postOrder" id="postOrder">
+                            <option>None</option>
+                            <option>Newest posts first</option>
+                            <option>Oldest posts first</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row mt-2">
+                    <label for="postSearchResults" class="col-sm-2 col-form-label">Max results</label>
+                    <div>
+                        <select class="form-control" name="postMaxResults" id="postMaxResults">
+                            <option>All</option>
+                            <option>10</option>
+                            <option>20</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Apply</button>
+            </div>
+        </div>
+    </div>
+</div>

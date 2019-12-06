@@ -122,8 +122,6 @@
     font-size: 16px; /* Set a font size */
     cursor: pointer; /* Mouse pointer on hover */
 }
-
-
 @media (min-width: 992px) {
     .card {
         width: 50vw;

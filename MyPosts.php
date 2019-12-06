@@ -4,6 +4,7 @@ require_once "Data/DataManager.php";
 $view = new stdClass();
 $view->pageTitle = "My posts";
 $view->isUserLoggedIn = isset($_SESSION['user_id']);
+
 $dbHandler = DataManager::getInstance();
 $view->displayRemoveButton = true;
 

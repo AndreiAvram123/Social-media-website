@@ -4,7 +4,6 @@ require_once "Data/DataManager.php";
 require_once "Data/Validator.php";
 $view = new stdClass();
 $view->pageTitle = "AddPost";
-$view ->isUserLoggedIn = isset($_SESSION['user_id']);
 $dbManager = DataManager::getInstance();
 $validator = new Validator();
 $view->categories = $dbManager->getAllCategories();
@@ -17,16 +16,21 @@ if (isset($_POST["addPostButton"])) {
     $postContent = $_POST["postContent"];
     $postDate = date('Y-m-d H:i:s');
     $postImage = $_FILES["fileToUpload"]["name"];
-    //returns true if valid
-    //else returns error message
-    $result = $validator->arePostDetailsValid($postTitle,$postContent,$postImage);
-    if($result === true) {
-            $serverImageLocation = $databaseHandler->uploadImageToServer($postImage,$_FILES["fileToUpload"]["tmp_name"],"images/posts/");
+    $captchaValue = htmlentities($_POST['captchaValueEntered']);
+    if ($captchaValue !== $_SESSION['captcha_code']) {
+        $view->warningMessage = "Invalid code, please try again";
+    } else {
+        //returns true if valid
+        //else returns error message
+        $result = $validator->arePostDetailsValid($postTitle, $postContent, $postImage);
+        if ($result === true) {
+            $serverImageLocation = $databaseHandler->uploadImageToServer($postImage, $_FILES["fileToUpload"]["tmp_name"], "images/posts/");
             $databaseHandler->uploadPost($_SESSION['user_id'],
                 $postTitle, $postContent, $postCategoryName, $postDate, $serverImageLocation);
             $view->warningMessage = "You successfully added your post :). Go to main page to check it.";
-    }else{
-        $view->warningMessage = $result;
+        } else {
+            $view->warningMessage = $result;
+        }
     }
 }
 

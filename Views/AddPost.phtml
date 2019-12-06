@@ -1,6 +1,9 @@
 <?php
 include_once "Views/pageElements/Header.phtml";
-
+if(!isset($_SESSION['user_id'])){
+    echo  '<meta http-equiv="refresh"
+   content="0; url=index.php">';
+}
 if (isset($view->warningMessage)) {
     include "Modals/WarningModal.phtml";
     echo "<script>$('#warningModal').modal('show')</script>";
@@ -35,13 +38,18 @@ if (isset($view->warningMessage)) {
                     <textarea id="postContent" class="form-control text-area" name="postContent"></textarea>
                 </div>
 
-                <div class="mt-3">
+                <div class="mt-3 form-group">
                     <label>Post picture</label>
                     <div class="custom-file mt-2">
                         <input type="file" name="fileToUpload" id="fileToUpload">
                     </div>
                 </div>
-
+                <div class="mt-3 form-group">
+                    <img src="Data/Captcha.php" alt=""/>
+                    <div>
+                        <input type="text" name="captchaValueEntered"/>
+                    </div>
+                </div>
                 <button type="submit" name="addPostButton" class="btn btn-primary mt-3">Add post</button>
             </form>
         </div>

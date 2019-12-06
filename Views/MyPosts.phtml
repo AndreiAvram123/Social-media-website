@@ -1,5 +1,9 @@
 <?php
 include "Views/pageElements/Header.phtml";
+if(!isset($_SESSION['user_id'])){
+    echo  '<meta http-equiv="refresh"
+   content="0; url=index.php">';
+}
 $myPosts = $view->myPosts;
 ?>
     <div class="row">

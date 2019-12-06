@@ -2,9 +2,8 @@
 require_once "Data/DataManager.php";
 session_start();
 $view = new stdClass();
-$view->isUserLoggedIn = isset($_SESSION['user_id']);
-$userId = $_SESSION['user_id'];
 
+$userId = $_SESSION['user_id'];
 $view->pageTitle = "Favorite posts";
 $dbHandle = DataManager::getInstance();
 $view->displayRemoveButton = true;
