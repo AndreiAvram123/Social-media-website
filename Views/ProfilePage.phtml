@@ -1,25 +1,28 @@
 <?php
 include_once "Views/pageElements/Header.phtml";
 
-if(isset($view->warningMessage)){
+if (isset($view->warningMessage)) {
     include_once "Modals/WarningModal.phtml";
     echo "<script>$('#warningModal').modal('show')</script>";
 }
 
-if($view->currentUser !==null) {
+if ($view->currentUser !== null) {
     $currentUser = $view->currentUser;
     $userPosts = $view->userPosts;
     ?>
     <div class="row">
         <div class="col">
-            <img class="rounded image-profile" src="<?php echo $currentUser->getProfilePicture()?>">
+            <img class="rounded image-profile" src="<?php echo $currentUser->getProfilePicture() ?>">
         </div>
         <div class="col">
             <h1><?php echo $currentUser->getUsername() ?></h1>
             <h2>A member since <?php echo $currentUser->getJoinDate() ?></h2>
             <span>Email : <?php echo $currentUser->getEmail() ?></span>
             <?php
-            if ($view->isUserLoggedIn &&
+            //display the add to friend button only if the user
+            //is logged in and if the profile page does not belong to
+            //the logged in user
+            if (isset($_SESSION['user_id']) &&
                 $currentUser->getUserId() !== $_SESSION['user_id']) {
                 ?>
                 <form method="post" action="Friends.php" class="mt-3">

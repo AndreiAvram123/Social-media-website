@@ -1,25 +1,25 @@
 <?php
 include "Views/pageElements/Header.phtml";
-if(!isset($_SESSION['user_id'])){
-    echo  '<meta http-equiv="refresh"
+if (!isset($_SESSION['user_id'])) {
+    echo '<meta http-equiv="refresh"
    content="0; url=index.php">';
 }
 $favoritePosts = $view->favoritePosts;
 ?>
 
 
-    <div class="row">
-        <div class="col">
-            <?php
-            foreach ($favoritePosts as $post) {
+<div class="row">
+    <div class="col">
+        <?php
+        foreach ($favoritePosts as $post) {
             $view->post = $post;
             include "Views/PostCard.phtml";
-            }?>
-        </div>
+        } ?>
     </div>
+</div>
 
-    <?php
- if(sizeof($favoritePosts) ==0) {
+<?php
+if (sizeof($favoritePosts) == 0) {
 
     ?>
     <div class="alert alert-secondary mt-5" role="alert">

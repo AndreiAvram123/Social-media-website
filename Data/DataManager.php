@@ -4,14 +4,22 @@ require_once "Data/Comment.php";
 require_once "Data/Post.php";
 require_once "Data/User.php";
 
+/**
+ * This class is used to handle
+ * all SQL interactions with the
+ * database (SELECT ,INSERT, UPDATE ,DELETE)
+ * Class DataManager
+ */
 class DataManager
 {
     protected $_dbHandler;
     protected $_dbInstance;
     //create a singleton pattern for this as well
     private static $dataManager;
-    public static $postPerPage = 10;
+    //define how may posts should be displayed on page
+    private $postPerPage = 10;
 
+    //method used to create a singleton pattern
     public static function getInstance()
     {
         if (self::$dataManager !== null) {
@@ -29,26 +37,40 @@ class DataManager
         $this->_dbHandler = $this->_dbInstance->getDatabaseConnection();
     }
 
+    /**
+     * This function is used in order to return
+     * a given number of posts(how many are defined in the $postPerPage variable)
+     * @param $page - give a specific page number and the method will return the
+     * posts from that specific page ($page >0)
+     * In case there are no posts for that specific page the method will return an empty
+     * array
+     * @return array
+     */
     public function getPosts($page)
-    {     $offset = ($page-1) * self::$postPerPage;
+    {
+        $offset = ($page - 1) * $this->postPerPage;
         //Get the posts in chronological order
         //and in order of pagination
-          $postPerPage = self::$postPerPage;
-        //get the username dynamically from the user id using a join
         $query = "SELECT forum_posts.post_id, post_author_id, post_title, post_content, post_category_name, post_date, post_image, username
  FROM forum_posts INNER JOIN users ON users.user_id = forum_posts.post_author_id 
- ORDER BY post_date DESC LIMIT $postPerPage OFFSET $offset";
+ ORDER BY post_date DESC LIMIT $this->postPerPage OFFSET $offset";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         $posts = [];
         while ($row = $result->fetch()) {
             //limit the amount of text on the main page
-            $row['post_content'] = substr($row['post_content'], 1, 700);
+            $row['post_content'] = substr($row['post_content'], 0, 700);
             $posts[] = new Post($row);
         }
         return $posts;
     }
 
+    /**
+     * This method is used in order to get the user
+     * password from the database(encrypted password)
+     * @param $email - the email of the user
+     * @return
+     */
     public function getUserPasswordFromDB($email)
     {
         $query = "SELECT password FROM users WHERE email = :email";
@@ -60,6 +82,12 @@ class DataManager
         return $password;
     }
 
+    /**
+     * This method is used to return all category
+     * names from the database and put them in an
+     * array
+     * @return array of category names
+     */
     public function getAllCategories()
     {
         $query = "SELECT category_name FROM categories";
@@ -72,6 +100,19 @@ class DataManager
         return $categories;
     }
 
+    /**
+     * This method is used in order to upload a post
+     * into the database by gy using the following parameters
+     * !!!parameters must not be NULL
+     * The function is sql injection protected by using a
+     * parameterized query
+     * @param $postAuthorId
+     * @param $postTitle
+     * @param $postContent
+     * @param $postCategoryName
+     * @param $postDate
+     * @param $serverImageLocation
+     */
     public function uploadPost($postAuthorId, $postTitle, $postContent, $postCategoryName, $postDate, $serverImageLocation)
     {
         $query = "INSERT INTO forum_posts VALUES (NULL,:postAuthorId,:postTitle,
@@ -86,6 +127,18 @@ class DataManager
         $result->execute();
     }
 
+    /**
+     * This method is used to create an user in the database
+     * by giving the following parameters
+     * !!!$imageLocation can be null(in this case the user will be given a default
+     * profile picture)
+     * The method is sql injection protected as it uses parameterized query
+     * @param $username
+     * @param $email
+     * @param $password
+     * @param $creationDate
+     * @param $imageLocation
+     */
     public function createUser($username, $email, $password, $creationDate, $imageLocation)
     {
         $encryptedPassword = md5($password);
@@ -109,18 +162,32 @@ VALUES (NULL,?,?,?,?,?)";
 
     }
 
+    /**
+     * This method is used to upload an image to the server by
+     * giving the following parameters
+     * The method encrypts the image name as as security reason
+     * @param $target_file - the location of the file on the user's computer
+     * @param $tempName - the temporary name of the image
+     * @param $target_dir - where the image should be place in the server
+     * @return string - the image location on the server in order
+     * to be stored in a database table
+     */
     public function uploadImageToServer($target_file, $tempName, $target_dir)
     {
         $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
         //once you encrypt the image, the algorithm will also encrypt
         //the file extension. That's why I need to add it as well
         $targetLocation = $target_dir . md5($target_file) . '.' . $imageFileType;
-        //$_FILES["fileToUpload"]["tmp_name"]
         move_uploaded_file($tempName, $targetLocation);
         return $targetLocation;
     }
 
 
+    /**
+     * This method is used to return all the IDs of
+     * the available posts in the database
+     * @return array
+     */
     public function getAllPostsIDs()
     {
         $query = "SELECT post_id FROM forum_posts";
@@ -133,9 +200,17 @@ VALUES (NULL,?,?,?,?,?)";
         return $ids;
     }
 
+    /**
+     * This function is used to return a specific post
+     * that matches an ID in the database
+     * Because the post stores the user_id we use a JOIN
+     *in order to dynamically get the username
+     * @param $postId
+     * @return Post
+     */
     public function getPostById($postId)
     {
-         $query = "SELECT post_id, post_author_id, post_title, post_content, post_category_name, post_date, post_image,users.username
+        $query = "SELECT post_id, post_author_id, post_title, post_content, post_category_name, post_date, post_image,users.username
          FROM forum_posts
          INNER JOIN users ON user_id = post_author_id
          WHERE post_id ='$postId'";
@@ -145,6 +220,15 @@ VALUES (NULL,?,?,?,?,?)";
         return new Post($row);
     }
 
+    /**
+     * This method is used in order to upload a
+     * comment into the database by giving the following parameters
+     * !!parameters should not be null
+     * @param $comment_user_id
+     * @param $comment_post_id
+     * @param $comment_text
+     * @param $comment_date
+     */
     public function uploadComment($comment_user_id, $comment_post_id, $comment_text, $comment_date)
     {
         $query = "INSERT INTO comments VALUES(NULL,:commentUserID,:commentPostID
@@ -157,6 +241,12 @@ VALUES (NULL,?,?,?,?,?)";
         $result->execute();
     }
 
+    /**
+     * This method is used to get an array  of comments
+     * for a specific post by passing the post id
+     * @param $postID
+     * @return array
+     */
     public function getCommentsForPost($postID)
     {
         $query = "SELECT comment_id, comment_user_id, comment_post_id, comment_text, comment_date, user_id, username, email, password, creation_date, profile_picture ,username
@@ -171,6 +261,10 @@ WHERE comment_post_id = '$postID'";
         return $comments;
     }
 
+    /**
+     * Return all the comments id stored in the database
+     * @return array
+     */
     public function getAllCommentsIDs()
     {
         $query = "SELECT comment_id FROM comments";
@@ -183,6 +277,12 @@ WHERE comment_post_id = '$postID'";
         return $commentsId;
     }
 
+    /**
+     * Get the user ID from the user email
+     *
+     * @param $email
+     * @return mixed
+     */
     public function getUserIDFromEmail($email)
     {
         $query = "SELECT user_id FROM  users WHERE email = :email";
@@ -197,29 +297,30 @@ WHERE comment_post_id = '$postID'";
      * This function is used to search
      * for specific posts in the database
      * for a given query
-     * @param $searchQuery
-     * @param $category
-     * @param $order
+     * @param $searchQuery - the query that the user entered
+     * @param $category - the category that could have been selected as a filter
+     * @param $order - the order that the search results should be displayed
+     * @param $maxNumberOfResults - the maximum number of results that should be returned
      * @return array
      */
-    public function getSearchResult($searchQuery, $category, $order,$maxNumberOfResults)
+    public function getSearchResult($searchQuery, $category, $order, $maxNumberOfResults)
     {
         //compose a query in order to search by the title, content or category
         //the query searches in order of priorities
         //due to the fact that in a post has the user id
-        //we need to execute a subquery to get the username
+        //we need to execute a JOIN to get the username
 
-        $query = "SELECT post_id, post_author_id, post_title, post_content, post_category_name, post_date, post_image,username FROM forum_posts 
-        INNER JOIN users ON users.user_id = forum_posts.post_author_id";
+        $query = "SELECT post_id, post_author_id, post_title, post_content, post_category_name, post_date, post_image,username FROM forum_posts
+        INNER JOIN users ON users.user_id = forum_posts.post_author_id WHERE";
 
-        //add search filters
+         //add search filters
         if ($category !== "All") {
-            $query = $query . " WHERE post_category_name = $category";
+            $query = $query . "  post_category_name = '$category' AND ";
         }
         //define what to search for
-        $query = $query . " WHERE post_title LIKE :searchQueryTitle 
+        $query = $query . "(post_title LIKE :searchQueryTitle 
          OR post_content LIKE :searchQueryContent OR 
-         post_author_id IN (SELECT user_id FROM users WHERE username LIKE :searchQueryAuthor)";
+         post_author_id IN (SELECT user_id FROM users WHERE username LIKE :searchQueryAuthor))";
 
         //sort
         switch ($order) {
@@ -232,8 +333,8 @@ WHERE comment_post_id = '$postID'";
 
         }
 
-        if($maxNumberOfResults!=="All"){
-         $query = $query . "LIMIT $maxNumberOfResults";
+        if ($maxNumberOfResults !== "All") {
+            $query = $query . " LIMIT $maxNumberOfResults";
         }
 
 
@@ -267,7 +368,13 @@ WHERE comment_post_id = '$postID'";
 
     }
 
-    public function isPostAddedToFavorite($post_id, $user_id)
+    /**
+     * Return true if the post is added to the user's watch list or not
+     * @param $post_id
+     * @param $user_id
+     * @return bool
+     */
+    public function isPostAddedToWatchList($post_id, $user_id)
     {
         $query = "SELECT * from favorite_posts WHERE user_id = '$user_id' AND post_id = '$post_id'";
         $result = $this->_dbHandler->prepare($query);
@@ -276,9 +383,13 @@ WHERE comment_post_id = '$postID'";
         return $row != null;
     }
 
-
-    public
-    function getFavoritePosts($userId)
+    /**
+     * Get the watch list of a specific user by passing the
+     * $userID
+     * @param $userId
+     * @return array
+     */
+    public function getWatchList($userId)
     {
         //get the post ids from the favorite table and then select
         //all the posts from the posts table that have
@@ -294,7 +405,7 @@ WHERE comment_post_id = '$postID'";
         $posts = [];
         while ($row = $result->fetch()) {
             $post = new Post($row);
-            $post->setIsFavorite(true);
+            $post->setAddedToWatchList(true);
             $posts[] = $post;
         }
         return $posts;
@@ -303,7 +414,7 @@ WHERE comment_post_id = '$postID'";
     /**
      * @param $postID
      * Use this function in order to remove a specific
-     * post from the favorite list of a specific
+     * post from the watchList of a specific
      * user
      * @param $user_id
      */
@@ -317,33 +428,51 @@ WHERE comment_post_id = '$postID'";
     }
 
 
-    public
-    function getAllUserPosts($user_id)
+    /**
+     * This function returns all the users posts
+     * in the database by passing the userId
+     * @param $user_id
+     * @return array
+     */
+    public function getUserPosts($user_id)
     {
-        $query = "SELECT  post_id, post_author_id, post_title, post_content, post_category_name, post_date, post_image,username
+        $query = "SELECT  post_id, post_author_id, post_title, post_content, post_category_name, post_date, post_image,username FROM forum_posts
         INNER JOIN users ON user_id = post_author_id
-        FROM forum_posts WHERE post_author_id = '$user_id' LIMIT 10";
+       WHERE post_author_id = '$user_id' LIMIT 10";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         $posts = [];
         while ($row = $result->fetch()) {
 
-            $posts[] = new Post($row, $username);
+            $posts[] = new Post($row);
         }
         return $posts;
     }
 
-    public
-    function removePost($postsID)
+    /**
+     * This method is used in order to
+     * remove a post from the database given the id
+     * It makes sure that once removed from the posts table
+     * all the corresponding rows in the other tables are removed
+     * as well
+     * @param $postID
+     */
+    public function removePost($postID)
     {
-        $query = "DELETE FROM forum_posts WHERE post_id = $postsID";
+        $query = "DELETE FROM forum_posts WHERE post_id = $postID";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
-
+        $this->removePostOccurrenceInFavorites($postID);
     }
 
-    public
-    function usernameExists($username)
+    /**
+     * Method used in order to check if the username
+     * already exists in the database
+     * Return true if the username exists or false if not
+     * @param $username
+     * @return bool
+     */
+    public function usernameExists($username)
     {
         $query = "SELECT user_id FROM users WHERE username = :username";
         $result = $this->_dbHandler->prepare($query);
@@ -353,14 +482,22 @@ WHERE comment_post_id = '$postID'";
         return $row != null;
     }
 
-    public
-    function deleteComment($commentID)
+    /**
+     * Method used to delete a comment from the database
+     * @param $commentID
+     */
+    public function deleteComment($commentID)
     {
         $query = "DELETE FROM comments WHERE comment_id = '$commentID'";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
     }
 
+    /**
+     * Return the total number of pages
+     * depending on the variable $this->postsPerPage
+     * @return int
+     */
     public function getNumberOfPages()
     {
         $query = "SELECT COUNT(post_id) FROM forum_posts";
@@ -368,16 +505,19 @@ WHERE comment_post_id = '$postID'";
         $result->execute();
         $row = $result->fetch();
         $totalPosts = $row['COUNT(post_id)'];
-        //I chose to display 10 posts per page
-        //If the number is multiple of 10 just return the value
+        //If the number is multiple of $this->$postsPerPage  return the value
         //Otherwise divide it by 10 and then add 1
-        if ($totalPosts % self::$postPerPage == 0) {
-            return $totalPosts / self::$postPerPage;
+        if ($totalPosts % $this->postPerPage == 0) {
+            return $totalPosts / $this->postPerPage;
         } else {
-            return $totalPosts / self::$postPerPage + 1;
+            return $totalPosts / $this->postPerPage + 1;
         }
     }
 
+    /**
+     * Return all the users Ids in the database
+     * @return array
+     */
     public function getAllUsersId()
     {
         $query = "SELECT user_id FROM users";
@@ -390,6 +530,12 @@ WHERE comment_post_id = '$postID'";
         return $userIds;
     }
 
+    /**
+     * Return a user from the database by
+     * passing the $userId to the method
+     * @param $userId
+     * @return User
+     */
     public function getUserById($userId)
     {
         $query = "SELECT * from users WHERE user_id = '$userId'";
@@ -399,6 +545,11 @@ WHERE comment_post_id = '$postID'";
         return new User($row);
     }
 
+    /**
+     * Method used to add an User to another user's friends liss
+     * @param $currentUserId - the id of the current logged in user
+     * @param $userId - the id of the user that should be added to the friends list
+     */
     public function addToFriendList($currentUserId, $userId)
     {
         $query = "INSERT INTO friends VALUES ('$currentUserId','$userId')";
@@ -406,6 +557,12 @@ WHERE comment_post_id = '$postID'";
         $result->execute();
     }
 
+    /**
+     * Get an array of users(friends) by passing the id of the current
+     * logged in user
+     * @param $user_id
+     * @return array
+     */
     public function getAllFriends($user_id)
     {
         $query = "SELECT * FROM users WHERE user_id IN 
@@ -419,6 +576,12 @@ WHERE comment_post_id = '$postID'";
         return $friends;
     }
 
+    /**
+     * Method used to remove a friend from the friends' list of
+     * the current user
+     * @param $user_id
+     * @param $friendId
+     */
     public function removeFriend($user_id, $friendId)
     {
         $query = "DELETE FROM friends WHERE user1_id ='$user_id' AND user2_id = '$friendId'";
@@ -427,6 +590,12 @@ WHERE comment_post_id = '$postID'";
 
     }
 
+    /**
+     * Update the post title in the
+     * database of a specific post
+     * @param $postID
+     * @param $postTitle - !!!must not be null
+     */
     public function changePostTitle($postID, $postTitle)
     {
         $query = "UPDATE forum_posts SET post_title = :postTitle WHERE post_id = :postId";
@@ -436,6 +605,12 @@ WHERE comment_post_id = '$postID'";
         $result->execute();
     }
 
+    /**
+     * Update the post content of
+     * a specific post
+     * @param $postID
+     * @param $postContent - !!!must not be null
+     */
     public function changePostContent($postID, $postContent)
     {
         $query = "UPDATE forum_posts SET post_content = :postContent WHERE post_id = :postId";
@@ -445,6 +620,12 @@ WHERE comment_post_id = '$postID'";
         $result->execute();
     }
 
+    /**
+     * Update the post category
+     * of a specific post
+     * @param $postID
+     * @param $postCategory - !!!must not be null
+     */
     public function changePostCategory($postID, $postCategory)
     {
         $query = "UPDATE forum_posts SET post_category_name = :postCategoryName WHERE post_id = :postId";
@@ -454,6 +635,12 @@ WHERE comment_post_id = '$postID'";
         $result->execute();
     }
 
+    /**
+     * Update the image
+     * of a specific post
+     * @param $postID
+     * @param $postImage
+     */
     public function changePostImage($postID, $postImage)
     {
         $query = "UPDATE forum_posts SET post_image = :postImage WHERE post_id = :postId";
@@ -464,6 +651,12 @@ WHERE comment_post_id = '$postID'";
 
     }
 
+    /**
+     * Check if the user email exists in the
+     * database
+     * @param $email
+     * @return bool - true if the email exists or false if not
+     */
     public function emailExists($email)
     {
         $query = "SELECT user_id FROM users WHERE email = :email";
@@ -472,6 +665,20 @@ WHERE comment_post_id = '$postID'";
         $result->execute();
         $row = $result->fetch();
         return $row != null;
+    }
+
+    /**
+     *This method is called once
+     * a post in deleted in order to delete
+     * all the rows in the favorites table that
+     * include that post
+     * @param $postID
+     */
+    private function removePostOccurrenceInFavorites($postID)
+    {
+        $query = "DELETE FROM favorite_posts WHERE post_id = '$postID'";
+        $result = $this->_dbHandler->prepare($query);
+        $result->execute();
     }
 
 }

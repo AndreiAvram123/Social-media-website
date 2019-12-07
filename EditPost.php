@@ -1,13 +1,17 @@
 <?php
+/**
+ * This file is the controller used to handle the EditPost action
+ */
 session_start();
 require_once "Data/DataManager.php";
 require_once "Data/Validator.php";
+//put the details in the view class
 $view = new stdClass();
-$view->isUserLoggedIn = isset($_SESSION['user_id']);
 $view->pageTitle = "Edit post";
 $dataManager = DataManager::getInstance();
 $view->categories = $dataManager->getAllCategories();
 $currentPostID = null;
+
 //handle the situation when an user presses save changes button
 if (isset($_POST['saveChangesButton'])) {
     $validator = new Validator();

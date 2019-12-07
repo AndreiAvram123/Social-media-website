@@ -1,4 +1,7 @@
 <?php
+/**
+ * This file is the controller for the register action
+ */
 session_start();
 require_once "Data/SessionManager.php";
 $view = new stdClass();

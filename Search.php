@@ -1,10 +1,13 @@
 <?php
+/**
+ * This file is the controller used to handler the search action
+ */
 require_once "Data/DataManager.php";
 session_start();
 $view = new stdClass();
-$view->isUserLoggedIn = isset($_SESSION['user_id']);
 $view->pageTitle = "Search results";
 $dbHandler = new DataManager();
+$view->categories = $dbHandler->getAllCategories();
 
 if (isset($_POST['search-button'])) {
     //make sure that the user has not inserted any code in the search box

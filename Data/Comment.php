@@ -1,6 +1,9 @@
 <?php
 
-
+/**
+ * This class is used to create objects from a
+ * comment row in the database
+ */
 class Comment
 {
     private $comment_id;
@@ -13,26 +16,22 @@ class Comment
     /**
      * Comment constructor.
      * @param $databaseRow - a comment row from the database
-     * @param $author - the author of the Comment
      */
     public function __construct($databaseRow)
     {
-      $this->comment_id = $databaseRow['comment_id'];
-      $this->comment_user_id = $databaseRow['comment_user_id'];
-      $this->comment_post_id = $databaseRow['comment_post_id'];
-      $this->comment_text = $databaseRow['comment_text'];
-      $this->comment_date = $databaseRow['comment_date'];
-      $this->author = $databaseRow['username'];
+        $this->comment_id = $databaseRow['comment_id'];
+        $this->comment_user_id = $databaseRow['comment_user_id'];
+        $this->comment_post_id = $databaseRow['comment_post_id'];
+        $this->comment_text = $databaseRow['comment_text'];
+        $this->comment_date = $databaseRow['comment_date'];
+        $this->author = $databaseRow['username'];
     }
 
-    /**
-     * @return mixed
-     */
+
     public function getAuthor()
     {
         return $this->author;
     }
-
 
 
     public function getCommentId()
@@ -62,7 +61,6 @@ class Comment
     {
         return $this->comment_date;
     }
-
 
 
 }

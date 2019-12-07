@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * This class is used to create Post object
+ * that contain the data from a Post row in the
+ * database
+ *
+ */
 class Post
 {
     private $authorName;
@@ -79,7 +85,7 @@ class Post
     }
 
 
-    public function setIsFavorite($isFavorite)
+    public function setAddedToWatchList($isFavorite)
     {
         $this->isFavorite = $isFavorite;
     }

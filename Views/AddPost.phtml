@@ -1,7 +1,9 @@
 <?php
 include_once "Views/pageElements/Header.phtml";
-if(!isset($_SESSION['user_id'])){
-    echo  '<meta http-equiv="refresh"
+if (!isset($_SESSION['user_id'])) {
+    //redirect user to home if he is not logged in but tried
+    //to access this page
+    echo '<meta http-equiv="refresh"
    content="0; url=index.php">';
 }
 if (isset($view->warningMessage)) {
@@ -16,9 +18,9 @@ if (isset($view->warningMessage)) {
             <form class="mt-5" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>" enctype="multipart/form-data">
                 <h1 class="page-title text-center mt-3">What do you want to include in your post?</h1>
                 <div class="mt-3">
-                    <label>Title</label>
+                    <label for="postTitle">Title</label>
                     <div class="input-group ">
-                        <input type="text" name="postTitle" class="form-control"
+                        <input type="text" name="postTitle" id="postTitle" class="form-control"
                                aria-describedby="inputGroup-sizing-default">
                     </div>
                 </div>

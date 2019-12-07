@@ -1,20 +1,24 @@
 <?php
 
+/**
+ * Class used to create objects that contain
+ * the data from a user row in the database
+ */
 
 class User
 {
-   private $userId;
-   private $username;
-   private $email;
-   private $joinDate;
-   private $profilePicture;
+    private $userId;
+    private $username;
+    private $email;
+    private $joinDate;
+    private $profilePicture;
 
     public function __construct($db_row)
     {
         $this->userId = $db_row['user_id'];
         $this->username = $db_row['username'];
         $this->email = $db_row['email'];
-        $this->joinDate =$db_row['creation_date'];
+        $this->joinDate = $db_row['creation_date'];
         $this->profilePicture = $db_row['profile_picture'];
     }
 
@@ -24,7 +28,8 @@ class User
         return $this->userId;
     }
 
-    public function getProfilePicture(){
+    public function getProfilePicture()
+    {
         return $this->profilePicture;
     }
 
@@ -33,7 +38,6 @@ class User
     {
         return $this->username;
     }
-
 
 
     public function getJoinDate()

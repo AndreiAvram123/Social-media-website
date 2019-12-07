@@ -3,32 +3,52 @@ $post = $view->post;
 ?>
 <div class="card mt-3 p-3">
     <div>
-    <h3 class="card-title text-primary">  <?php echo $post->getPostTitle() ?></h3>
+        <h3 class="card-title text-primary">  <?php echo $post->getPostTitle() ?></h3>
+        <?php
+        //if the user is logged in and the post belongs to him
+        //let him him edit the post no matter where in the forum
+        if (isset($_SESSION['user_id']) && $_SESSION['user_id'] === $post->getAuthorID()) {
+            ?>
+            <form method="get" action="EditPost.php" class="float-right">
+                <button class="icon-button" type="submit"><i class="edit-icon"></i></button>
+                <input type="hidden" name="valuePostID" value="<?php
+                //it is better for security if we encrypt the post id, so
+                // users cannot change it in the inspector
+                echo md5($post->getPostID()) ?>">
+            </form>
+            <?php
+        }
+        ?>
+    </div>
     <?php
-     //if the user is logged in and the post belongs to him
-    //let him him edit the post no matter where in the forum
-    if(isset($_SESSION['user_id'] )&& $_SESSION['user_id'] === $post->getAuthorID()){
-    ?>
-    <form method="get" action="EditPost.php" class="float-right" >
-        <button class="icon-button" type="submit"><i class="edit-icon"></i></button>
-        <input type="hidden" name="valuePostID" value="<?php
-        //it is better for security if we encrypt the post id, so
-        // users cannot change it in the inspector
-        echo md5($post->getPostID()) ?>">
-    </form>
-    <?php
+    if (isset($_SESSION['user_id'])) {
+        ?>
+        <form method="get" action="ProfilePage.php">
+
+            <button type="submit" class="link-button" name="profileButton">Author
+                : <?php echo $post->getAuthorName() ?></button>
+            <input type="hidden" name="authorIDValue" value="<?php echo md5($post->getAuthorID()) ?>">
+
+        </form>
+        <?php
+    }else {
+        ?>
+        <span>Author: <?php echo $post->getAuthorName() ?></span>
+        <?php
     }
     ?>
-    </div>
-    <form method="get" action="ProfilePage.php">
-        <button type="submit" class="link-button" name="profileButton">Author
-            : <?php echo $post->getAuthorName() ?></button>
-        <input type="hidden" name="authorIDValue" value="<?php echo md5($post->getAuthorID()) ?>">
-    </form>
     <div>
-    <span>Posted on : <?php echo $post->getPostDate()?></span>
+        <span>Posted on : <?php echo $post->getPostDate() ?></span>
     </div>
-    <img src="<?php echo $post->getPostImage() ?>" class="card-img-top card-image">
+
+    <img src="<?php
+    if (isset($_SESSION['user_id'])) {
+        echo $post->getPostImage();
+    }else{
+        echo "images/posts/image_not_logged_in.png";
+    }
+
+    ?>" class="card-img-top card-image" alt="">
 
     <div class="card-body">
         <p class="card-text"> <?php echo $post->getPostContent() ?></p>
