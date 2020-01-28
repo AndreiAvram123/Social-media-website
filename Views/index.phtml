@@ -30,12 +30,12 @@ if ($view->isUserLoggedIn) {
     <div class="row mt-4 ">
         <div class="col text-center">
             <input type="hidden" name="currentPageId" value="<?php echo md5($view->currentPage) ?>">
+            <!--Make sure that the previous button is disabled if we are on the first page-->
             <button type="submit" name="previousPage"
-                    <!--Make sure that the previous button is disabled if we are on the first page-->
                     class="btn btn-primary" <?php if ($view->currentPage == 1) echo 'disabled' ?>>Previous page
             </button>
+            <!--Make sure that the next button is disabled if we are on the last page-->
             <button type="submit" name="nextPage"
-                    <!--Make sure that the next button is disabled if we are on the last page-->
                     class="btn btn-primary" <?php if ($view->currentPage == $view->numberOfPages) echo 'disabled' ?> >
                 Next page
             </button>
