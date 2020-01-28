@@ -1,12 +1,17 @@
 <?php
 require_once "Data/DataManager.php";
-
+require_once "Data/Validator.php";
+/**
+ * This class in used to handle actions
+ * regarding to logging in or registering users
+ */
 class SessionManager
 {
     private $_dbManager;
     //create singleton pattern for this class
     private static $sessionHandler;
-
+    private $_validator;
+    //method used to create the singleton pattern
     public static function getInstance()
     {
         if (self::$sessionHandler !== null) {
@@ -20,6 +25,7 @@ class SessionManager
     private function __construct()
     {
         $this->_dbManager = DataManager::getInstance();
+        $this->_validator = new Validator();
     }
 
     public function signUserOut()
@@ -33,10 +39,18 @@ class SessionManager
         $_SESSION['user_id'] = $userId;
     }
 
+    /**
+     * This method is used in order to login a user
+     * Returns true if the login action has
+     * been successful or an error message if not
+     * @param $email
+     * @param $enteredPassword
+     * @return bool|string
+     */
     public function loginUser($email, $enteredPassword)
     {
-        $databaseHandler = new DataManager();
-        $check = $this->areLoginCredentialsValid($email, $enteredPassword);
+        $databaseHandler = DataManager::getInstance();
+        $check = $this->_validator->areLoginCredentialsValid($email, $enteredPassword);
         if ($check === true) {
             $userPasswordDB = $databaseHandler->getUserPasswordFromDB($email);
             if (!empty($userPasswordDB)) {
@@ -54,23 +68,30 @@ class SessionManager
         }
     }
 
-    private function areLoginCredentialsValid($email, $password)
-    {
-        if (empty($email)) {
-            return "You have not entered an email";
-        }
-        if (empty($password)) {
-            return "You have not entered a password";
-        }
-        return true;
-    }
 
-    function createUser($username, $email, $password, $image, $creationDate)
+
+    /**
+     * Method used in order to create a new user
+     * It checks the details entered and return true
+     * if it managed to create a new user or
+     * an error message if not
+     * @param $username
+     * @param $email
+     * @param $password
+     * @param $image
+     * @param $creationDate
+     * @return bool|string
+     */
+    public function createUser($username, $email, $password, $image, $creationDate)
     {
         $databaseHandler = DataManager::getInstance();
         $check = $this->checkRegisterCredentials($username, $email, $password, $image);
         if ($check === true) {
-            $imageLocation = $databaseHandler->uploadImage($image, "images/");
+            $imageLocation = null;
+            if(!empty($image)) {
+                $imageLocation = $databaseHandler->uploadImageToServer($image, $_FILES["profilePicture"]["tmp_name"],"images/users/");
+            }
+            //the user will have a default image is he does not choose one
             $databaseHandler->createUser($username, $email, $password, $creationDate, $imageLocation);
             return true;
         } else {
@@ -83,47 +104,36 @@ class SessionManager
         if (empty($username)) {
             return "You have not entered an email";
         }
+        if (strlen($email) < 5) {
+            return "Your email is not long enough";
+        }
         if (empty($email)) {
             return "You have not entered an email";
+        }
+        if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
+            return "Your email is not valid";
         }
         if (empty($password)) {
             return "You have not entered a password";
         }
+        if($email)
         if (strlen($password) < 7) {
             return "Your password is not strong enough";
         }
         if ($this->_dbManager->usernameExists($username)) {
             return "The username already exists";
         }
-        if (!is_null($image)) {
-            return $this->isImageValid($image);
+        if($this->_dbManager->emailExists($email)){
+            return "Email already used";
+        }
+        if (!empty($image)) {
+            return $this->_validator->isProfileImageValid($image);
         }
         return true;
 
     }
 
-    private function isImageValid($image)
-    {
 
-        $imageFileType = strtolower(pathinfo($image, PATHINFO_EXTENSION));
-        //use the function getimagesize() to check if the image is real or not
-        $check = getimagesize($_FILES["profilePicture"]["tmp_name"]);
-        if ($check === false) {
-            //image not real
-            return "Please select an image";
-        }
-
-        if ($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg") {
-            return "Please select a valid image type from : jpg, png or jpeg";
-        }
-        // Check file size > 5mb
-        if ($_FILES["profilePicture"]["size"] > 5000000) {
-            return "The size of your image should not be bigger than 5mb";
-
-        }
-        return true;
-
-    }
 }
 
 ?>

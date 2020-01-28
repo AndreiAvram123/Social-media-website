@@ -1,6 +1,13 @@
 <?php
 $friend = $view->friend;
 ?>
-
-<img src="images/nela.jpg" class="rounded">
-<h2> Nela Cactus</h2>
+<div class="container-friend clearfix">
+    <img src="<?php echo $friend->getProfilePicture() ?>" class="rounded image-card float-left mr-3">
+    <div class="clearfix">
+        <h2><?php echo $friend->getUsername() ?></h2>
+        <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>" class="mt-5">
+            <button type="submit" name="unfriendButton" class="btn btn-danger">Unfriend</button>
+            <input type="hidden" name="userIdValue" value="<?php echo $friend->getUserId() ?>">
+        </form>
+    </div>
+</div>

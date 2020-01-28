@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * This class is used to create Post object
+ * that contain the data from a Post row in the
+ * database
+ *
+ */
 class Post
 {
     private $authorName;
@@ -13,7 +19,7 @@ class Post
     private $isFavorite;
 
 
-    public function __construct($db_row, $authorName)
+    public function __construct($db_row)
     {
         $this->postID = $db_row['post_id'];
         $this->postTitle = $db_row['post_title'];
@@ -22,7 +28,7 @@ class Post
         $this->postCategoryName = $db_row['post_category_name'];
         $this->authorID = $db_row['post_author_id'];
         $this->postImage = $db_row['post_image'];
-        $this->authorName = $authorName;
+        $this->authorName = $db_row['username'];
         $this->isFavorite = FALSE;
     }
 
@@ -31,16 +37,14 @@ class Post
         return $this->postID;
     }
 
-    /**
-     * @return mixed
-     */
+
     public function getAuthorID()
     {
         return $this->authorID;
     }
 
 
-    public function getPostCategoryName()
+    public function getCategoryName()
     {
         return $this->postCategoryName;
     }
@@ -74,18 +78,14 @@ class Post
         return $this->postImage;
     }
 
-    /**
-     * @return mixed
-     */
+
     public function getIsFavorite()
     {
         return $this->isFavorite;
     }
 
-    /**
-     * @param mixed $isFavorite
-     */
-    public function setIsFavorite($isFavorite)
+
+    public function setAddedToWatchList($isFavorite)
     {
         $this->isFavorite = $isFavorite;
     }

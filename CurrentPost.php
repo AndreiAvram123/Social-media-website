@@ -1,12 +1,16 @@
 <?php
-require_once "Data/DataManager.php";
+/**
+ * This file is used as a controller when the user
+ * has pressed the see Post button. It gathers all the necessary
+ * data about that specific post and displays it
+ */
 
+require_once "Data/DataManager.php";
 session_start();
 $view = new stdClass();
-$view->pageTitle = "OpenedPost ";
-$view->isUserLoggedIn = isset($_SESSION['user_id']);
+$view->pageTitle = "OpenedPost";
 $dbHandler = DataManager::getInstance();
-
+$view->categories = $dbHandler->getAllCategories();
 
 //check if the user has pressed the add to favorite button
 if (isset($_POST['addToFavoriteButton'])) {
@@ -20,61 +24,55 @@ if (isset($_POST['removeFromFavoriteButton'])) {
 }
 
 
-if (isset($_POST["OpenPostButton"])) {
-    $postIDEncrypted = $_POST["valuePostID"];
-    //check weather the post id we are looking
-    //for exists or the user is trying to modify code
-    //in the inspector
-    $postFound = false;
+if (isset($_GET["OpenPostButton"])) {
+    $postIDEncrypted = $_GET["valuePostID"];
+    //reset the post id set in the session
+    $_SESSION["currentPostId"] = null;
     foreach ($dbHandler->getAllPostsIDs() as $postID) {
         if ($postIDEncrypted === md5($postID)) {
-            $postFound = true;
             //store the post id in the session
             $_SESSION["currentPostId"] = $postID;
         }
     }
-    if($postFound === false){
-        //replace the last post id from the session with null
-        $_SESSION["currentPostId"] = null;
-    }
 }
-
 $currentPostID = $_SESSION["currentPostId"];
 
-if($currentPostID==null) {
+if ($currentPostID == null) {
     //security breach
     //the user has changed values in the inspector
     $view->currentPost = null;
-    $view->warningMessage= "!!!Any attempt to hack the website could lead to you being banned 
+    $view->warningMessage = "!!!Any attempt to hack the website could lead to you being banned 
     from the forum!!!";
-}else {
+} else {
+    //get the expanded post
     $view->currentPost = $dbHandler->getPostById($currentPostID);
-
-    $view->postBelongsToUser = true;
-
-    if ($view->isUserLoggedIn) {
+    //check if the user is logged in
+    //in order to see if the post belongs to
+    //him or if it is added to the watch list
+    if (isset($_SESSION['user_id'])) {
         if ($_SESSION['user_id'] !== $view->currentPost->getAuthorID()) {
             $view->postBelongsToUser = false;
-            $isPostFavorite = $dbHandler->isPostAddedToFavorite($currentPostID,$_SESSION['user_id']);
-            $view->currentPost->setIsFavorite($isPostFavorite);
+            $addedToWatchList = $dbHandler->isPostAddedToWatchList($currentPostID, $_SESSION['user_id']);
+            $view->currentPost->setAddedToWatchList($addedToWatchList);
         } else {
             $view->postBelongsToUser = true;
             //an user cannot have his own post to favorites
-            $view->currentPost->setIsFavorite(false);
+            $view->currentPost->setAddedToWatchList(false);
         }
     }
 
-//handle the new comment
+       //handle the new comment
     if (isset($_POST['postReviewButton'])) {
+        //filter malicious code
         $comment_text = htmlentities($_POST['comment_text']);
         if (!empty($comment_text)) {
             $comment_user_id = $_SESSION['user_id'];
             $comment_post_id = htmlentities($_SESSION['currentPostId']);
-            $comment_date = date('Y/m/d');
-            $comment_likes = 0;
+            $comment_date = date('Y-m-d H:i:s');
             $dbHandler->uploadComment($comment_user_id,
-                $comment_post_id, $comment_text, $comment_date, $comment_likes);
-
+                $comment_post_id, $comment_text, $comment_date);
+            //make sure that users cannot refresh the page and add the comment again
+            echo  '<meta http-equiv="refresh" content="0; url=CurrentPost.php">';
         } else {
             $view->warningMessage = "Please include some text for your comment!!";
         }
@@ -82,19 +80,19 @@ if($currentPostID==null) {
 
 //for security reasons encrypt the comment id
 //so it is not visible to users in the inspector
-if(isset($_POST['removeCommentButton']))  {
-    $commentIDEncrypted = $_POST['valueCommentID'];
-    foreach($dbHandler ->getAllCommentsIDs() as $commentID){
-        if($commentIDEncrypted === md5($commentID)){
-            $dbHandler->deleteComment($commentID);
+    if (isset($_POST['removeCommentButton'])) {
+        $commentIDEncrypted = $_POST['valueCommentID'];
+        foreach ($dbHandler->getAllCommentsIDs() as $commentID) {
+            if ($commentIDEncrypted === md5($commentID)) {
+                $dbHandler->deleteComment($commentID);
+            }
         }
     }
+    //get the comments for the post
+    $currentPostComments = $dbHandler->getCommentsForPost($currentPostID);
+    $view->currentPostComments = $currentPostComments;
 }
-//get the comments for the post
-$currentPostComments = $dbHandler->getCommentsForPost($currentPostID);
-$view->currentPostComments = $currentPostComments;
-}
-
-require_once("Views/CurrentPost.phtml");
+//include the view
+include_once("Views/CurrentPost.phtml");
 
 ?>

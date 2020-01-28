@@ -1,8 +1,8 @@
 <?php include "Views/pageElements/Header.phtml";
- if(isset($view->redirectHome)){
+if(isset($_SESSION['user_id'])){
     echo  '<meta http-equiv="refresh"
    content="0; url=index.php">';
- }
+}
 ?>
 <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
     <div class ="container-form">
@@ -16,6 +16,12 @@
             <label for="inputPasswordLogin">Password</label>
             <input name="passwordSignIn" type="password" class="form-control" id="inputPasswordLogin"
                    placeholder="Password">
+        </div>
+        <div class="mt-4 form-group">
+            <img src="Data/Captcha.php" alt=""/>
+            <div>
+                <input type="text" name="captchaValueEntered"/>
+            </div>
         </div>
         <button type="submit" class="btn btn-primary" name="loginButton">Log in</button>
          <?php if(isset($view->errorMessage)) {

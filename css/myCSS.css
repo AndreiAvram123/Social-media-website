@@ -1,63 +1,84 @@
-.navbar-collapse a{
+.navbar-collapse a {
     font-size: 20px;
-}
-.page-title{
-    color:#007BFF;
-}
-.card-image{
-  max-height: 40vh;
 }
 
-.container-form{
-    width : 70vw;
+.page-title {
+    color: #007BFF;
+}
+.card-title{
+    display: inline;
+}
+
+.card-image {
+    max-height: 40vh;
+}
+
+.container-form {
+    width: 70vw;
     margin: 0 auto;
 }
-.post-text{
+
+.post-text {
     font-size: 20px;
 }
-.text-area{
+
+.text-area {
     resize: none;
 }
-.float{
-    position:fixed;
-    width:60px;
-    height:60px;
-    bottom:40px;
-    right:40px;
-    background-color:#007BFF;
-    color:#ffffff;
-    border-radius:50px;
-    text-align:center;
+.title-post{
+    color:#007BFF;
+}
+.float {
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    bottom: 40px;
+    right: 40px;
+    background-color: #007BFF;
+    color: #ffffff;
+    border-radius: 50px;
+    text-align: center;
     box-shadow: 2px 2px 3px #999;
 }
-.float:hover{
+
+.float:hover {
     opacity: 0.5;
 
 }
 
-.page-index{
+.page-index {
     font-size: 20px;
 }
 
 
-.add-button{
-    margin-top:23px;
+.add-button {
+    margin-top: 23px;
 }
 
 
-.comment-body{
-  padding:20px;
+.comment-body {
+    padding: 10px 20px;
+    background: #F1EEEE;
 
 }
+.comment-body p{
+    margin-top: 10px;
+}
+.comment-body span{
+    color: #0079BF;
+    font-weight: bold;
+}
+
 .card {
     width: 80vw;
     margin: auto;
 }
+
 .link-button {
-    background: none!important;
+    background: none !important;
     border: none;
-    padding: 0!important;
-    font-size: 20px ;
+    padding: 0 !important;
+    font-size: 20px;
     /*optional*/
     font-family: arial, sans-serif;
     /*input has OS specific font-family*/
@@ -65,16 +86,48 @@
     text-decoration: underline;
     cursor: pointer;
 }
-.image-profile{
+
+.image-profile {
     max-width: 40vw;
     max-height: 40vh;
 }
 
+.delete-icon {
+    background: url("../images/trash.png");
+    width: 32px;
+    height: 32px;
+    display: block;
+}
+.edit-icon {
+    background: url("../images/edit-icon.png");
+    width: 32px;
+    height: 32px;
+    display: inline-block;
+}
+
+
+.image-card {
+    max-width: 200px;
+    max-height: 200px;
+}
+
+.container-friend {
+    background: #EFEBEB;
+    padding: 20px;
+}
+.icon-button{
+    background-color: transparent; /* Blue background */
+    border: none; /* Remove borders */
+    padding: 4px 6px; /* Some padding */
+    font-size: 16px; /* Set a font size */
+    cursor: pointer; /* Mouse pointer on hover */
+}
 @media (min-width: 992px) {
-    .card{
-        width:50vw;
+    .card {
+        width: 50vw;
     }
-    .container-form{
-        width : 40vw;
+
+    .container-form {
+        width: 40vw;
     }
 }

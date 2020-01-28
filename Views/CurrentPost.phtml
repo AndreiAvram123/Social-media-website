@@ -5,6 +5,8 @@ $currentPost = $view->currentPost;
 
 if (isset($view->warningMessage)) {
     include "Modals/WarningModal.phtml";
+    //show the modal
+    echo "<script>$('#warningModal').modal('show')</script>";
 }
 //if the currentPost is null
 //then the user must have modified a value in the inspector
@@ -14,17 +16,22 @@ if ($currentPost != null) {
 
     <div class="row mt-4">
         <div class="col">
-            <h1 class="text-center"> <?php echo $currentPost->getPostTitle() ?></h1>
-            <img src="<?php echo $currentPost->getPostImage() ?>" class="img-fluid mx-auto d-block">
+            <h1 class="text-center title-post"> <?php echo $currentPost->getPostTitle() ?></h1>
+            <h3 class="text-center">Category : <?php echo $currentPost-> getCategoryName()?></h3>
+            <img src="<?php if (isset($_SESSION['user_id'])) {
+                echo $currentPost->getPostImage();
+            }else{
+                echo "images/posts/image_not_logged_in.png";
+            } ?>" class="img-fluid mx-auto d-block">
             <p class="post-text mt-5"> <?php echo $currentPost->getPostContent(); ?> </p>
             <?php
             //check if the user is logged in and if the post belong to him
-            if ($view->isUserLoggedIn && !$view->postBelongsToUser) {
+            if (isset($_SESSION['user_id']) && !$view->postBelongsToUser) {
                 if ($currentPost->getIsFavorite() === false) {
                     //if the user is logged in but the post is not added to favorite
                     ?>
-                    <form action="CurrentPost.php" method="post">
-                        <button type="submit" class="btn btn-primary btn" name="addToFavoriteButton">Add to favorites
+                    <form  method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+                        <button type="submit" class="btn btn-primary btn" name="addToFavoriteButton">Add to watch list
                         </button>
                     </form>
                     <?php
@@ -45,25 +52,28 @@ if ($currentPost != null) {
             <?php
             foreach ($currentPostComments as $comment) {
                 ?>
-                <div class="comment">
-                    <div class="comment-body">
-                        <span><?php echo $comment->getAuthor() ?></span>
-                        <p><?php echo $comment->getCommentText(); ?></p>
-                        <?php
-                        //allow the user to remove a comment directly from the post
-                        if (isset($_SESSION['user_id']) && $comment->getCommentUserID() === $_SESSION['user_id']) {
-                            ?>
-                            <form method="post">
-                                <button type="submit" name="removeCommentButton">
-                                    <i class="fas fa-trash-alt"></i></button>
-                                <input type="hidden" name="valueCommentID"
-                                       value="<?php echo md5($comment->getCommentID()) ?>"
-                            </form>
-                            <?php
-                        }
-                        ?>
+                <div class="comment-body mt-3 clearfix">
+                    <span><?php echo $comment->getAuthor() ?></span>
+                    <p><?php echo $comment->getCommentText(); ?></p>
+                    <div>
+                    <span class="float-right"><?php echo $comment->getCommentDate() ?></span>
                     </div>
+                        <?php
+                    //allow the user to remove a comment directly from the post
+                    //but check if the user of the comment is the user logged in
+                    if (isset($_SESSION['user_id']) && $comment->getCommentUserID() === $_SESSION['user_id']) {
+                        ?>
+                        <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+                            <button type="submit" name="removeCommentButton" class="button-icon">
+                                <i class="delete-icon"></i></button>
+                            <input type="hidden" name="valueCommentID"
+                                   value="<?php echo md5($comment->getCommentID()) ?>">
+                        </form>
+                        <?php
+                    }
+                    ?>
                 </div>
+
                 <?php
             }
             ?>
@@ -73,7 +83,7 @@ if ($currentPost != null) {
     <div class="row mt-4">
         <div class="col">
             <?php
-            if ($view->isUserLoggedIn) {
+            if (isset($_SESSION['user_id'])) {
                 ?>
                 <button type="button" class="btn btn-primary btn" data-toggle="modal" data-target="#writeReviewModal">
                     Write

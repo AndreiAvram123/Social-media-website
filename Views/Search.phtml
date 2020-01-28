@@ -1,6 +1,6 @@
 <?php
 include "Views/pageElements/Header.phtml";
-$results = $view-> searchResults;
+$results = $view->searchResults;
 foreach ($results as $post) {
     $view->post = $post;
     ?>
@@ -13,7 +13,7 @@ foreach ($results as $post) {
 
     <?php
 }
-if(sizeof($results)==0) {
+if (sizeof($results) == 0) {
     ?>
     <div class="alert alert-secondary mt-5" role="alert">
         We have not found any result for your search ...

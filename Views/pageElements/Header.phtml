@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <title><?php echo $view->pageTitle; ?></title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -30,7 +31,7 @@
 
                 <?php
                 //include options for the profile if the user is logged in
-                if ($view->isUserLoggedIn) {
+                if (isset($_SESSION['user_id'])) {
 
                 ?>
                 <!--List items that should be shown if the user is logged in -->
@@ -51,11 +52,17 @@
             <form class="form-inline my-2 my-lg-0 mr-4" method="post" action="Search.php">
                 <input class="form-control mr-sm-2" type="search" placeholder="Search posts..." name="search-text"
                        aria-label="Search">
+                <button type="button" class="btn btn-success mr-2" data-toggle="modal" data-target="#filtersModal">
+                    Filters
+                </button>
                 <button class="btn btn-outline-success my-2 my-sm-0" name="search-button" type="submit">Search</button>
-            </form>
+                <?php
+                  include_once "Modals/FiltersModal.phtml";
+                ?>
+             </form>
         </div>
         <?php
-        if (!$view->isUserLoggedIn) {
+        if (!isset($_SESSION['user_id'])) {
             ?>
             <a class="btn btn-primary mr-3" href="Login.php" role="button">Login</a>
             <a class="btn btn-primary" href="Register.php" role="button">Register</a>
@@ -78,8 +85,13 @@
     <?php
     //the confirmation modal is mainly used to ask the user
     //for confirmation for certain actions such as signing out
-    include "Modals/ConfimationModal.phtml"
+    include_once "Modals/ConfimationModal.phtml";
+    include_once "Modals/FiltersModal.phtml";
     ?>
+    <!--Include JQuery in order for bootstrap to properly work
+       Getting the files from cache via link is more efficient than actually
+       storing them on the server
+    -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"

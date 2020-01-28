@@ -2,22 +2,18 @@
 include "Views/pageElements/Header.phtml";
 ?>
 
-<div class="row">
+
+<div class="row" xmlns="http://www.w3.org/1999/html">
     <div class="col">
         <h1 class="page-title text-center mb-3">Here are some recent posts</h1>
+        <?php
+        foreach ($view->posts as $post) {
+            $view->post = $post;
+            include "PostCard.phtml";
+        }
+        ?>
     </div>
 </div>
-
-    <div class="row">
-        <div class="col">
-            <?php
-            foreach ($view->posts as $post) {
-                $view->post = $post;
-                include "PostCard.phtml";
-            }
-            ?>
-        </div>
-    </div>
 
 
 <?php
@@ -30,18 +26,21 @@ if ($view->isUserLoggedIn) {
     <?php
 }
 ?>
-<form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
-<div class="row mt-4">
-    <div class="col text-center">
-        <?php
-        for($i = 1;$i<=$view->numberOfPages;$i++) {
-            ?>
-            <input class="btn btn-primary" type="submit" name="<?php echo md5($i) ?>" value="<?php echo $i ?>">
-            <?php
-        }
-        ?>
+<form method="get" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+    <div class="row mt-4 ">
+        <div class="col text-center">
+            <input type="hidden" name="currentPageId" value="<?php echo md5($view->currentPage) ?>">
+            <!--Make sure that the previous button is disabled if we are on the first page-->
+            <button type="submit" name="previousPage"
+                    class="btn btn-primary" <?php if ($view->currentPage == 1) echo 'disabled' ?>>Previous page
+            </button>
+            <!--Make sure that the next button is disabled if we are on the last page-->
+            <button type="submit" name="nextPage"
+                    class="btn btn-primary" <?php if ($view->currentPage == $view->numberOfPages) echo 'disabled' ?> >
+                Next page
+            </button>
+        </div>
     </div>
-</div>
 </form>
 
 </div>

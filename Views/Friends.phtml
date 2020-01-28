@@ -1,12 +1,35 @@
 <?php
- include "Views/pageElements/Header.phtml";
+include "Views/pageElements/Header.phtml";
+if (!isset($_SESSION['user_id'])) {
+    echo '<meta http-equiv="refresh"
+   content="0; url=index.php">';
+}
+include "Modals/WriteReviewModal.phtml";
+$friends = $view->friends;
 ?>
 
-<div class="row">
-    <div class="col">
-
-    </div>
-</div>
+<?php
+     if(sizeof($friends)!=0) {
+         foreach ($friends as $friend) {
+             $view->friend = $friend;
+             ?>
+             <div class="row mt-3">
+                 <div class="col">
+                     <?php
+                     include "FriendCard.phtml";
+                     ?>
+                 </div>
+             </div>
+             <?php
+         }
+     }else{
+         ?>
+        <div class="alert alert-warning mt-3" role="alert">
+        You do not have any friends yet
+        </div>
+        <?php
+    }
+?>
 
 </div>
 </body>

@@ -1,14 +1,22 @@
 <?php
+/**
+ * This file is the controller used to handler the search action
+ */
 require_once "Data/DataManager.php";
 session_start();
 $view = new stdClass();
-$view->isUserLoggedIn = isset($_SESSION['user_id']);
 $view->pageTitle = "Search results";
 $dbHandler = new DataManager();
+$view->categories = $dbHandler->getAllCategories();
 
 if (isset($_POST['search-button'])) {
+    //make sure that the user has not inserted any code in the search box
     $searchQuery = htmlentities($_POST['search-text']);
-    $view->searchResults = $dbHandler->getSearchResult($searchQuery);
+    //get query filters
+    $category = htmlentities($_POST['postCategoryFilter']);
+    $maxNumberOfResults = htmlentities($_POST['postMaxResults']);
+    $order = htmlentities($_POST['postOrder']);
+    $view->searchResults = $dbHandler->getSearchResult($searchQuery,$category,$order,$maxNumberOfResults);
 }
 
 include "Views/Search.phtml";
