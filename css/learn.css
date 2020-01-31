@@ -1,0 +1,67 @@
+
+#article-heading {
+    color: #4197CD;
+    text-align: left;
+}
+
+#article-content {
+    color: white;
+}
+
+#article-menu {
+    height: 100%;
+    background: #343A40;
+    position: fixed;
+    top: 10%;
+    right: 0;
+    transition: 0.5s;
+    overflow-x: hidden;
+
+}
+
+
+#article-menu > i {
+    font-size: 30px;
+    top: 1%;
+    left: 2%;
+    transform: translate(2%, 1%);
+}
+
+#open-nav {
+    font-size: 30px;
+    top: 50%;
+    right: 5%;
+    transform: translate(50%, 5%);
+}
+
+
+#article-menu > h1 {
+    margin-top: 10px;
+    font-size: 25px;
+    color: #946025;
+}
+
+
+article p {
+    color: white;
+
+}
+
+#article-image {
+    /* Align the image in the middle */
+    /* margin-left:auto;
+    margin-right:auto;
+    display:block; */
+    margin-left: 0px;
+
+}
+
+
+#article-menu {
+    width: 15%;
+    padding: 15px;
+}
+
+
+
+

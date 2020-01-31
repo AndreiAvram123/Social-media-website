@@ -2,6 +2,7 @@
 session_start();
 require_once "Data/SessionManager.php";
 require_once "Data/DataManager.php";
+require_once "Data/ChatManager.php";
 $view = new stdClass();
 $view->pageTitle = "Home";
 $dbHandle = DataManager::getInstance();
@@ -31,10 +32,20 @@ if(isset($_GET['nextPage'])){
         }
     }
 }
+
 $view->currentPage = $currentPage;
 $view->posts = $dbHandle->getPosts($view->currentPage);
+$view ->friends = $dbHandle->getAllFriends($_SESSION['user_id']);
+
+//todo
+//modify this
+$charManager = ChatManager::getInstance();
+if(isset($_POST["messageContent"])){
+
+}
 
 
+$view->messages =$charManager->getMessagesWithUser(2);
 
 $view->isUserLoggedIn = isset($_SESSION['user_id']);
 
