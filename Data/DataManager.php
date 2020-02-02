@@ -681,4 +681,23 @@ WHERE comment_post_id = '$postID'";
         $result->execute();
     }
 
+    public function sendFriendRequest($sender_id, $receiver_id)
+    {
+        $query = "INSERT INTO friend_requests VALUES (NULL,'$sender_id','$receiver_id')";
+        $result = $this->_dbHandler->prepare($query);
+        $result->execute();
+    }
+
+    public function getAllFriendRequests($user_id)
+    {
+         $query = "SELECT * FROM friend_requests WHERE receiver_id = '$user_id'";
+         $result = $this->_dbHandler->prepare($query);
+         $result->execute();
+         $friendRequests=[];
+         while($row = $result->fetch()){
+             $friendRequests[] = new FriendRequest($row);
+         }
+         return $friendRequests;
+    }
+
 }

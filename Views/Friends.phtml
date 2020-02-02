@@ -7,7 +7,12 @@ if (!isset($_SESSION['user_id'])) {
 include "Modals/WriteReviewModal.phtml";
 $friends = $view->friends;
 ?>
+<h3 class="text-center">Pending requests</h3>
+<div class="row">
+    <div class="col">
+    </div>
 
+</div>
 <?php
      if(sizeof($friends)!=0) {
          foreach ($friends as $friend) {

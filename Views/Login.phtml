@@ -4,7 +4,7 @@ if(isset($_SESSION['user_id'])){
    content="0; url=index.php">';
 }
 ?>
-<form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+<form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>" onsubmit="return robotTestPassed ">
     <div class ="container-form">
         <div class="form-group">
             <label for="inputEmailLogin">Email address</label>
@@ -17,13 +17,9 @@ if(isset($_SESSION['user_id'])){
             <input name="passwordSignIn" type="password" class="form-control" id="inputPasswordLogin"
                    placeholder="Password">
         </div>
-        <div class="mt-4 form-group">
-            <img src="Data/Captcha.php" alt=""/>
-            <div>
-                <input type="text" name="captchaValueEntered"/>
-            </div>
-        </div>
-        <button type="submit" class="btn btn-primary" name="loginButton">Log in</button>
+        <div class="g-recaptcha" data-sitekey="6LdKHNUUAAAAAHsmXarGJoQsxW56PmU3K4n4mK41" data-callback="enableButton"></div>
+
+        <button type="submit" class="btn btn-primary" name="loginButton" id="loginButton" disabled>Log in</button>
          <?php if(isset($view->errorMessage)) {
 
              ?>
@@ -35,8 +31,17 @@ if(isset($_SESSION['user_id'])){
          }
         ?>
     </div>
+    <script>
+        var robotTestPassed = false;
+        function enableButton() {
+          robotTestPassed = true;
+          document.getElementById("loginButton").disabled = false;
+        }</script>
 </form>
 
 </div>
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
 </body>
+
 </html>
