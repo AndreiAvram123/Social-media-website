@@ -2,14 +2,16 @@
 
 class FriendRequest
 {
-   private $senderId;
-   private $receiverId;
+    private $requestId;
+    private $senderId;
+    private $receiverId;
 
-   public function __construct($row)
-   {
-       $this->senderId = $row["sender_id"];
-       $this->receiverId = $row["receiver_id"];
-   }
+    public function __construct($row)
+    {
+        $this->senderId = $row["sender_id"];
+        $this->receiverId = $row["receiver_id"];
+        $this->receiverId = $row["request_id"];
+    }
 
 
     public function getSenderId()
@@ -22,5 +24,12 @@ class FriendRequest
     {
         return $this->receiverId;
     }
+
+
+    public function getRequestId()
+    {
+        return $this->requestId;
+    }
+
 
 }

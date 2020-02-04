@@ -1,11 +1,11 @@
 <?php include "Views/pageElements/Header.phtml";
-if(isset($_SESSION['user_id'])){
-    echo  '<meta http-equiv="refresh"
+if (isset($_SESSION['user_id'])) {
+    echo '<meta http-equiv="refresh"
    content="0; url=index.php">';
 }
 ?>
 <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>" onsubmit="return robotTestPassed ">
-    <div class ="container-form">
+    <div class="container-form">
         <div class="form-group">
             <label for="inputEmailLogin">Email address</label>
             <input type="email" class="form-control" id="inputEmailLogin" aria-describedby="emailHelp"
@@ -17,25 +17,26 @@ if(isset($_SESSION['user_id'])){
             <input name="passwordSignIn" type="password" class="form-control" id="inputPasswordLogin"
                    placeholder="Password">
         </div>
-        <div class="g-recaptcha" data-sitekey="6LdKHNUUAAAAAHsmXarGJoQsxW56PmU3K4n4mK41" data-callback="enableButton"></div>
+        <div class="g-recaptcha" data-sitekey="6LdKHNUUAAAAAHsmXarGJoQsxW56PmU3K4n4mK41"
+             data-callback="enableButton"></div>
 
-        <button type="submit" class="btn btn-primary" name="loginButton" id="loginButton" disabled>Log in</button>
-         <?php if(isset($view->errorMessage)) {
+        <button type="submit" class="btn btn-primary" name="loginButton" id="submitButton" disabled>Log in</button>
+        <?php if (isset($view->errorMessage)) {
 
-             ?>
-             <div class="alert alert-danger mt-3" role="alert">
-                <?php echo $view->errorMessage?>
-             </div>
+            ?>
+            <div class="alert alert-danger mt-3" role="alert">
+                <?php echo $view->errorMessage ?>
+            </div>
 
-             <?php
-         }
+            <?php
+        }
         ?>
     </div>
     <script>
         var robotTestPassed = false;
         function enableButton() {
-          robotTestPassed = true;
-          document.getElementById("loginButton").disabled = false;
+            robotTestPassed = true;
+            document.getElementById("submitButton").disabled = false;
         }</script>
 </form>
 
