@@ -1,3 +1,21 @@
+#friendsList{
+    z-index: 1;
+    position: fixed;
+    bottom: 10px;
+    width: 15%;
+    right: 2%;
+    background: #EBE2E2;
+}
+#header-friends-list{
+    background: #007BFF;
+  border-bottom: 2px solid;
+    cursor:pointer;
+}
+#header-friends-list >p{
+    font-size: 20px;
+    margin-bottom: 0 !important;
+}
+
 .message-window {
     position: fixed;
     bottom: 10px;
@@ -5,9 +23,16 @@
     right: 18%;
     background: #EBE2E2;
 }
+.message-window .fa-times {
+    cursor: pointer;
+    font-size: 30px;
+}
 
 .message-header {
+    cursor: pointer;
     background: #007BFF;
+    padding-top: 2px;
+    padding-bottom: 1px;
 }
 
 

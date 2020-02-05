@@ -16,36 +16,45 @@ include "Views/pageElements/Header.phtml";
     if (isset($view->friends)) {
         ?>
         <script src="Javascript/MessageManager.js"></script>
-        <div class="col-1">
+        <div id="friendsList" class="text-center">
+            <div id="header-friends-list" onclick="toggleElement(document.getElementById('friends-list-body'))">
+                <p>Friends</p>
+            </div>
+            <div id="friends-list-body">
 
-            <?php
-            foreach ($view->friends as $friend) {
-                ?>
-                <div>
-                    <a href="#"
-                       onclick="startChat('<?php echo $_SESSION['user_id']?>',
-                               '<?php echo $friend->getUserId() ?>','<?php echo $friend->getUsername()?>')"><?php echo $friend->getUsername() ?></a>
-                </div>
                 <?php
-            }
-            ?>
+                foreach ($view->friends as $friend) {
+                    ?>
+                    <div>
+                        <button class="link-button"
+                                onclick="startChat('<?php echo $_SESSION['user_id'] ?>',
+                                        '<?php echo $friend->getUserId() ?>','<?php echo $friend->getUsername() ?>')"><?php echo $friend->getUsername() ?>
+                        </button>
+                    </div>
+                    <?php
+                }
+                ?>
+            </div>
         </div>
         <?php
     }
     ?>
 </div>
 
-
 <?php
-//only show the add post button if the user is logged in
-if ($view->isUserLoggedIn) {
-    ?>
-    <a href="AddPost.php">
-        <div class="float"><i class="fa fa-plus add-button"></i></div>
-    </a>
-    <?php
-}
-?>
+//todo
+//don't forget to reAdd this feature
+
+
+////only show the add post button if the user is logged in
+//if ($view->isUserLoggedIn) {
+//    ?>
+<!--    <a href="AddPost.php">-->
+<!--        <div class="float"><i class="fa fa-plus add-button"></i></div>-->
+<!--    </a>-->
+<!--    --><?php
+//}
+//?>
 <form method="get" action="<?php echo $_SERVER['PHP_SELF']; ?>">
     <div class="row mt-4 ">
         <div class="col text-center">

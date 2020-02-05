@@ -3,10 +3,10 @@ let timeIntervalCheck = 1000;
 let intervalCheck;
 let lastMessageDate;
 let sessionUserId;
-let windowInitialized = false;
+let chatWindowInitialized = false;
 
 function fetchNewMessages(receiverId, container) {
-    let url = "asyncControllers/ChatController.php?requestName=fetchNewMessages";
+    let url = "ChatController.php?requestName=fetchNewMessages";
     url += "&lastMessageDate=" + lastMessageDate;
     url += "&currentUserId=" + sessionUserId;
     url += "&receiverId=" + receiverId;
@@ -25,17 +25,21 @@ function fetchNewMessages(receiverId, container) {
 function sendMessage(receiverId) {
     let messageField = document.getElementById("messageField");
     let message = messageField.value;
-    //  let messageContainer = document.getElementById("messageContainer");
+    let messageContainer = document.getElementsByClassName("message-container")[0];
     if (message.trim() !== "") {
         let dataToSend = "messageContent=" + message;
         dataToSend += "&receiverId=" + receiverId;
         dataToSend += "&currentUserId=" + sessionUserId;
         let xhttp = new XMLHttpRequest();
+
         xhttp.open("POST", "asyncControllers/ChatController.php", true);
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         xhttp.send(dataToSend);
-        messageField.value = "";
 
+        let messageJson = JSON.parse("{ \"messageContent\":\"" + messageField.value + "\" , \"senderId\":\""
+            + sessionUserId + "\",\"messageDate\":\"" + new Date().getTime() + "\"}");
+        addMessageToChat(messageJson, messageContainer);
+        messageField.value = "";
 
     }
 }
@@ -48,10 +52,11 @@ function getXmlHttpGetRequest(url) {
 }
 
 function startChat(currentUserId, receiverId, username) {
-    if (windowInitialized === false) {
+    if (chatWindowInitialized === false) {
         sessionUserId = currentUserId;
         document.body.innerHTML += '<div class="message-window" >\n' +
-            '    <div class="message-header" onclick="updateMessageWindowVisibility()">' +
+            '<i class="fas fa-times float-right" onclick="removeChat(this.parentNode)"></i>' +
+            '    <div class="message-header" onclick="toggleElement(document.getElementById(' + '\''+ 'message-window-body'+ '\')'+')">' +
             '        <p class="text-center" style="color: white">' + username + '</p>\n' +
             '    </div>\n' +
             '    <div id="message-window-body">\n' +
@@ -75,6 +80,10 @@ function startChat(currentUserId, receiverId, username) {
     }
 }
 
+function removeChat(chat){
+    document.body.removeChild(chat);
+    chatWindowInitialized = false;
+}
 function updateMessageWindowVisibility() {
 
     let messageContainer = document.getElementById("message-window-body");
@@ -88,36 +97,51 @@ function updateMessageWindowVisibility() {
 function processMessages(data, container) {
     let jsonDataArray = JSON.parse(data);
     jsonDataArray.forEach(elementData => {
-        let messageView = getMessageView(elementData);
-        container.appendChild(messageView);
+        addMessageToChat(elementData, container);
     });
-    lastMessageDate = jsonDataArray[jsonDataArray.length - 1].messageDate;
+}
 
-
-    function getMessageView(messageData) {
-        let messageView = document.createElement("p");
-        messageView.innerText = messageData.messageContent;
-        if (messageData.sender_id === sessionUserId) {
-            messageView.style.textAlign = "right";
-        }
-        return messageView;
+function addMessageToChat(messageJson, container) {
+    let messageView = document.createElement("p");
+    messageView.innerText = messageJson.messageContent;
+    if (messageJson.senderId === sessionUserId) {
+        messageView.style.textAlign = "right";
     }
+    container.appendChild(messageView);
+    lastMessageDate = messageJson.messageDate;
+    scrollToLastMessage(container);
 
+}
+function  scrollToLastMessage(container) {
+  container.scrollTop = container.lastChild.offsetTop;
 }
 
 
 function fetchChatMessages(user2Id, container) {
-    let url = "asyncControllers/ChatController.php?requestName=fetchMessages";
+    let url = "ChatController.php?requestName=fetchMessages";
     url += "&user1Id=" + sessionUserId;
     url += "&user2Id=" + user2Id;
     getXmlHttpGetRequest(url).onreadystatechange = function () {
         if (this.readyState === 4 && this.status === 200) {
-            console.log(this.responseText);
             if (this.responseText.trim() !== "No results") {
                 processMessages(this.responseText, container, sessionUserId);
                 intervalCheck = setInterval(fetchNewMessages, timeIntervalCheck, user2Id, container);
             }
         }
     };
-
 }
+function toggleElement(element){
+    if(element.style.display !== "none"){
+        element.style.display = "none";
+    }else{
+        element.style.display = "block";
+    }
+}
+
+
+
+
+
+
+
+

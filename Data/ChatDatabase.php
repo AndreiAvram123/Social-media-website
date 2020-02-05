@@ -1,8 +1,6 @@
 <?php
-$path_database = $_SERVER['DOCUMENT_ROOT'] . "/myCms/Data/Database.php";
-$path_message_class = $_SERVER['DOCUMENT_ROOT'] . "/myCms/Data/Message.php";
-require_once($path_database);
-require_once($path_message_class);
+require_once("Data/Database.php");
+require_once("Data/Message.php");
 
 class ChatDatabase
 {
