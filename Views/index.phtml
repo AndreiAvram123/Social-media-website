@@ -12,66 +12,81 @@ include "Views/pageElements/Header.phtml";
         }
         ?>
     </div>
-    <?php
-    if (isset($view->friends)) {
-        ?>
-        <script src="Javascript/MessageManager.js"></script>
-        <div id="friendsList" class="text-center">
-            <div id="header-friends-list" onclick="toggleElement(document.getElementById('friends-list-body'))">
-                <p>Friends</p>
-            </div>
-            <div id="friends-list-body">
 
-                <?php
-                foreach ($view->friends as $friend) {
-                    ?>
-                    <div>
-                        <button class="link-button"
-                                onclick="startChat('<?php echo $_SESSION['user_id'] ?>',
-                                        '<?php echo $friend->getUserId() ?>','<?php echo $friend->getUsername() ?>')"><?php echo $friend->getUsername() ?>
-                        </button>
-                    </div>
-                    <?php
-                }
-                ?>
-            </div>
+    <script src="Javascript/ChatManager.js"></script>
+    <div id="friendsList" class="text-center">
+        <div id="header-friends-list" onclick="toggleElement(document.getElementById('friends-list-body'))">
+            <p>Friends</p>
         </div>
-        <?php
-    }
-    ?>
-</div>
+        <div id="friends-list-body">
+            <div class="mt-3 mb-3">
+                <input class="form-control mr-sm-2" autocomplete="off" type="search"
+                       placeholder="Search for new people"
+                       name="search-text"
+                       aria-label="Search"
+                       onkeyup="fetchFriendsSuggestions(this.value)"
+                >
+            </div>
+            <?php
+            if (isset($view->friends)) {
+                ?>
+                <div id="friend-container">
+                    <?php
+                    foreach ($view->friends as $friend) {
+                        ?>
+                        <div>
+                            <button class="link-button"
+                                    onclick="startChat('<?php echo $_SESSION['user_id'] ?>',
+                                            '<?php echo $friend->getUserId() ?>','<?php echo $friend->getUsername() ?>')"><?php echo $friend->getUsername() ?>
+                            </button>
+                        </div>
+                        <?php
+                    }
+                    ?>
+                </div>
+                <?php
+            }
+            ?>
+            <div id ="friends-suggestions-container">
 
-<?php
-//todo
-//don't forget to reAdd this feature
-
-
-////only show the add post button if the user is logged in
-//if ($view->isUserLoggedIn) {
-//    ?>
-<!--    <a href="AddPost.php">-->
-<!--        <div class="float"><i class="fa fa-plus add-button"></i></div>-->
-<!--    </a>-->
-<!--    --><?php
-//}
-//?>
-<form method="get" action="<?php echo $_SERVER['PHP_SELF']; ?>">
-    <div class="row mt-4 ">
-        <div class="col text-center">
-            <input type="hidden" name="currentPageId" value="<?php echo md5($view->currentPage) ?>">
-            <!--Make sure that the previous button is disabled if we are on the first page-->
-            <button type="submit" name="previousPage"
-                    class="btn btn-primary" <?php if ($view->currentPage == 1) echo 'disabled' ?>>Previous page
-            </button>
-            <!--Make sure that the next button is disabled if we are on the last page-->
-            <button type="submit" name="nextPage"
-                    class="btn btn-primary" <?php if ($view->currentPage == $view->numberOfPages) echo 'disabled' ?> >
-                Next page
-            </button>
+            </div>
         </div>
     </div>
-</form>
 </div>
+
+    <?php
+    //todo
+    //don't forget to reAdd this feature
+
+
+    ////only show the add post button if the user is logged in
+    //if ($view->isUserLoggedIn) {
+    //    ?>
+    <!--    <a href="AddPost.php">-->
+    <!--        <div class="float"><i class="fa fa-plus add-button"></i></div>-->
+    <!--    </a>-->
+    <!--    --><?php
+    //}
+    //?>
+    <form method="get" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+        <div class="row mt-4 ">
+            <div class="col text-center">
+                <input type="hidden" name="currentPageId" value="<?php echo md5($view->currentPage) ?>">
+                <!--Make sure that the previous button is disabled if we are on the first page-->
+                <button type="submit" name="previousPage"
+                        class="btn btn-primary" <?php if ($view->currentPage == 1) echo 'disabled' ?>>Previous page
+                </button>
+                <!--Make sure that the next button is disabled if we are on the last page-->
+                <button type="submit" name="nextPage"
+                        class="btn btn-primary" <?php if ($view->currentPage == $view->numberOfPages) echo 'disabled' ?> >
+                    Next page
+                </button>
+            </div>
+        </div>
+    </form>
+
+</div>
+<script src="Javascript/LiveSearch.js"></script>
 </body>
 </html>
 

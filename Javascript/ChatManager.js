@@ -24,10 +24,10 @@ function fetchNewMessages(receiverId, container) {
 
 function sendMessage(receiverId) {
     let messageField = document.getElementById("messageField");
-    let message = messageField.value;
+    let message = messageField.value.trim();
     let messageContainer = document.getElementsByClassName("message-container")[0];
-    if (message.trim() !== "") {
-        let dataToSend = "messageContent=" + message;
+    if (message !== "") {
+        let dataToSend = "messageContent=" ;
         dataToSend += "&receiverId=" + receiverId;
         dataToSend += "&currentUserId=" + sessionUserId;
         let xhttp = new XMLHttpRequest();
@@ -36,7 +36,7 @@ function sendMessage(receiverId) {
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         xhttp.send(dataToSend);
 
-        let messageJson = JSON.parse("{ \"messageContent\":\"" + messageField.value + "\" , \"senderId\":\""
+        let messageJson = JSON.parse("{ \"messageContent\":\"" + message + "\" , \"senderId\":\""
             + sessionUserId + "\",\"messageDate\":\"" + new Date().getTime() + "\"}");
         addMessageToChat(messageJson, messageContainer);
         messageField.value = "";
@@ -56,7 +56,7 @@ function startChat(currentUserId, receiverId, username) {
         sessionUserId = currentUserId;
         document.body.innerHTML += '<div class="message-window" >\n' +
             '<i class="fas fa-times float-right" onclick="removeChat(this.parentNode)"></i>' +
-            '    <div class="message-header" onclick="toggleElement(document.getElementById(' + '\''+ 'message-window-body'+ '\')'+')">' +
+            '    <div class="message-header" onclick="toggleElement(document.getElementById(' + '\'' + 'message-window-body' + '\')' + ')">' +
             '        <p class="text-center" style="color: white">' + username + '</p>\n' +
             '    </div>\n' +
             '    <div id="message-window-body">\n' +
@@ -80,18 +80,9 @@ function startChat(currentUserId, receiverId, username) {
     }
 }
 
-function removeChat(chat){
+function removeChat(chat) {
     document.body.removeChild(chat);
     chatWindowInitialized = false;
-}
-function updateMessageWindowVisibility() {
-
-    let messageContainer = document.getElementById("message-window-body");
-    if (messageContainer.style.display === "block") {
-        messageContainer.style.display = "none";
-    } else {
-        messageContainer.style.display = "block";
-    }
 }
 
 function processMessages(data, container) {
@@ -112,8 +103,9 @@ function addMessageToChat(messageJson, container) {
     scrollToLastMessage(container);
 
 }
-function  scrollToLastMessage(container) {
-  container.scrollTop = container.lastChild.offsetTop;
+
+function scrollToLastMessage(container) {
+    container.scrollTop = container.lastChild.offsetTop;
 }
 
 
@@ -130,13 +122,24 @@ function fetchChatMessages(user2Id, container) {
         }
     };
 }
-function toggleElement(element){
-    if(element.style.display !== "none"){
+
+function toggleElement(element) {
+    if (element.style.display !== "none") {
         element.style.display = "none";
-    }else{
+    } else {
         element.style.display = "block";
     }
 }
+
+
+
+
+
+
+
+
+
+
 
 
 

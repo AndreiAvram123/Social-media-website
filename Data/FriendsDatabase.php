@@ -3,6 +3,7 @@
 require_once "Data/Database.php";
 require_once "Data/FriendRequest.php";
 require_once "Data/User.php";
+require_once "Data/UserModelAsync.php";
 class FriendsDatabase
 {
 
@@ -137,6 +138,26 @@ class FriendsDatabase
     public function rejectFriendRequest($senderId, $receiverId)
     {
         $this->deleteFriendRequest($senderId,$receiverId);
+    }
+
+    /**
+     * Use this method in order to get a list of friend suggestions
+     * for a given query
+     * The query returns only the id, username and profile picture in order to optimize
+     * the speed
+     * @param $query
+     * @return array
+     */
+    public function getAllFriendsSuggestionsForQuery($query)
+    {
+        $query = "SELECT user_id,username,profile_picture FROM users WHERE username LIKE '$query%'";
+        $result = $this->_dbHandler ->prepare($query);
+        $result->execute();
+        $users = [];
+        while($row = $result->fetch()){
+            $users[] = new UserModelAsync($row);
+        }
+        return $users;
     }
 
 }
