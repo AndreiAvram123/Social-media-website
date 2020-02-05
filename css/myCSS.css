@@ -1,3 +1,40 @@
+.message-window {
+    position: fixed;
+    bottom: 10px;
+    width: 20%;
+    right: 18%;
+    background: #EBE2E2;
+}
+
+.message-header {
+    background: #007BFF;
+}
+
+
+.message-container {
+    overflow: auto;
+    height: 40vh;
+}
+
+.message-area {
+    overflow: auto;
+    height: 40vh;
+}
+
+.message-footer {
+    display :flex;
+}
+
+.message-footer > textarea {
+    width: 100%;
+    resize: none;
+}
+
+.message-footer  button {
+    background: #007BFF;
+    color: white
+}
+
 .navbar-collapse a {
     font-size: 20px;
 }
@@ -5,7 +42,8 @@
 .page-title {
     color: #007BFF;
 }
-.card-title{
+
+.card-title {
     display: inline;
 }
 
@@ -25,9 +63,11 @@
 .text-area {
     resize: none;
 }
-.title-post{
-    color:#007BFF;
+
+.title-post {
+    color: #007BFF;
 }
+
 .float {
     position: fixed;
     width: 60px;
@@ -61,10 +101,12 @@
     background: #F1EEEE;
 
 }
-.comment-body p{
+
+.comment-body p {
     margin-top: 10px;
 }
-.comment-body span{
+
+.comment-body span {
     color: #0079BF;
     font-weight: bold;
 }
@@ -98,6 +140,7 @@
     height: 32px;
     display: block;
 }
+
 .edit-icon {
     background: url("../images/edit-icon.png");
     width: 32px;
@@ -111,17 +154,20 @@
     max-height: 200px;
 }
 
-.container-friend {
+.container-item {
     background: #EFEBEB;
     padding: 20px;
 }
-.icon-button{
+
+
+.icon-button {
     background-color: transparent; /* Blue background */
     border: none; /* Remove borders */
     padding: 4px 6px; /* Some padding */
     font-size: 16px; /* Set a font size */
     cursor: pointer; /* Mouse pointer on hover */
 }
+
 @media (min-width: 992px) {
     .card {
         width: 50vw;
@@ -131,3 +177,4 @@
         width: 40vw;
     }
 }
+

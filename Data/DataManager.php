@@ -3,6 +3,7 @@ require_once "Data/Database.php";
 require_once "Data/Comment.php";
 require_once "Data/Post.php";
 require_once "Data/User.php";
+require_once "Data/FriendRequest.php";
 
 /**
  * This class is used to handle
@@ -545,50 +546,7 @@ WHERE comment_post_id = '$postID'";
         return new User($row);
     }
 
-    /**
-     * Method used to add an User to another user's friends liss
-     * @param $currentUserId - the id of the current logged in user
-     * @param $userId - the id of the user that should be added to the friends list
-     */
-    public function addToFriendList($currentUserId, $userId)
-    {
-        $query = "INSERT INTO friends VALUES ('$currentUserId','$userId')";
-        $result = $this->_dbHandler->prepare($query);
-        $result->execute();
-    }
 
-    /**
-     * Get an array of users(friends) by passing the id of the current
-     * logged in user
-     * @param $user_id
-     * @return array
-     */
-    public function getAllFriends($user_id)
-    {
-        $query = "SELECT * FROM users WHERE user_id IN 
-        (SELECT user2_id from friends WHERE user1_id = '$user_id')";
-        $result = $this->_dbHandler->prepare($query);
-        $result->execute();
-        $friends = [];
-        while ($row = $result->fetch()) {
-            $friends[] = new User($row);
-        }
-        return $friends;
-    }
-
-    /**
-     * Method used to remove a friend from the friends' list of
-     * the current user
-     * @param $user_id
-     * @param $friendId
-     */
-    public function removeFriend($user_id, $friendId)
-    {
-        $query = "DELETE FROM friends WHERE user1_id ='$user_id' AND user2_id = '$friendId'";
-        $result = $this->_dbHandler->prepare($query);
-        $result->execute();
-
-    }
 
     /**
      * Update the post title in the
@@ -680,5 +638,7 @@ WHERE comment_post_id = '$postID'";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
     }
+
+
 
 }

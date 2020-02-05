@@ -2,7 +2,6 @@
 include "Views/pageElements/Header.phtml";
 ?>
 
-
 <div class="row" xmlns="http://www.w3.org/1999/html">
     <div class="col">
         <h1 class="page-title text-center mb-3">Here are some recent posts</h1>
@@ -13,6 +12,27 @@ include "Views/pageElements/Header.phtml";
         }
         ?>
     </div>
+    <?php
+    if (isset($view->friends)) {
+        ?>
+        <script src="Javascript/MessageManager.js"></script>
+        <div class="col-1">
+
+            <?php
+            foreach ($view->friends as $friend) {
+                ?>
+                <div>
+                    <a href="#"
+                       onclick="startChat('<?php echo $_SESSION['user_id']?>',
+                               '<?php echo $friend->getUserId() ?>','<?php echo $friend->getUsername()?>')"><?php echo $friend->getUsername() ?></a>
+                </div>
+                <?php
+            }
+            ?>
+        </div>
+        <?php
+    }
+    ?>
 </div>
 
 
@@ -42,7 +62,6 @@ if ($view->isUserLoggedIn) {
         </div>
     </div>
 </form>
-
 </div>
 </body>
 </html>
