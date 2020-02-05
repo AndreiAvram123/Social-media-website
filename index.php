@@ -3,9 +3,13 @@ session_start();
 require_once "Data/SessionManager.php";
 require_once "Data/DataManager.php";
 require_once "Data/ChatManager.php";
+require_once "Data/FriendsDatabase.php";
+
 $view = new stdClass();
 $view->pageTitle = "Home";
 $dbHandle = DataManager::getInstance();
+$dbFriends = FriendsDatabase::getInstance();
+
 $numberOfPages = $dbHandle->getNumberOfPages();
 $view->numberOfPages = $numberOfPages;
 $view->categories = $dbHandle->getAllCategories();
@@ -35,20 +39,9 @@ if(isset($_GET['nextPage'])){
 
 $view->currentPage = $currentPage;
 $view->posts = $dbHandle->getPosts($view->currentPage);
-
-//
-//$view ->friends = $dbHandle->getAllFriends($_SESSION['user_id']);
-//
-////todo
-////modify this
-//$charManager = ChatManager::getInstance();
-//if(isset($_POST["messageContent"])){
-//
-//}
-//
-//
-//$view->messages =$charManager->getMessagesWithUser(2);
-
+if(isset($_SESSION['user_id'])) {
+    $view->friends = $dbFriends->getAllFriends($_SESSION['user_id']);
+}
 $view->isUserLoggedIn = isset($_SESSION['user_id']);
 
 require_once "Views/index.phtml";

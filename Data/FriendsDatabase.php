@@ -49,7 +49,8 @@ class FriendsDatabase
     public function getAllFriends($user_id)
     {
         $query = "SELECT * FROM users WHERE user_id IN 
-        (SELECT user2_id from friends WHERE user1_id = '$user_id')";
+        (SELECT user2_id from friends WHERE user1_id = '$user_id') OR
+         user_id IN (SELECT user1_id from friends WHERE user2_id = '$user_id')";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         $friends = [];
@@ -58,8 +59,9 @@ class FriendsDatabase
         }
         return $friends;
     }
+
     /**
-     * Method used to add an User to another user's friends liss
+     * Method used to add an User to another user's friends list
      * @param $currentUserId - the id of the current logged in user
      * @param $userId - the id of the user that should be added to the friends list
      */

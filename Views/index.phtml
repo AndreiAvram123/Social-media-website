@@ -1,7 +1,6 @@
 <?php
 include "Views/pageElements/Header.phtml";
 ?>
-<link rel="stylesheet" href="css/learn.css">
 
 <div class="row" xmlns="http://www.w3.org/1999/html">
     <div class="col">
@@ -13,20 +12,28 @@ include "Views/pageElements/Header.phtml";
         }
         ?>
     </div>
+    <?php
+    if (isset($view->friends)) {
+        ?>
+        <script src="Javascript/MessageManager.js"></script>
+        <div class="col-1">
+
+            <?php
+            foreach ($view->friends as $friend) {
+                ?>
+                <div>
+                    <a href="#"
+                       onclick="startChat('<?php echo $_SESSION['user_id']?>',
+                               '<?php echo $friend->getUserId() ?>','<?php echo $friend->getUsername()?>')"><?php echo $friend->getUsername() ?></a>
+                </div>
+                <?php
+            }
+            ?>
+        </div>
+        <?php
+    }
+    ?>
 </div>
-<!--<section id="article-menu">-->
-<!--    --><?php
-//    foreach ($view->friends as $friend) {
-//
-//        ?>
-<!--        <div>-->
-<!--            <a href="#" onclick="startChat()">--><?php //echo $friend->getUsername() ?><!--</a>-->
-<!--        </div>-->
-<!--        --><?php
-//    }
-//    ?>
-<!--    <script src="javascript/PageManager.js"></script>-->
-<!--</section>-->
 
 
 <?php
@@ -55,7 +62,6 @@ if ($view->isUserLoggedIn) {
         </div>
     </div>
 </form>
-
 </div>
 </body>
 </html>
