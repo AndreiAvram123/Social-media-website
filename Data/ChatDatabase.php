@@ -40,10 +40,15 @@ class ChatDatabase
 
     public function insertNewMessage($messageContent, $date, $sender_id, $receiver_id)
     {
-        $query = "INSERT INTO messages VALUES (NULL,'$messageContent','$date',
-                             '$sender_id','$receiver_id')";
+        $query = "INSERT INTO messages VALUES (NULL,'$messageContent','$date', '$sender_id','$receiver_id')";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
+        $message = new stdClass();
+        $message->messageContent = $messageContent;
+        $message->messageDate = $date;
+        $message->senderId = $sender_id;
+
+        return json_encode($message);
     }
 
     public function getNewMessages($lastMessageDate, $user1Id, $user2Id)

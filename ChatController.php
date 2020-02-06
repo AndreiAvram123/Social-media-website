@@ -31,7 +31,7 @@ if (isset($_REQUEST["requestName"]) && $_REQUEST["requestName"] === "fetchNewMes
 if (isset($_REQUEST["messageContent"]) &&
     isset($_REQUEST["receiverId"]) && isset($_REQUEST["currentUserId"])) {
     $messageDate = time() * 1000;
-    $chatDatabase->insertNewMessage($_REQUEST["messageContent"],
+    echo $chatDatabase->insertNewMessage($_REQUEST["messageContent"],
         $messageDate, $_REQUEST["currentUserId"], $_REQUEST["receiverId"]);
 
 }

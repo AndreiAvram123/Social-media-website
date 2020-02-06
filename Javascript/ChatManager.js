@@ -27,20 +27,24 @@ function sendMessage(receiverId) {
     let message = messageField.value.trim();
     let messageContainer = document.getElementsByClassName("message-container")[0];
     if (message !== "") {
-        let dataToSend = "messageContent=" ;
+
+        let dataToSend = "messageContent=" + message;
         dataToSend += "&receiverId=" + receiverId;
         dataToSend += "&currentUserId=" + sessionUserId;
         let xhttp = new XMLHttpRequest();
 
-        xhttp.open("POST", "asyncControllers/ChatController.php", true);
+        xhttp.open("POST", "ChatController.php", true);
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         xhttp.send(dataToSend);
+        xhttp.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 200) {
+                console.log(this.responseText);
+                let messageJson = JSON.parse(this.responseText);
+                addMessageToChat(messageJson, messageContainer);
+            }
 
-        let messageJson = JSON.parse("{ \"messageContent\":\"" + message + "\" , \"senderId\":\""
-            + sessionUserId + "\",\"messageDate\":\"" + new Date().getTime() + "\"}");
-        addMessageToChat(messageJson, messageContainer);
+        }
         messageField.value = "";
-
     }
 }
 
@@ -98,8 +102,9 @@ function addMessageToChat(messageJson, container) {
     if (messageJson.senderId === sessionUserId) {
         messageView.style.textAlign = "right";
     }
-    container.appendChild(messageView);
     lastMessageDate = messageJson.messageDate;
+    console.log(lastMessageDate);
+    container.appendChild(messageView);
     scrollToLastMessage(container);
 
 }
@@ -116,6 +121,7 @@ function fetchChatMessages(user2Id, container) {
     getXmlHttpGetRequest(url).onreadystatechange = function () {
         if (this.readyState === 4 && this.status === 200) {
             if (this.responseText.trim() !== "No results") {
+                console.log(this.responseText);
                 processMessages(this.responseText, container, sessionUserId);
                 intervalCheck = setInterval(fetchNewMessages, timeIntervalCheck, user2Id, container);
             }
