@@ -17,7 +17,7 @@ if (isset($_REQUEST["requestName"]) && $_REQUEST["requestName"] === "fetchMessag
 if (isset($_REQUEST["requestName"]) && $_REQUEST["requestName"] === "fetchNewMessages") {
     $receiverId = $_REQUEST["receiverId"];
     $currentUserId = $_REQUEST["currentUserId"];
-    $lastMessageDate = $_REQUEST["lastMessageDate"];
+    $lastMessageDate = $_REQUEST["lastMessageId"];
     $messages = $chatDatabase->getNewMessages($lastMessageDate, $currentUserId, $receiverId);
     if (sizeof($messages) > 0) {
         echo json_encode($messages);
@@ -31,7 +31,7 @@ if (isset($_REQUEST["requestName"]) && $_REQUEST["requestName"] === "fetchNewMes
 if (isset($_REQUEST["messageContent"]) &&
     isset($_REQUEST["receiverId"]) && isset($_REQUEST["currentUserId"])) {
     $messageDate = time() * 1000;
-    echo $chatDatabase->insertNewMessage($_REQUEST["messageContent"],
+     $chatDatabase->insertNewMessage($_REQUEST["messageContent"],
         $messageDate, $_REQUEST["currentUserId"], $_REQUEST["receiverId"]);
 
 }

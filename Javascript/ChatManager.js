@@ -1,17 +1,18 @@
-//check the database every second
-let timeIntervalCheck = 1000;
+//check the database every third of  a second
+let timeIntervalCheck = 300;
 let intervalCheck;
-let lastMessageDate;
+let lastMessageId;
 let sessionUserId;
 let chatWindowInitialized = false;
 
 function fetchNewMessages(receiverId, container) {
+
     let url = "ChatController.php?requestName=fetchNewMessages";
-    url += "&lastMessageDate=" + lastMessageDate;
+    url += "&lastMessageId=" + lastMessageId;
     url += "&currentUserId=" + sessionUserId;
     url += "&receiverId=" + receiverId;
 
-    if (lastMessageDate != null) {
+    if (lastMessageId != null) {
         getXmlHttpGetRequest(url).onreadystatechange = function () {
             if (this.readyState === 4 && this.status === 200) {
                 if (this.responseText !== "No results") {
@@ -25,7 +26,7 @@ function fetchNewMessages(receiverId, container) {
 function sendMessage(receiverId) {
     let messageField = document.getElementById("messageField");
     let message = messageField.value.trim();
-    let messageContainer = document.getElementsByClassName("message-container")[0];
+    //  let messageContainer = document.getElementsByClassName("message-container")[0];
     if (message !== "") {
 
         let dataToSend = "messageContent=" + message;
@@ -38,11 +39,10 @@ function sendMessage(receiverId) {
         xhttp.send(dataToSend);
         xhttp.onreadystatechange = function () {
             if (this.readyState === 4 && this.status === 200) {
-                let messageJson = JSON.parse(this.responseText);
-                addMessageToChat(messageJson, messageContainer);
+                console.log(this.responseText);
             }
 
-        }
+        };
         messageField.value = "";
     }
 }
@@ -88,11 +88,32 @@ function removeChat(chat) {
     chatWindowInitialized = false;
 }
 
+function shouldPlayNotificationSound() {
+    if (!document.hasFocus()) {
+        return true;
+    }
+
+    return document.activeElement.id !== "messageField" && chatWindowInitialized === true;
+
+
+}
+
 function processMessages(data, container) {
+    function playNotificationSound() {
+        let audioPlayer = document.getElementById("notificationAudio");
+        audioPlayer.play();
+    }
+
+    if (shouldPlayNotificationSound()) {
+        playNotificationSound();
+    }
     let jsonDataArray = JSON.parse(data);
     jsonDataArray.forEach(elementData => {
         addMessageToChat(elementData, container);
     });
+    //set the last message id
+    lastMessageId = jsonDataArray[jsonDataArray.length - 1].messageId;
+    chatWindowInitialized = true;
 }
 
 function addMessageToChat(messageJson, container) {
@@ -101,7 +122,6 @@ function addMessageToChat(messageJson, container) {
     if (messageJson.senderId === sessionUserId) {
         messageView.style.textAlign = "right";
     }
-    lastMessageDate = messageJson.messageDate;
     container.appendChild(messageView);
     scrollToLastMessage(container);
 
@@ -119,7 +139,6 @@ function fetchChatMessages(user2Id, container) {
     getXmlHttpGetRequest(url).onreadystatechange = function () {
         if (this.readyState === 4 && this.status === 200) {
             if (this.responseText.trim() !== "No results") {
-                console.log(this.responseText);
                 processMessages(this.responseText, container, sessionUserId);
                 intervalCheck = setInterval(fetchNewMessages, timeIntervalCheck, user2Id, container);
             }

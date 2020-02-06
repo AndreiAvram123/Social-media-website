@@ -43,17 +43,12 @@ class ChatDatabase
         $query = "INSERT INTO messages VALUES (NULL,'$messageContent','$date', '$sender_id','$receiver_id')";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
-        $message = new stdClass();
-        $message->messageContent = $messageContent;
-        $message->messageDate = $date;
-        $message->senderId = $sender_id;
 
-        return json_encode($message);
     }
 
-    public function getNewMessages($lastMessageDate, $user1Id, $user2Id)
+    public function getNewMessages($lastMessageId, $user1Id, $user2Id)
     {
-        $query = "SELECT * FROM messages WHERE '$lastMessageDate' < message_date AND  
+        $query = "SELECT * FROM messages WHERE '$lastMessageId' < message_id AND  
                              ((receiver_id = '$user1Id' AND sender_id = '$user2Id')
                               OR (receiver_id ='$user2Id' AND sender_id = '$user1Id'))";
         $result = $this->_dbHandler->prepare($query);

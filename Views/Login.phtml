@@ -18,9 +18,10 @@ if (isset($_SESSION['user_id'])) {
                    placeholder="Password">
         </div>
         <?php
-           include "Views/commonLayouts/GoogleCaptcha.html";
+        include "Views/commonLayouts/GoogleCaptcha.html";
         ?>
-        <button type="submit" class="btn btn-primary" name="loginButton"  disabled>Log in</button>
+        <button type="submit" class="btn btn-primary submitButton" name="loginButton" disabled>Log in</button>
+
         <?php if (isset($view->errorMessage)) {
 
             ?>
@@ -34,10 +35,12 @@ if (isset($_SESSION['user_id'])) {
     </div>
     <script>
         var robotTestPassed = false;
+
         function enableButton() {
             robotTestPassed = true;
             document.getElementsByClassName("submitButton")[0].disabled = false;
         }</script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </form>
 
 </div>
