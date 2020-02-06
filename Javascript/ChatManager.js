@@ -38,7 +38,6 @@ function sendMessage(receiverId) {
         xhttp.send(dataToSend);
         xhttp.onreadystatechange = function () {
             if (this.readyState === 4 && this.status === 200) {
-                console.log(this.responseText);
                 let messageJson = JSON.parse(this.responseText);
                 addMessageToChat(messageJson, messageContainer);
             }
@@ -103,7 +102,6 @@ function addMessageToChat(messageJson, container) {
         messageView.style.textAlign = "right";
     }
     lastMessageDate = messageJson.messageDate;
-    console.log(lastMessageDate);
     container.appendChild(messageView);
     scrollToLastMessage(container);
 

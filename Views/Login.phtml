@@ -17,10 +17,10 @@ if (isset($_SESSION['user_id'])) {
             <input name="passwordSignIn" type="password" class="form-control" id="inputPasswordLogin"
                    placeholder="Password">
         </div>
-        <div class="g-recaptcha" data-sitekey="6LdKHNUUAAAAAHsmXarGJoQsxW56PmU3K4n4mK41"
-             data-callback="enableButton"></div>
-
-        <button type="submit" class="btn btn-primary" name="loginButton" id="submitButton" disabled>Log in</button>
+        <?php
+           include "Views/commonLayouts/GoogleCaptcha.html";
+        ?>
+        <button type="submit" class="btn btn-primary" name="loginButton"  disabled>Log in</button>
         <?php if (isset($view->errorMessage)) {
 
             ?>
@@ -36,12 +36,11 @@ if (isset($_SESSION['user_id'])) {
         var robotTestPassed = false;
         function enableButton() {
             robotTestPassed = true;
-            document.getElementById("submitButton").disabled = false;
+            document.getElementsByClassName("submitButton")[0].disabled = false;
         }</script>
 </form>
 
 </div>
-<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
 </body>
 
