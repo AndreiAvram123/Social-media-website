@@ -56,7 +56,6 @@ if (isset($_REQUEST["requestName"])) {
         $chatDatabase->setUserIsTyping($_REQUEST["chatId"], $_REQUEST["userId"],$_REQUEST["isTyping"]);
     }
     if ($_REQUEST["requestName"] === "checkUserIsTyping") {
-
         echo $chatDatabase->checkUserIsTyping($_REQUEST["chatId"],$_REQUEST["userId"]);
     }
 

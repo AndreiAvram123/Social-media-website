@@ -11,6 +11,36 @@ let chatId;
 let lastKeyPressedTime;
 let shouldFetchNewMessages;
 let userIsTypingHint;
+let defaultResponseNoData = "No results";
+
+class ChatWindow {
+    constructor(username, receiverId) {
+        document.body.innerHTML += '<div class="message-window" >\n' +
+            '<i class="fas fa-times float-right" onclick="removeChat(this.parentNode)"></i>' +
+            '    <div class="message-header" onclick="toggleElement(document.getElementById(' + '\'' + 'message-window-body' + '\')' + ')">' +
+            '        <p class="text-center" style="color: white">' + username + '</p>\n' +
+            '    </div>\n' +
+            '    <div id="message-window-body">\n' +
+            '        <div class ="message-container container">\n' +
+            '\n' +
+            '        </div>\n' +
+            '<p id="user-is-typing-hint">User is typing</p>' +
+            '        <div class="message-footer">\n' +
+            '            <textarea type="text" id="messageField"></textarea>\n' +
+            '            <button onclick="sendMessage(' + '\'' + receiverId + '\'' + ')"><i\n' +
+            '                    class="far fa-paper-plane"></i></button>\n' +
+            '        </div>\n' +
+            '    </div>\n' +
+            '</div>';
+        this.initializeUserIsTypingHint();
+    }
+
+    initializeUserIsTypingHint() {
+        userIsTypingHint = document.getElementById("user-is-typing-hint");
+        userIsTypingHint.style.display = "none";
+    }
+
+}
 
 function checkUserIsTyping() {
     let url = "ChatController.php?requestName=checkUserIsTyping";
@@ -18,8 +48,7 @@ function checkUserIsTyping() {
     url += "&chatId=" + chatId;
     getXmlHttpGetRequest(url).onreadystatechange = function () {
         if (this.readyState === 4 && this.status === 200) {
-            console.log(this.responseText);
-            if (this.responseText == 1) {
+            if (this.responseText === 1) {
                 displayUserTypingHint(true);
             } else {
                 displayUserTypingHint(false)
@@ -46,7 +75,7 @@ function fetchNewMessages(receiverId, container) {
         shouldFetchNewMessages = false;
         getXmlHttpGetRequest(url).onreadystatechange = function () {
             if (this.readyState === 4 && this.status === 200) {
-                if (this.responseText !== "No results") {
+                if (this.responseText !== defaultResponseNoData) {
                     processMessages(this.responseText, container);
                 }
                 shouldFetchNewMessages = true;
@@ -84,27 +113,19 @@ function getXmlHttpGetRequest(url) {
 
 
 function startChat(currentUserId, receiverId, username) {
+
+    function resetDatabase() {
+        markCurrentUserAsTyping(false);
+    }
+
+    window.onbeforeunload = resetDatabase;
+
+
+    //todo
+    //change to allow multiple chats
     if (chatWindowInitialized === false) {
         sessionUserId = currentUserId;
-        document.body.innerHTML += '<div class="message-window" >\n' +
-            '<i class="fas fa-times float-right" onclick="removeChat(this.parentNode)"></i>' +
-            '    <div class="message-header" onclick="toggleElement(document.getElementById(' + '\'' + 'message-window-body' + '\')' + ')">' +
-            '        <p class="text-center" style="color: white">' + username + '</p>\n' +
-            '    </div>\n' +
-            '    <div id="message-window-body">\n' +
-            '        <div class ="message-container">\n' +
-            '\n' +
-            '        </div>\n' +
-            '<p id="user-is-typing-hint">User is typing</p>' +
-            '        <div class="message-footer">\n' +
-            '            <textarea type="text" id="messageField"></textarea>\n' +
-            '            <button onclick="sendMessage(' + '\'' + receiverId + '\'' + ')"><i\n' +
-            '                    class="far fa-paper-plane"></i></button>\n' +
-            '        </div>\n' +
-            '    </div>\n'
-        '</div>';
-        userIsTypingHint = document.getElementById("user-is-typing-hint");
-        userIsTypingHint.style.display = "none";
+        let chatWindow = new ChatWindow(username, receiverId);
         (document.getElementById("messageField")).addEventListener('keyup', (event) => {
             if (event.key === "Enter") {
                 sendMessage(receiverId);
@@ -164,7 +185,8 @@ function processMessages(data, container) {
 }
 
 function addMessageToChat(messageJson, container) {
-    let messageView = document.createElement("p");
+    let messageView = document.createElement("span");
+    messageView.style.display = "block";
     messageView.innerText = messageJson.messageContent;
     if (messageJson.senderId === sessionUserId) {
         messageView.style.textAlign = "right";
@@ -212,12 +234,11 @@ function fetchChatMessages(user2Id, container) {
 
     getXmlHttpGetRequest(url).onreadystatechange = function () {
         if (this.readyState === 4 && this.status === 200) {
-            if (this.responseText.trim() !== "No results") {
+            if (this.responseText.trim() !== defaultResponseNoData) {
                 processMessages(this.responseText, container, sessionUserId);
-                initializeAsyncFunctions();
-
             }
             shouldFetchNewMessages = true;
+            initializeAsyncFunctions();
         }
     };
 }
