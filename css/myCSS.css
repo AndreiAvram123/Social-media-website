@@ -1,3 +1,27 @@
+#friendsList {
+    z-index: 1;
+    position: fixed;
+    bottom: 10px;
+    width: 15%;
+    right: 2%;
+    background: #EBE2E2;
+}
+
+#header-friends-list {
+    background: #007BFF;
+    border-bottom: 2px solid;
+    cursor: pointer;
+}
+
+#header-friends-list > p {
+    font-size: 20px;
+    margin-bottom: 0 !important;
+}
+
+#friends-list-body {
+    height: 80vh;
+}
+
 .message-window {
     position: fixed;
     bottom: 10px;
@@ -6,8 +30,16 @@
     background: #EBE2E2;
 }
 
+.message-window .fa-times {
+    cursor: pointer;
+    font-size: 30px;
+}
+
 .message-header {
+    cursor: pointer;
     background: #007BFF;
+    padding-top: 2px;
+    padding-bottom: 1px;
 }
 
 
@@ -22,15 +54,17 @@
 }
 
 .message-footer {
-    display :flex;
+    display: flex;
 }
 
 .message-footer > textarea {
     width: 100%;
     resize: none;
+    overflow: hidden;
+
 }
 
-.message-footer  button {
+.message-footer button {
     background: #007BFF;
     color: white
 }
@@ -38,7 +72,9 @@
 .navbar-collapse a {
     font-size: 20px;
 }
-
+.suggestion-friend-item img{
+    max-width: 100px;
+}
 .page-title {
     color: #007BFF;
 }
@@ -68,12 +104,12 @@
     color: #007BFF;
 }
 
-.float {
+.float-button-left {
     position: fixed;
     width: 60px;
     height: 60px;
     bottom: 40px;
-    right: 40px;
+    left: 40px;
     background-color: #007BFF;
     color: #ffffff;
     border-radius: 50px;
@@ -81,7 +117,7 @@
     box-shadow: 2px 2px 3px #999;
 }
 
-.float:hover {
+.float-button-left:hover {
     opacity: 0.5;
 
 }
