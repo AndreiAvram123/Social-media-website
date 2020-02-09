@@ -104,12 +104,12 @@
     color: #007BFF;
 }
 
-.float {
+.float-button-left {
     position: fixed;
     width: 60px;
     height: 60px;
     bottom: 40px;
-    right: 40px;
+    left: 40px;
     background-color: #007BFF;
     color: #ffffff;
     border-radius: 50px;
@@ -117,7 +117,7 @@
     box-shadow: 2px 2px 3px #999;
 }
 
-.float:hover {
+.float-button-left:hover {
     opacity: 0.5;
 
 }
