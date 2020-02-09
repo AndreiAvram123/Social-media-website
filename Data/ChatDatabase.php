@@ -49,9 +49,15 @@ class ChatDatabase
 
     public function getNewMessages($lastMessageId, $user1Id, $user2Id)
     {
-        $query = "SELECT * FROM messages WHERE '$lastMessageId' < message_id AND  
+        if ($lastMessageId !== null) {
+            $query = "SELECT * FROM messages WHERE '$lastMessageId' < message_id AND  
                              ((receiver_id = '$user1Id' AND sender_id = '$user2Id')
                               OR (receiver_id ='$user2Id' AND sender_id = '$user1Id'))";
+        } else {
+            $query = "SELECT * FROM messages WHERE  
+                             ((receiver_id = '$user1Id' AND sender_id = '$user2Id')
+                              OR (receiver_id ='$user2Id' AND sender_id = '$user1Id'))";
+        }
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         $messages = [];
@@ -97,9 +103,9 @@ OR (user1_id = '$user2Id' AND user2_id='$user1Id')";
         $this->executeQuery($query);
     }
 
-    public function checkUserIsTyping($chatId,$currentUserId)
+    public function checkUserIsTyping($chatId, $currentUserId)
     {
-      $query = "SELECT user_is_typing FROM chat_live_functions WHERE chat_id = '$chatId' AND user_id != '$currentUserId'";
+        $query = "SELECT user_is_typing FROM chat_live_functions WHERE chat_id = '$chatId' AND user_id != '$currentUserId'";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         return ($result->fetch())["user_is_typing"];
