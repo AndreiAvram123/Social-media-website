@@ -28,15 +28,24 @@ class ChatWindow {
             '<p id="user-is-typing-hint" style="display: none">User is typing</p>' +
             '        <div class="message-footer">\n' +
             '            <textarea type="text" id="messageField"></textarea>\n' +
+            '<button class="select-image-icon" ><i class="fas fa-images"></i></button>' +
             '            <button onclick="sendMessage(' + '\'' + receiverId + '\'' + ')"><i\n' +
             '                    class="far fa-paper-plane"></i></button>\n' +
             '        </div>\n' +
+            ' <input type="file"  name="files[]"  style="display: none"' +
             '    </div>\n' +
             '</div>';
         let domElement = domParser.parseFromString(chatString, "text/html");
         this.chatWindow = domElement.documentElement;
         this.userIsTypingHint = domElement.getElementById("user-is-typing-hint");
-        domElement.getElementsByTagName("i")[0].addEventListener('click',event =>removeChat(this.chatWindow));
+
+        domElement.getElementsByTagName("i")[0].addEventListener('click', event => removeChat(this.chatWindow));
+        let imageSelector = domElement.getElementsByName("files[]")[0];
+        let imageSelectIcon = domElement.getElementsByClassName("select-image-icon")[0];
+        imageSelectIcon.addEventListener('click', event => imageSelector.click());
+        imageSelector.addEventListener('change', event => {
+            uploadImage(receiverId);
+        });
         document.body.append(this.chatWindow);
     }
 
@@ -45,31 +54,54 @@ class ChatWindow {
         audioPlayer.play();
     }
 
-    addMessageToChat(messageJson, container) {
-        let messageView = document.createElement("span");
-        messageView.style.display = "block";
-        messageView.innerText = messageJson.messageContent;
-        if (messageJson.senderId === sessionUserId) {
-            messageView.style.textAlign = "right";
+    addMessagesToChat(messagesJson) {
+        let messageContainer = this.chatWindow.getElementsByClassName("message-container")[0];
+        let playNotification = false;
+        messagesJson.forEach(messageJson => {
+            let messageView;
+            if (messageJson.messageImage == null) {
+                messageView = document.createElement("span");
+                messageView.style.display = "block";
+                messageView.innerText = messageJson.messageContent;
+            } else {
+                messageView = document.createElement("div");
+                messageView.className = "float-right";
+                let messageImage = document.createElement("img");
+                messageImage.src = messageJson.messageImage;
+                messageImage.className = "message-image";
+                messageView.appendChild(messageImage);
+            }
+            if (messageJson.senderId === sessionUserId) {
+                messageView.style.textAlign = "right";
+            } else {
+                playNotification = true;
+            }
+
+            messageContainer.appendChild(messageView);
+        });
+        scrollToLastMessage(messageContainer);
+        if (playNotification && shouldPlayNotificationSound()) {
+            chatWindow.playNotificationSound();
         }
-        container.appendChild(messageView);
-        scrollToLastMessage(container);
 
     }
-     displayUserTypingHint(isTyping) {
+
+    displayUserTypingHint(isTyping) {
         if (isTyping === true) {
             this.userIsTypingHint.style.display = "block";
         } else {
             this.userIsTypingHint.style.display = "none";
         }
     }
-    stopAsyncFunctions(){
+
+    stopAsyncFunctions() {
         clearInterval(intervalCheck);
         clearInterval(userIsTypingCheck);
         clearInterval(currentUserIsTypingCheck);
     }
 
 }
+
 function removeChat(chat) {
     chatWindowInitialized = false;
     lastMessageId = null;
@@ -78,13 +110,47 @@ function removeChat(chat) {
 
 }
 
+
+function uploadImage(receiverId) {
+    let url = "ChatController.php?requestName=UploadImage";
+    let formData = new FormData();
+    const files = document.querySelector('[type=file]').files;
+
+
+    formData.append('files[]', files[0]);
+    formData.append("receiverId", receiverId);
+    formData.append("currentUserId", sessionUserId);
+
+    fetch(url, {
+        method: 'POST',
+        body: formData,
+    }).then(function (response) {
+        return response.text()
+    }).then(function (data) {
+        console.log(data);
+    })
+}
+
+function sendMessage(receiverId) {
+    let messageField = document.getElementById("messageField");
+    let message = messageField.value.trim();
+    if (message !== "") {
+        let dataToSend = "messageContent=" + message;
+        dataToSend += "&receiverId=" + receiverId;
+        dataToSend += "&currentUserId=" + sessionUserId;
+        getXmlHttpPostRequest(dataToSend);
+        messageField.value = "";
+    }
+}
+
+
 function checkUserIsTyping() {
     let url = "ChatController.php?requestName=checkUserIsTyping";
     url += "&userId=" + sessionUserId;
     url += "&chatId=" + chatId;
     getXmlHttpGetRequest(url).onreadystatechange = function () {
         if (this.readyState === 4 && this.status === 200) {
-            if (this.responseText === 1) {
+            if (this.responseText == 1) {
                 chatWindow.displayUserTypingHint(true);
             } else {
                 chatWindow.displayUserTypingHint(false)
@@ -100,7 +166,6 @@ function fetchNewMessages(receiverId, container) {
     url += "&lastMessageId=" + lastMessageId;
     url += "&currentUserId=" + sessionUserId;
     url += "&receiverId=" + receiverId;
-    console.log(url);
     if (shouldFetchNewMessages === true) {
         shouldFetchNewMessages = false;
         getXmlHttpGetRequest(url).onreadystatechange = function () {
@@ -114,17 +179,6 @@ function fetchNewMessages(receiverId, container) {
     }
 }
 
-function sendMessage(receiverId) {
-    let messageField = document.getElementById("messageField");
-    let message = messageField.value.trim();
-    if (message !== "") {
-        let dataToSend = "messageContent=" + message;
-        dataToSend += "&receiverId=" + receiverId;
-        dataToSend += "&currentUserId=" + sessionUserId;
-        getXmlHttpPostRequest(dataToSend);
-        messageField.value = "";
-    }
-}
 
 function getXmlHttpPostRequest(dataToSend) {
     let xhttp = new XMLHttpRequest();
@@ -185,20 +239,13 @@ function shouldPlayNotificationSound() {
     if (!document.hasFocus()) {
         return true;
     }
-
     return document.activeElement.id !== "messageField" && chatWindowInitialized === true;
 
 }
 
-function processMessages(data, container) {
-
-    if (shouldPlayNotificationSound()) {
-        chatWindow.playNotificationSound();
-    }
+function processMessages(data) {
     let jsonDataArray = JSON.parse(data);
-    jsonDataArray.forEach(elementData => {
-        chatWindow.addMessageToChat(elementData, container);
-    });
+    chatWindow.addMessagesToChat(jsonDataArray);
     //set the last message id
     lastMessageId = jsonDataArray[jsonDataArray.length - 1].messageId;
 }
@@ -238,6 +285,11 @@ function initializeChatFunctions(user2Id, container) {
     }
 
     initializeAsyncFunctions();
+}
+
+function sendImage() {
+    let formData = new FormData();
+
 }
 
 function toggleElement(element) {

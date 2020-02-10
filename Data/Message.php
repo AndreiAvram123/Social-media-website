@@ -8,6 +8,7 @@ class Message
   public $messageDate;
   public $senderId;
   public $receiverId;
+  public $messageImage;
 
   public function __construct($row)
   {
@@ -16,6 +17,7 @@ class Message
     $this->messageDate = $row["message_date"];
     $this->senderId = $row["sender_id"];
     $this->receiverId = $row["receiver_id"];
+    $this->messageImage = $row["message_image"];
   }
 
 }
