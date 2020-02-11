@@ -14,8 +14,7 @@ if (isset($_REQUEST["messageContent"]) &&
 
 // GET REQUESTS
 if (isset($_REQUEST["requestName"])) {
-
-    if ( $_REQUEST["requestName"] === "fetchNewMessages") {
+    if ($_REQUEST["requestName"] === "fetchNewMessages") {
         $receiverId = $_REQUEST["receiverId"];
         $currentUserId = $_REQUEST["currentUserId"];
         $lastMessageDate = $_REQUEST["lastMessageId"];

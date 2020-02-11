@@ -1,7 +1,13 @@
 <?php include "Views/pageElements/Header.phtml";
+include "Views/pageElements/ResetPasswordModal.phtml";
+
 if (isset($_SESSION['user_id'])) {
     echo '<meta http-equiv="refresh"
    content="0; url=index.php">';
+}
+if (isset($view->warningMessage)) {
+    include "Modals/WarningModal.phtml";
+    echo "<script>$('#warningModal').modal('show')</script>";
 }
 ?>
 <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>" onsubmit="return robotTestPassed ">
@@ -17,32 +23,47 @@ if (isset($_SESSION['user_id'])) {
             <input name="passwordSignIn" type="password" class="form-control" id="inputPasswordLogin"
                    placeholder="Password">
         </div>
+
+        <div class="form-group form-check">
+            <button class="link-button" data-toggle="modal" data-target="#resendEmailModal">Forgot your password?
+            </button>
+        </div>
         <?php
         include "Views/commonLayouts/GoogleCaptcha.html";
         ?>
         <button type="submit" class="btn btn-primary submitButton" name="loginButton" disabled>Log in</button>
 
-        <?php if (isset($view->errorMessage)) {
+        <script>
+            var robotTestPassed = false;
+
+            function enableButton() {
+                robotTestPassed = true;
+                document.getElementsByClassName("submitButton")[0].disabled = false;
+            }</script>
+        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+</form>
+<?php if (isset($view->errorMessage)) {
+
+    ?>
+    <div class="alert alert-danger mt-3" role="alert">
+        <?php
+        echo $view->errorMessage;
+        if ($view->emailNotVerified) {
 
             ?>
-            <div class="alert alert-danger mt-3" role="alert">
-                <?php echo $view->errorMessage ?>
-            </div>
-
+            <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+                <input type="hidden" value="<?php echo $view->userEmail ?>" name="userEmailResendVerification"/>
+                <button class="link-button" name="resendVerificationEmail" type="submit">Resend verification email
+                </button>
+            </form>
             <?php
         }
         ?>
     </div>
-    <script>
-        var robotTestPassed = false;
-
-        function enableButton() {
-            robotTestPassed = true;
-            document.getElementsByClassName("submitButton")[0].disabled = false;
-        }</script>
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-</form>
-
+    <?php
+}
+?>
+</div>
 </div>
 
 </body>

@@ -23,19 +23,6 @@ class ChatManager
         $this->_dbInstance = Database::getInstance();
         $this->_dbHandler = $this->_dbInstance->getDatabaseConnection();
     }
-    //TODO
-    //you should not get all data
-   public function getMessagesWithUser($id){
-      $query = "SELECT * FROM messages ORDER BY message_date ASC";
-      $result = $this->_dbHandler->prepare($query);
-      $result->execute();
-      $messages = [];
-      while($row = $result->fetch()){
-          $messages[] = new Message($row);
-      }
-      return $messages;
-
-   }
 
     public function postMessage($messageContent, $messageDate)
     {

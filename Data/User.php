@@ -12,6 +12,7 @@ class User
     private $email;
     private $joinDate;
     private $profilePicture;
+    private $isEmailVerified;
 
     public function __construct($db_row)
     {
@@ -20,6 +21,16 @@ class User
         $this->email = $db_row['email'];
         $this->joinDate = $db_row['creation_date'];
         $this->profilePicture = $db_row['profile_picture'];
+        $this->isEmailVerified = $db_row['email_verified'];
+
+    }
+
+    /**
+     * @return mixed
+     */
+    public function isEmailVerified()
+    {
+        return $this->isEmailVerified;
     }
 
 

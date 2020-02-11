@@ -171,6 +171,7 @@ function fetchNewMessages(receiverId, container) {
         getXmlHttpGetRequest(url).onreadystatechange = function () {
             if (this.readyState === 4 && this.status === 200) {
                 if (this.responseText !== defaultResponseNoData) {
+                    console.log(this.responseText);
                     processMessages(this.responseText, container);
                 }
                 shouldFetchNewMessages = true;
@@ -225,12 +226,13 @@ function startChat(currentUserId, receiverId, username) {
 
 }
 
-function markCurrentUserAsTyping($isTyping) {
-    lastKeyPressedTime = new Date().getTime();
+function markCurrentUserAsTyping(isTyping) {
+
+
     let dataToSend = "ChatController.php?requestName=markTyping";
     dataToSend += "&userId=" + sessionUserId;
     dataToSend += "&chatId=" + chatId;
-    dataToSend += "&isTyping=" + $isTyping;
+    dataToSend += "&isTyping=" + isTyping;
     getXmlHttpGetRequest(dataToSend);
 }
 
