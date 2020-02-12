@@ -1,8 +1,12 @@
 <?php
 include "Views/pageElements/Header.phtml";
+include "Views/commonLayouts/SearchForm.phtml";
 ?>
 
-<div class="row" xmlns="http://www.w3.org/1999/html">
+
+
+<div class="row mt-5" xmlns="http://www.w3.org/1999/html">
+
     <div class="col">
         <h1 class="page-title text-center mb-3">Here are some recent posts</h1>
         <?php
@@ -62,9 +66,6 @@ include "Views/pageElements/Header.phtml";
 </div>
 
 <?php
-//todo
-//don't forget to reAdd this feature
-
 
 //only show the add post button if the user is logged in
 if ($view->isUserLoggedIn) {

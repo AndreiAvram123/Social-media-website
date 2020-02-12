@@ -1,5 +1,4 @@
 function fetchFriendsSuggestions(query) {
-    console.log(query);
     let friendsList = document.getElementById("friend-container");
     let friendsSuggestionsContainer = document.getElementById("friends-suggestions-container");
 

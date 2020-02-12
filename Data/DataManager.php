@@ -32,7 +32,7 @@ class DataManager
 
     }
 
-    public function __construct()
+    private function __construct()
     {
         $this->_dbInstance = Database::getInstance();
         $this->_dbHandler = $this->_dbInstance->getDatabaseConnection();
@@ -284,14 +284,14 @@ WHERE comment_post_id = '$postID'";
      * @param $email
      * @return mixed
      */
-    public function getUserIDFromEmail($email)
+    public function getUserFromEmail($email)
     {
-        $query = "SELECT user_id FROM  users WHERE email = :email";
+        $query = "SELECT * FROM  users WHERE email = :email";
         $result = $this->_dbHandler->prepare($query);
         $result->bindValue(':email', $email);
         $result->execute();
         $row = $result->fetch();
-        return $row['user_id'];
+        return new User($row);
     }
 
     /**

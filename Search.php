@@ -6,7 +6,7 @@ require_once "Data/DataManager.php";
 session_start();
 $view = new stdClass();
 $view->pageTitle = "Search results";
-$dbHandler = new DataManager();
+$dbHandler = DataManager::getInstance();
 $view->categories = $dbHandler->getAllCategories();
 
 if (isset($_POST['search-button'])) {

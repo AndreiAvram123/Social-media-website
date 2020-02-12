@@ -24,6 +24,25 @@ class ChatDatabase
         $this->_dbInstance = Database::getInstance();
         $this->_dbHandler = $this->_dbInstance->getDatabaseConnection();
     }
+    /**
+     * This method is used to upload an image to the server by
+     * giving the following parameters
+     * The method encrypts the image name as as security reason
+     * @param $target_file - the location of the file on the user's computer
+     * @param $tempName - the temporary name of the image
+     * @param $target_dir - where the image should be place in the server
+     * @return string - the image location on the server in order
+     * to be stored in a database table
+     */
+    public function uploadImageToServer($target_file, $tempName, $target_dir)
+    {
+        $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+        //once you encrypt the image, the algorithm will also encrypt
+        //the file extension. That's why I need to add it as well
+        $targetLocation = $target_dir . md5($target_file) . '.' . $imageFileType;
+        move_uploaded_file($tempName, $targetLocation);
+        return $targetLocation;
+    }
 
     public function getAllMessagesWithUser($user1Id, $user2Id)
     {
@@ -40,18 +59,27 @@ class ChatDatabase
 
     public function insertNewMessage($messageContent, $date, $sender_id, $receiver_id)
     {
-        $query = "INSERT INTO messages VALUES (NULL,'$messageContent','$date', '$sender_id','$receiver_id')";
+        $query = "INSERT INTO messages VALUES (NULL,'$messageContent','$date', '$sender_id','$receiver_id',NULL)";
 
-        $result = $this->_dbHandler->prepare($query);
-        $result->execute();
+       $this->executeQuery($query);
 
+    }
+    public function insertImageMessage($imagePath, $date, $sender_id, $receiver_id){
+        $query = "INSERT INTO messages VALUES (NULL,NULL,'$date', '$sender_id','$receiver_id','$imagePath')";
+        $this->executeQuery($query);
     }
 
     public function getNewMessages($lastMessageId, $user1Id, $user2Id)
     {
-        $query = "SELECT * FROM messages WHERE '$lastMessageId' < message_id AND  
+        if ($lastMessageId !== null) {
+            $query = "SELECT * FROM messages WHERE '$lastMessageId' < message_id AND  
                              ((receiver_id = '$user1Id' AND sender_id = '$user2Id')
                               OR (receiver_id ='$user2Id' AND sender_id = '$user1Id'))";
+        } else {
+            $query = "SELECT * FROM messages WHERE  
+                             ((receiver_id = '$user1Id' AND sender_id = '$user2Id')
+                              OR (receiver_id ='$user2Id' AND sender_id = '$user1Id'))";
+        }
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         $messages = [];
@@ -97,9 +125,9 @@ OR (user1_id = '$user2Id' AND user2_id='$user1Id')";
         $this->executeQuery($query);
     }
 
-    public function checkUserIsTyping($chatId,$currentUserId)
+    public function checkUserIsTyping($chatId, $currentUserId)
     {
-      $query = "SELECT user_is_typing FROM chat_live_functions WHERE chat_id = '$chatId' AND user_id != '$currentUserId'";
+        $query = "SELECT user_is_typing FROM chat_live_functions WHERE chat_id = '$chatId' AND user_id != '$currentUserId'";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         return ($result->fetch())["user_is_typing"];

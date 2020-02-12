@@ -48,17 +48,7 @@
                 ?>
 
             </ul>
-            <form class="form-inline my-2 my-lg-0 mr-4" method="post" action="Search.php">
-                <input class="form-control mr-sm-2" type="search" placeholder="Search posts..." name="search-text"
-                       aria-label="Search">
-                <button type="button" class="btn btn-success mr-2" data-toggle="modal" data-target="#filtersModal">
-                    Filters
-                </button>
-                <button class="btn btn-outline-success my-2 my-sm-0" name="search-button" type="submit">Search</button>
-                <?php
-                  include_once "Modals/FiltersModal.phtml";
-                ?>
-             </form>
+
         </div>
         <?php
         if (!isset($_SESSION['user_id'])) {
@@ -85,7 +75,6 @@
     //the confirmation modal is mainly used to ask the user
     //for confirmation for certain actions such as signing out
     include_once "Modals/ConfimationModal.phtml";
-    include_once "Modals/FiltersModal.phtml";
     ?>
     <!--Include JQuery in order for bootstrap to properly work
        Getting the files from cache via link is more efficient than actually

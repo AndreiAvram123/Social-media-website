@@ -1,6 +1,7 @@
 <?php
 require_once "Data/DataManager.php";
 require_once "Data/Validator.php";
+
 /**
  * This class in used to handle actions
  * regarding to logging in or registering users
@@ -11,6 +12,7 @@ class SessionManager
     //create singleton pattern for this class
     private static $sessionHandler;
     private $_validator;
+
     //method used to create the singleton pattern
     public static function getInstance()
     {
@@ -51,23 +53,18 @@ class SessionManager
     {
         $databaseHandler = DataManager::getInstance();
         $check = $this->_validator->areLoginCredentialsValid($email, $enteredPassword);
-        if ($check === true) {
-            $userPasswordDB = $databaseHandler->getUserPasswordFromDB($email);
-            if (!empty($userPasswordDB)) {
-                if (md5($enteredPassword) == $userPasswordDB) {
-                    $this->addUserDataToSession($databaseHandler->getUserIDFromEmail($email));
-                    return true;
-                } else {
-                    return "Incorrect password";
-                }
-            } else {
-                return "Hmm...Seems like your account does not exist";
-            }
-        } else {
-            return $check;
-        }
-    }
+        if ($check !== true) return $check;
+        $userPasswordDB = $databaseHandler->getUserPasswordFromDB($email);
+        if (empty($userPasswordDB)) return "Hmm...Seems like your account does not exist";
+        if (md5($enteredPassword) != $userPasswordDB) return "Incorrect password";
+        $user = $databaseHandler->getUserFromEmail($email);
+        if ($user->isEmailVerified() == false) return "Email not verified";
+        $this->addUserDataToSession($user->getUserId());
 
+        return true;
+
+
+    }
 
 
     /**
@@ -88,8 +85,8 @@ class SessionManager
         $check = $this->checkRegisterCredentials($username, $email, $password, $image);
         if ($check === true) {
             $imageLocation = null;
-            if(!empty($image)) {
-                $imageLocation = $databaseHandler->uploadImageToServer($image, $_FILES["profilePicture"]["tmp_name"],"images/users/");
+            if (!empty($image)) {
+                $imageLocation = $databaseHandler->uploadImageToServer($image, $_FILES["profilePicture"]["tmp_name"], "images/users/");
             }
             //the user will have a default image is he does not choose one
             $databaseHandler->createUser($username, $email, $password, $creationDate, $imageLocation);
@@ -110,20 +107,20 @@ class SessionManager
         if (empty($email)) {
             return "You have not entered an email";
         }
-        if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return "Your email is not valid";
         }
         if (empty($password)) {
             return "You have not entered a password";
         }
-        if($email)
-        if (strlen($password) < 7) {
-            return "Your password is not strong enough";
-        }
+        if ($email)
+            if (strlen($password) < 7) {
+                return "Your password is not strong enough";
+            }
         if ($this->_dbManager->usernameExists($username)) {
             return "The username already exists";
         }
-        if($this->_dbManager->emailExists($email)){
+        if ($this->_dbManager->emailExists($email)) {
             return "Email already used";
         }
         if (!empty($image)) {
