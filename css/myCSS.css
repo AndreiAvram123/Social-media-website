@@ -69,7 +69,7 @@
     color: white
 }
 
-.message-image{
+.message-image {
     max-width: 200px;
     margin-top: 20px;
     margin-bottom: 20px;
@@ -78,9 +78,11 @@
 .navbar-collapse a {
     font-size: 20px;
 }
-.suggestion-friend-item img{
+
+.suggestion-friend-item img {
     max-width: 100px;
 }
+
 .page-title {
     color: #007BFF;
 }
@@ -93,10 +95,16 @@
     max-height: 40vh;
 }
 
-.container-form {
+.container-element-center {
     width: 70vw;
     margin: 0 auto;
 }
+
+.search-box{
+    width: 60% !important;
+    margin: auto;
+}
+
 
 .post-text {
     font-size: 20px;
@@ -215,7 +223,7 @@
         width: 50vw;
     }
 
-    .container-form {
+    .container-element-center {
         width: 40vw;
     }
 }
