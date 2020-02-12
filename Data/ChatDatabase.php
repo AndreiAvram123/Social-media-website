@@ -24,6 +24,7 @@ class ChatDatabase
         $this->_dbInstance = Database::getInstance();
         $this->_dbHandler = $this->_dbInstance->getDatabaseConnection();
     }
+
     /**
      * This method is used to upload an image to the server by
      * giving the following parameters
@@ -61,10 +62,12 @@ class ChatDatabase
     {
         $query = "INSERT INTO messages VALUES (NULL,'$messageContent','$date', '$sender_id','$receiver_id',NULL)";
 
-       $this->executeQuery($query);
+        $this->executeQuery($query);
 
     }
-    public function insertImageMessage($imagePath, $date, $sender_id, $receiver_id){
+
+    public function insertImageMessage($imagePath, $date, $sender_id, $receiver_id)
+    {
         $query = "INSERT INTO messages VALUES (NULL,NULL,'$date', '$sender_id','$receiver_id','$imagePath')";
         $this->executeQuery($query);
     }
@@ -82,6 +85,9 @@ class ChatDatabase
         }
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
+        return $this->getProcessedMessages($result);
+    }
+    private function getProcessedMessages($result){
         $messages = [];
         while ($row = $result->fetch()) {
             $messages[] = new Message($row);
@@ -131,6 +137,18 @@ OR (user1_id = '$user2Id' AND user2_id='$user1Id')";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         return ($result->fetch())["user_is_typing"];
+    }
+
+    public function fetchRecentMessages($user1Id, $user2Id)
+    {
+        $query = "SELECT * FROM messages WHERE  
+                             ((receiver_id = '$user1Id' AND sender_id = '$user2Id')
+                              OR (receiver_id ='$user2Id' AND sender_id = '$user1Id'))
+                              ORDER BY message_id DESC LIMIT 10";
+        $result = $this->_dbHandler->prepare($query);
+        $result->execute();
+        return $this->getProcessedMessages($result);
+
     }
 
 

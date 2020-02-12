@@ -13,7 +13,17 @@ if (isset($_REQUEST["messageContent"]) &&
 
 
 // GET REQUESTS
+
+if ($_REQUEST["requestName"] === "fetchRecentMessages") {
+    $receiverId = $_REQUEST["receiverId"];
+    $currentUserId = $_REQUEST["currentUserId"];
+    echo json_encode($chatDatabase->fetchRecentMessages($receiverId,$currentUserId));
+}
+
 if (isset($_REQUEST["requestName"])) {
+
+
+
     if ($_REQUEST["requestName"] === "fetchNewMessages") {
         $receiverId = $_REQUEST["receiverId"];
         $currentUserId = $_REQUEST["currentUserId"];
@@ -27,7 +37,8 @@ if (isset($_REQUEST["requestName"])) {
 
     }
 
-    if ( $_REQUEST["requestName"] === "fetchChatId") {
+
+    if ($_REQUEST["requestName"] === "fetchChatId") {
         $user1Id = $_REQUEST["user1Id"];
         $user2Id = $_REQUEST["user2Id"];
         $chatId = $chatDatabase->fetchChatId($user1Id, $user2Id);
@@ -42,10 +53,10 @@ if (isset($_REQUEST["requestName"])) {
     }
 
     if ($_REQUEST["requestName"] === "UploadImage") {
-        if(isset($_FILES)){
-           $imagePath =  $chatDatabase->uploadImageToServer($_FILES["files"]["name"][0],$_FILES["files"]["tmp_name"][0],"images/chatImages/");
+        if (isset($_FILES)) {
+            $imagePath = $chatDatabase->uploadImageToServer($_FILES["files"]["name"][0], $_FILES["files"]["tmp_name"][0], "images/chatImages/");
             $messageDate = time() * 1000;
-            $chatDatabase ->insertImageMessage($imagePath,
+            $chatDatabase->insertImageMessage($imagePath,
                 $messageDate, $_REQUEST["currentUserId"], $_REQUEST["receiverId"]);
 
         }
@@ -53,10 +64,10 @@ if (isset($_REQUEST["requestName"])) {
     }
 
     if ($_REQUEST["requestName"] === "markTyping") {
-        $chatDatabase->setUserIsTyping($_REQUEST["chatId"], $_REQUEST["userId"],$_REQUEST["isTyping"]);
+        $chatDatabase->setUserIsTyping($_REQUEST["chatId"], $_REQUEST["userId"], $_REQUEST["isTyping"]);
     }
     if ($_REQUEST["requestName"] === "checkUserIsTyping") {
-        echo $chatDatabase->checkUserIsTyping($_REQUEST["chatId"],$_REQUEST["userId"]);
+        echo $chatDatabase->checkUserIsTyping($_REQUEST["chatId"], $_REQUEST["userId"]);
     }
 
 }

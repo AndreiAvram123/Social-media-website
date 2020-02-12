@@ -4,10 +4,8 @@ let timeIntervalCheckTyping = 700;
 let intervalCheck;
 let userIsTypingCheck;
 let currentUserIsTypingCheck;
-let lastMessageId = null;
 let sessionUserId;
 let chatWindowInitialized = false;
-let chatId;
 let lastKeyPressedTime;
 let shouldFetchNewMessages = true;
 let defaultResponseNoData = "No results";
@@ -36,8 +34,7 @@ class ChatWindow {
             '    </div>\n' +
             '</div>';
         let domElement = domParser.parseFromString(chatString, "text/html");
-        this.chatWindow = domElement.documentElement;
-        this.userIsTypingHint = domElement.getElementById("user-is-typing-hint");
+        this.initializeViews(domElement);
 
         domElement.getElementsByTagName("i")[0].addEventListener('click', event => removeChat(this.chatWindow));
         let imageSelector = domElement.getElementsByName("files[]")[0];
@@ -49,13 +46,19 @@ class ChatWindow {
         document.body.append(this.chatWindow);
     }
 
+    initializeViews(domElement) {
+        this.chatWindow = domElement.documentElement;
+        this.userIsTypingHint = domElement.getElementById("user-is-typing-hint");
+        this.messageContainer = domElement.getElementsByClassName("message-container")[0];
+    }
+
     playNotificationSound() {
         let audioPlayer = document.getElementById("notificationAudio");
         audioPlayer.play();
     }
 
+
     addMessagesToChat(messagesJson) {
-        let messageContainer = this.chatWindow.getElementsByClassName("message-container")[0];
         let playNotification = false;
         messagesJson.forEach(messageJson => {
             let messageView;
@@ -77,9 +80,10 @@ class ChatWindow {
                 playNotification = true;
             }
 
-            messageContainer.appendChild(messageView);
+            this.messageContainer.appendChild(messageView);
+            this.lastMessageID = messageJson.messageId;
         });
-        scrollToLastMessage(messageContainer);
+        scrollToLastMessage(this.messageContainer);
         if (playNotification && shouldPlayNotificationSound()) {
             chatWindow.playNotificationSound();
         }
@@ -104,18 +108,16 @@ class ChatWindow {
 
 function removeChat(chat) {
     chatWindowInitialized = false;
-    lastMessageId = null;
+    chatWindow.lastMessageID = null;
     chatWindow.stopAsyncFunctions();
     document.body.removeChild(chat);
 
 }
 
-
 function uploadImage(receiverId) {
     let url = "ChatController.php?requestName=UploadImage";
     let formData = new FormData();
     const files = document.querySelector('[type=file]').files;
-
 
     formData.append('files[]', files[0]);
     formData.append("receiverId", receiverId);
@@ -147,7 +149,7 @@ function sendMessage(receiverId) {
 function checkUserIsTyping() {
     let url = "ChatController.php?requestName=checkUserIsTyping";
     url += "&userId=" + sessionUserId;
-    url += "&chatId=" + chatId;
+    url += "&chatId=" + chatWindow.chatId;
     getXmlHttpGetRequest(url).onreadystatechange = function () {
         if (this.readyState === 4 && this.status === 200) {
             if (this.responseText == 1) {
@@ -161,9 +163,9 @@ function checkUserIsTyping() {
 }
 
 
-function fetchNewMessages(receiverId, container) {
+function fetchNewMessages(receiverId) {
     let url = "ChatController.php?requestName=fetchNewMessages";
-    url += "&lastMessageId=" + lastMessageId;
+    url += "&lastMessageId=" + chatWindow.lastMessageID;
     url += "&currentUserId=" + sessionUserId;
     url += "&receiverId=" + receiverId;
     if (shouldFetchNewMessages === true) {
@@ -171,12 +173,28 @@ function fetchNewMessages(receiverId, container) {
         getXmlHttpGetRequest(url).onreadystatechange = function () {
             if (this.readyState === 4 && this.status === 200) {
                 if (this.responseText !== defaultResponseNoData) {
-                    console.log(this.responseText);
-                    processMessages(this.responseText, container);
+                    chatWindow.addMessagesToChat(JSON.parse(this.responseText));
                 }
                 shouldFetchNewMessages = true;
             }
         };
+    }
+}
+
+/**
+ * This function is usd in order to fetch the
+ * most recent messages in a chat
+ */
+function fetchRecentMessages(receiverID) {
+    let url = "ChatController.php?requestName=fetchRecentMessages";
+    url += "&currentUserId=" + sessionUserId;
+    url += "&receiverId=" + receiverID;
+    getXmlHttpGetRequest(url).onreadystatechange = function () {
+        if (this.readyState === 4 && this.status === 200) {
+            console.log(this.responseText);
+            chatWindow.addMessagesToChat(JSON.parse(this.responseText));
+            initializeAsyncFunctions(receiverID, document.getElementsByClassName("message-container")[0]);
+        }
     }
 }
 
@@ -196,7 +214,14 @@ function getXmlHttpGetRequest(url) {
     return xhttp;
 }
 
-
+/**
+ * Call this method in order to create a new chat window
+ * It automatically resets the parameters in the database
+ * on close
+ * @param currentUserId
+ * @param receiverId
+ * @param username
+ */
 function startChat(currentUserId, receiverId, username) {
 
     function resetDatabase() {
@@ -220,8 +245,7 @@ function startChat(currentUserId, receiverId, username) {
 
 
         });
-
-        initializeChatFunctions(receiverId, document.getElementsByClassName("message-container")[0]);
+       fetchRecentMessages(receiverId);
     }
 
 }
@@ -231,7 +255,7 @@ function markCurrentUserAsTyping(isTyping) {
 
     let dataToSend = "ChatController.php?requestName=markTyping";
     dataToSend += "&userId=" + sessionUserId;
-    dataToSend += "&chatId=" + chatId;
+    dataToSend += "&chatId=" + chatWindow.chatId;
     dataToSend += "&isTyping=" + isTyping;
     getXmlHttpGetRequest(dataToSend);
 }
@@ -243,13 +267,6 @@ function shouldPlayNotificationSound() {
     }
     return document.activeElement.id !== "messageField" && chatWindowInitialized === true;
 
-}
-
-function processMessages(data) {
-    let jsonDataArray = JSON.parse(data);
-    chatWindow.addMessagesToChat(jsonDataArray);
-    //set the last message id
-    lastMessageId = jsonDataArray[jsonDataArray.length - 1].messageId;
 }
 
 
@@ -264,7 +281,7 @@ function checkCurrentUserTyping() {
     }
 }
 
-function initializeChatFunctions(user2Id, container) {
+function initializeAsyncFunctions(user2Id, container) {
 
     function getChatId() {
         let url = "ChatController.php?requestName=fetchChatId";
@@ -272,7 +289,7 @@ function initializeChatFunctions(user2Id, container) {
         url += "&user2Id=" + user2Id;
         getXmlHttpGetRequest(url).onreadystatechange = function () {
             if (this.readyState === 4 && this.status === 200) {
-                chatId = this.responseText;
+                chatWindow.chatId = this.responseText;
             }
         }
     }
@@ -289,10 +306,6 @@ function initializeChatFunctions(user2Id, container) {
     initializeAsyncFunctions();
 }
 
-function sendImage() {
-    let formData = new FormData();
-
-}
 
 function toggleElement(element) {
     if (element.style.display !== "none") {
@@ -301,8 +314,6 @@ function toggleElement(element) {
         element.style.display = "block";
     }
 }
-
-
 
 
 

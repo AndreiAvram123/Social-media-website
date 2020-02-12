@@ -1,3 +1,5 @@
+
+
 function fetchFriendsSuggestions(query) {
     let friendsList = document.getElementById("friend-container");
     let friendsSuggestionsContainer = document.getElementById("friends-suggestions-container");
@@ -41,4 +43,7 @@ function fetchFriendsSuggestions(query) {
     } else {
         friendsList.style.display = "block";
     }
+}
+function fetchPostSuggestions($query){
+
 }
