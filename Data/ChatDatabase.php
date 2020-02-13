@@ -74,15 +74,9 @@ class ChatDatabase
 
     public function getNewMessages($lastMessageId, $user1Id, $user2Id)
     {
-        if ($lastMessageId !== null) {
             $query = "SELECT * FROM messages WHERE '$lastMessageId' < message_id AND  
                              ((receiver_id = '$user1Id' AND sender_id = '$user2Id')
                               OR (receiver_id ='$user2Id' AND sender_id = '$user1Id'))";
-        } else {
-            $query = "SELECT * FROM messages WHERE  
-                             ((receiver_id = '$user1Id' AND sender_id = '$user2Id')
-                              OR (receiver_id ='$user2Id' AND sender_id = '$user1Id'))";
-        }
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         return $this->getProcessedMessages($result);
@@ -139,12 +133,13 @@ OR (user1_id = '$user2Id' AND user2_id='$user1Id')";
         return ($result->fetch())["user_is_typing"];
     }
 
-    public function fetchRecentMessages($user1Id, $user2Id)
+    public function fetchOldMessages($user1Id, $user2Id, $offset)
     {
         $query = "SELECT * FROM messages WHERE  
                              ((receiver_id = '$user1Id' AND sender_id = '$user2Id')
                               OR (receiver_id ='$user2Id' AND sender_id = '$user1Id'))
-                              ORDER BY message_id DESC LIMIT 10";
+                              ORDER BY message_id DESC LIMIT 20 OFFSET $offset ";
+
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         return $this->getProcessedMessages($result);

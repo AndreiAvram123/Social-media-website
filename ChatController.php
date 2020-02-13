@@ -14,26 +14,32 @@ if (isset($_REQUEST["messageContent"]) &&
 
 // GET REQUESTS
 
-if ($_REQUEST["requestName"] === "fetchRecentMessages") {
+if ($_REQUEST["requestName"] === "fetchOldMessages") {
     $receiverId = $_REQUEST["receiverId"];
     $currentUserId = $_REQUEST["currentUserId"];
-    echo json_encode($chatDatabase->fetchRecentMessages($receiverId,$currentUserId));
+    $offset = $_REQUEST["offset"];
+    $oldMessages = $chatDatabase->fetchOldMessages($receiverId, $currentUserId, $offset);
+    if (sizeof($oldMessages) > 0) {
+        echo json_encode($oldMessages);
+    } else {
+        echo $defaultNoResultsMessage;
+    }
 }
 
 if (isset($_REQUEST["requestName"])) {
 
 
-
     if ($_REQUEST["requestName"] === "fetchNewMessages") {
         $receiverId = $_REQUEST["receiverId"];
         $currentUserId = $_REQUEST["currentUserId"];
-        $lastMessageDate = $_REQUEST["lastMessageId"];
-        $messages = $chatDatabase->getNewMessages($lastMessageDate, $currentUserId, $receiverId);
+        $lastMessageID = $_REQUEST["lastMessageId"];
+        $messages = $chatDatabase->getNewMessages($lastMessageID, $currentUserId, $receiverId);
         if (sizeof($messages) > 0) {
             echo json_encode($messages);
         } else {
             echo $defaultNoResultsMessage;
         }
+
 
     }
 
