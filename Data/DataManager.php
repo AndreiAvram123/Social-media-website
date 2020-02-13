@@ -642,8 +642,20 @@ WHERE comment_post_id = '$postID'";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
     }
-    public function fetchSearchSuggestions($searchQuery){
-        $query = "SELECT post_id,post_title FROM forum_posts WHERE post_title LIKE '$searchQuery%' LIMIT 10";
+    public function fetchSearchSuggestions($searchQuery,$sortDate,$category){
+        $query = "SELECT post_id,post_title FROM forum_posts WHERE post_title LIKE '$searchQuery%' ";
+
+        if($category !=="All"){
+           $query.= "AND post_category_name = '$category'";
+        }
+        if($sortDate!=="None"){
+            if($sortDate === "Newest posts first"){
+                $query = $query . " ORDER BY post_date DESC";
+            }else{
+                $query = $query . " ORDER BY post_date";
+            }
+        }
+        $query.=" LIMIT 10";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         $suggestionsJsonObject = "";
