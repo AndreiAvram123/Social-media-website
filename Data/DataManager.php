@@ -635,10 +635,37 @@ WHERE comment_post_id = '$postID'";
     private function removePostOccurrenceInFavorites($postID)
     {
         $query = "DELETE FROM favorite_posts WHERE post_id = '$postID'";
+       $this->executeQuery($query);
+    }
+
+    private function executeQuery($query){
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
     }
+    public function fetchSearchSuggestions($searchQuery){
+        $query = "SELECT post_id,post_title FROM forum_posts WHERE post_title LIKE '$searchQuery%' LIMIT 10";
+        $result = $this->_dbHandler->prepare($query);
+        $result->execute();
+        $suggestionsJsonObject = "";
+        while($row = $result ->fetch()){
+            $suggestion = array(
+                'postID' => $row['post_id'],
+                'postTitle'=> $row['post_title'],
+            );
+            $jsonSuggestion =json_encode($suggestion);
+            if($suggestionsJsonObject === ""){
+                $suggestionsJsonObject ="[" . $jsonSuggestion;
+            }else{
+                $suggestionsJsonObject.= "," . $jsonSuggestion;
+            }
+
+        }
+        if($suggestionsJsonObject!==""){
+            $suggestionsJsonObject.= "]";
+        }
+        return $suggestionsJsonObject;
 
 
+    }
 
 }
