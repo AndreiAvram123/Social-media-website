@@ -314,7 +314,7 @@ WHERE comment_post_id = '$postID'";
         $query = "SELECT post_id, post_author_id, post_title, post_content, post_category_name, post_date, post_image,username FROM forum_posts
         INNER JOIN users ON users.user_id = forum_posts.post_author_id WHERE";
 
-         //add search filters
+        //add search filters
         if ($category !== "All") {
             $query = $query . "  post_category_name = '$category' AND ";
         }
@@ -547,7 +547,6 @@ WHERE comment_post_id = '$postID'";
     }
 
 
-
     /**
      * Update the post title in the
      * database of a specific post
@@ -635,47 +634,43 @@ WHERE comment_post_id = '$postID'";
     private function removePostOccurrenceInFavorites($postID)
     {
         $query = "DELETE FROM favorite_posts WHERE post_id = '$postID'";
-       $this->executeQuery($query);
+        $this->executeQuery($query);
     }
 
-    private function executeQuery($query){
+    private function executeQuery($query)
+    {
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
     }
-    public function fetchSearchSuggestions($searchQuery,$sortDate,$category){
+
+    public function fetchSearchSuggestions($searchQuery, $sortDate, $category)
+    {
         $query = "SELECT post_id,post_title FROM forum_posts WHERE post_title LIKE '$searchQuery%' ";
 
-        if($category !=="All"){
-           $query.= "AND post_category_name = '$category'";
+        if ($category !== null) {
+            $query .= "AND post_category_name = '$category'";
         }
-        if($sortDate!=="None"){
-            if($sortDate === "Newest posts first"){
+        if ($sortDate !== null) {
+            if ($sortDate === "Newest posts first") {
                 $query = $query . " ORDER BY post_date DESC";
-            }else{
+            } else {
                 $query = $query . " ORDER BY post_date";
             }
         }
-        $query.=" LIMIT 10";
+        $query .= " LIMIT 10";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
-        $suggestionsJsonObject = "";
-        while($row = $result ->fetch()){
-            $suggestion = array(
-                'postID' => $row['post_id'],
-                'postTitle'=> $row['post_title'],
-            );
-            $jsonSuggestion =json_encode($suggestion);
-            if($suggestionsJsonObject === ""){
-                $suggestionsJsonObject ="[" . $jsonSuggestion;
-            }else{
-                $suggestionsJsonObject.= "," . $jsonSuggestion;
-            }
+        $suggestions = [];
+
+        while ($row = $result->fetch()) {
+            $suggestion = new stdClass();
+            $suggestion->postID = md5($row['post_id']);
+            $suggestion->postTitle = $row['post_title'];
+            $jsonSuggestion = $suggestion;
+            $suggestions[] = $jsonSuggestion;
 
         }
-        if($suggestionsJsonObject!==""){
-            $suggestionsJsonObject.= "]";
-        }
-        return $suggestionsJsonObject;
+        return $suggestions;
 
 
     }

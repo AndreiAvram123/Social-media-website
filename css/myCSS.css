@@ -1,6 +1,6 @@
 
 .autocomplete {
-    /*the container must be positioned relative:*/
+    /*the postsSuggestionContainer must be positioned relative:*/
     position: relative;
     display: inline-block;
 }
@@ -11,7 +11,7 @@
     border-bottom: none;
     border-top: none;
     z-index: 99;
-    /*position the insertFetchedSuggestions items to be the same width as the container:*/
+    /*position the insertFetchedSuggestions items to be the same width as the postsSuggestionContainer:*/
     top: 100%;
     left: 0;
     right: 0;

@@ -22,24 +22,24 @@ if (isset($_POST['signOutButton'])) {
 $currentPage = 1;
 
 //handle pagination
-if(isset($_GET['previousPage'])){
-    for($i=1;$i<=$numberOfPages;$i++){
-        if(md5($i)==$_GET['currentPageId']){
-            $currentPage = $i -1;
+if (isset($_GET['previousPage'])) {
+    for ($i = 1; $i <= $numberOfPages; $i++) {
+        if (md5($i) == $_GET['currentPageId']) {
+            $currentPage = $i - 1;
         }
     }
 }
-if(isset($_GET['nextPage'])){
-    for($i=1;$i<=$numberOfPages ;$i++){
-        if(md5($i)==$_GET['currentPageId']){
-            $currentPage = $i +1;
+if (isset($_GET['nextPage'])) {
+    for ($i = 1; $i <= $numberOfPages; $i++) {
+        if (md5($i) == $_GET['currentPageId']) {
+            $currentPage = $i + 1;
         }
     }
 }
 
 $view->currentPage = $currentPage;
 $view->posts = $dbHandle->getPosts($view->currentPage);
-if(isset($_SESSION['user_id'])) {
+if (isset($_SESSION['user_id'])) {
     $view->friends = $dbFriends->getAllFriends($_SESSION['user_id']);
 }
 $view->isUserLoggedIn = isset($_SESSION['user_id']);

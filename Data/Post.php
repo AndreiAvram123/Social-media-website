@@ -6,7 +6,7 @@
  * database
  *
  */
-class Post
+class Post implements JsonSerializable
 {
     private $authorName;
     private $authorID;
@@ -30,6 +30,19 @@ class Post
         $this->postImage = $db_row['post_image'];
         $this->authorName = $db_row['username'];
         $this->isFavorite = FALSE;
+    }
+
+    public function jsonSerialize()
+    {
+        return
+            [
+                'postID'   => $this->getPostID(),
+                'postTitle' => $this->getPostTitle(),
+                'postDate' => $this->getPostDate(),
+                'postAuthor' =>$this->getAuthorName(),
+                'postImage' =>$this->getPostImage()
+
+            ];
     }
 
     public function getPostID()
@@ -89,6 +102,5 @@ class Post
     {
         $this->isFavorite = $isFavorite;
     }
-
 
 }

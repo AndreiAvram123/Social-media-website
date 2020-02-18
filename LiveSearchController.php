@@ -16,14 +16,20 @@ if (isset($_REQUEST["query"])) {
 }
 if (isset($_REQUEST["postsSearchQuery"])) {
     $query = htmlentities($_REQUEST["postsSearchQuery"]);
-    $sortDate = $_REQUEST['sortDate'];
-    $postCategory = $_REQUEST['category'];
+    $postCategory = null;
+    $sortDate = null;
+    if (isset($_REQUEST['sortDate'])) {
+        $sortDate = $_REQUEST['sortDate'];
+    }
+    if (isset($_REQUEST['category'])) {
+        $postCategory = $_REQUEST['category'];
+    }
     $dbManager = DataManager::getInstance();
 
     $fetchedSuggestions = $dbManager->fetchSearchSuggestions($query, $sortDate, $postCategory);
-    if ($fetchedSuggestions !== "") {
-        echo $fetchedSuggestions;
-    } else {
+    if(sizeof($fetchedSuggestions) >0 ){
+        echo json_encode($fetchedSuggestions);
+    }else{
         echo $defaultNoResultsMessage;
     }
 }

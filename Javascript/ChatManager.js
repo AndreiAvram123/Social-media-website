@@ -21,7 +21,7 @@ class ChatWindow {
             '        <p class="text-center" style="color: white">' + username + '</p>\n' +
             '    </div>\n' +
             '    <div id="message-window-body">\n' +
-            '        <div class ="message-container container">\n' +
+            '        <div class ="message-container">\n' +
             '\n' +
             '        </div>\n' +
             '<p id="user-is-typing-hint" style="display: none">User is typing</p>' +
@@ -43,6 +43,19 @@ class ChatWindow {
         this.initializeViews(domElement);
         this.attachListeners(domElement, receiverId);
         document.body.append(this.chatWindow);
+    }
+
+    addOldMessagesToContainer(messages) {
+        let messageContainer = this.messageContainer;
+        messages.forEach((messageView) => {
+            if (messageContainer.childNodes.length > 0) {
+                messageContainer.insertBefore(messageView, this.messageContainer.childNodes[0]);
+            } else {
+                messageContainer.appendChild(messageView);
+            }
+            this.currentlyDisplayedMessages++;
+        });
+
     }
 
     attachListeners(domElement, receiverId) {
@@ -130,10 +143,8 @@ class ChatWindow {
 
     attachScrollListener() {
         this.messageContainer.addEventListener('scroll', event => {
-            console.log(this.getMessageContainerTopOffset());
             if (this.fetchMessagesRequestSent !== true && this.getMessageContainerTopOffset() <= 100) {
                 if (this.noMoreOldMessagesToFetch === false) {
-                    console.log("Fetching old messages...");
                     this.fetchMessagesRequestSent = true;
                     fetchOldMessages(this.receiverID);
                 }
@@ -141,17 +152,6 @@ class ChatWindow {
         })
     }
 
-    addOldMessagesToContainer(messages) {
-        messages.forEach((messageView) => {
-            if (this.messageContainer.childNodes.length > 0) {
-                this.messageContainer.insertBefore(messageView, this.messageContainer.childNodes[0]);
-            } else {
-                this.messageContainer.appendChild(messageView);
-            }
-            this.currentlyDisplayedMessages++;
-        });
-
-    }
 
     addNewMessagesToContainer(messages) {
         messages.forEach((messageView) => {
@@ -184,6 +184,7 @@ function fetchOldMessages(receiverID) {
                     chatWindow.lastMessageID = jsonArray[0].messageId;
                     chatWindow.scrollToLastFetchedMessage();
                     initializeOtherAsyncFunctions(receiverID);
+                    chatWindow.attachScrollListener();
                 }
             }
         } else {
@@ -279,12 +280,6 @@ function getXmlHttpPostRequest(dataToSend) {
     return xhttp;
 }
 
-function getXmlHttpGetRequest(url) {
-    let xhttp = new XMLHttpRequest();
-    xhttp.open("GET", url, true);
-    xhttp.send();
-    return xhttp;
-}
 
 /**
  * Call this method in order to create a new chat window
@@ -317,7 +312,6 @@ function startChat(currentUserId, receiverId, username) {
 
         });
         fetchOldMessages(receiverId);
-        chatWindow.attachScrollListener();
 
     }
 
