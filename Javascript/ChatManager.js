@@ -5,7 +5,6 @@ let intervalCheck;
 let userIsTypingCheck;
 let currentUserIsTypingCheck;
 let sessionUserId;
-let chatWindowInitialized = false;
 let lastKeyPressedTime;
 let shouldFetchNewMessages = true;
 let defaultResponseNoData = "No results";
@@ -36,13 +35,18 @@ class ChatWindow {
             '</div>';
         let domElement = domParser.parseFromString(chatString, "text/html");
 
+        this.initializeDefaultParameters(receiverId);
+        this.initializeViews(domElement);
+        this.attachListeners(domElement, receiverId);
+        document.body.append(this.chatWindow);
+    }
+
+    initializeDefaultParameters(receiverId) {
         this.receiverID = receiverId;
         this.currentlyDisplayedMessages = 0;
         this.fetchMessagesRequestSent = false;
         this.noMoreOldMessagesToFetch = false;
-        this.initializeViews(domElement);
-        this.attachListeners(domElement, receiverId);
-        document.body.append(this.chatWindow);
+        this.chatWindowInitialized = false;
     }
 
     addOldMessagesToContainer(messages) {
@@ -74,12 +78,6 @@ class ChatWindow {
         this.messageContainer = domElement.getElementsByClassName("message-container")[0];
     }
 
-    playNotificationSound() {
-        let audioPlayer = document.getElementById("notificationAudio");
-        audioPlayer.play();
-    }
-
-
     getViewsForMessages(messagesJson) {
         let playNotification = false;
         let messagesViews = [];
@@ -99,10 +97,6 @@ class ChatWindow {
 
         });
         return messagesViews;
-        // if (playNotification && shouldPlayNotificationSound()) {
-        //     chatWindow.playNotificationSound();
-        // }
-
     }
 
     getMessageImageView(messageJson) {
@@ -179,8 +173,8 @@ function fetchOldMessages(receiverID) {
                 chatWindow.addOldMessagesToContainer(chatWindow.getViewsForMessages(jsonArray));
                 //if the fetchOldMessages function has been called
                 //the first time then chatWindowInitialized is false
-                if (chatWindowInitialized === false) {
-                    chatWindowInitialized = true;
+                if (chatWindow.chatWindowInitialized === false) {
+                    chatWindow.chatWindowInitialized = true;
                     chatWindow.lastMessageID = jsonArray[0].messageId;
                     chatWindow.scrollToLastFetchedMessage();
                     initializeOtherAsyncFunctions(receiverID);
@@ -195,19 +189,85 @@ function fetchOldMessages(receiverID) {
 
 
 function removeChat(chat) {
-    chatWindowInitialized = false;
-    chatWindow.lastMessageID = undefined;
     chatWindow.stopAsyncFunctions();
     document.body.removeChild(chat);
+}
+/**
+ * Call this method in order to create a new chat window
+ * It automatically resets the parameters in the database
+ * on close
+ * @param currentUserId
+ * @param receiverId
+ * @param username
+ */
+function startChat(currentUserId, receiverId, username) {
 
+    function resetDatabase() {
+        markCurrentUserAsTyping(false);
+    }
+
+    window.onbeforeunload = resetDatabase;
+    if (chatWindow === undefined ) {
+        sessionUserId = currentUserId;
+        chatWindow = new ChatWindow(username, receiverId);
+        (document.getElementById("messageField")).addEventListener('keyup', (event) => {
+            if (event.key === "Enter") {
+                sendMessage(receiverId);
+            } else {
+                if (event.key !== "Backspace") {
+                    markCurrentUserAsTyping(true);
+                }
+            }
+
+
+        });
+        fetchOldMessages(receiverId);
+    }
 }
 
+function initializeOtherAsyncFunctions(user2Id) {
+
+    function getChatId() {
+        let url = "ChatController.php?requestName=fetchChatId";
+        url += "&user1Id=" + sessionUserId;
+        url += "&user2Id=" + user2Id;
+        getXmlHttpGetRequest(url).onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 200) {
+                chatWindow.chatId = this.responseText;
+
+            }
+        }
+    }
+
+    getChatId();
+
+    function initializeAsyncFunctions() {
+        intervalCheck = setInterval(fetchNewMessages, timeIntervalCheck, user2Id, this.messageContainer);
+        userIsTypingCheck = setInterval(checkUserIsTyping, timeIntervalCheckTyping);
+        currentUserIsTypingCheck = setInterval(checkCurrentUserTyping, timeIntervalCheckTyping);
+    }
+
+    initializeAsyncFunctions();
+}
+
+
+function toggleElement(element) {
+    if (element.style.display !== "none") {
+        element.style.display = "none";
+    } else {
+        element.style.display = "block";
+    }
+}
+
+
+//*********************************************AJAX FUNCTION *************************************************
 function uploadImage(receiverId) {
     let url = "ChatController.php?requestName=UploadImage";
     let formData = new FormData();
     const files = document.querySelector('[type=file]').files;
 
     formData.append('files[]', files[0]);
+
     formData.append("receiverId", receiverId);
     formData.append("currentUserId", sessionUserId);
 
@@ -240,7 +300,7 @@ function checkUserIsTyping() {
     url += "&chatId=" + chatWindow.chatId;
     getXmlHttpGetRequest(url).onreadystatechange = function () {
         if (this.readyState === 4 && this.status === 200) {
-            if (this.responseText == 1) {
+            if (this.responseText === 1) {
                 chatWindow.displayUserTypingHint(true);
             } else {
                 chatWindow.displayUserTypingHint(false)
@@ -281,59 +341,12 @@ function getXmlHttpPostRequest(dataToSend) {
 }
 
 
-/**
- * Call this method in order to create a new chat window
- * It automatically resets the parameters in the database
- * on close
- * @param currentUserId
- * @param receiverId
- * @param username
- */
-function startChat(currentUserId, receiverId, username) {
-
-    function resetDatabase() {
-        markCurrentUserAsTyping(false);
-    }
-
-    window.onbeforeunload = resetDatabase;
-
-    if (chatWindowInitialized === false) {
-        sessionUserId = currentUserId;
-        chatWindow = new ChatWindow(username, receiverId);
-        (document.getElementById("messageField")).addEventListener('keyup', (event) => {
-            if (event.key === "Enter") {
-                sendMessage(receiverId);
-            } else {
-                if (event.key !== "Backspace") {
-                    markCurrentUserAsTyping(true);
-                }
-            }
-
-
-        });
-        fetchOldMessages(receiverId);
-
-    }
-
-}
-
 function markCurrentUserAsTyping(isTyping) {
-
-
     let dataToSend = "ChatController.php?requestName=markTyping";
     dataToSend += "&userId=" + sessionUserId;
     dataToSend += "&chatId=" + chatWindow.chatId;
     dataToSend += "&isTyping=" + isTyping;
     getXmlHttpGetRequest(dataToSend);
-}
-
-
-function shouldPlayNotificationSound() {
-    if (!document.hasFocus()) {
-        return true;
-    }
-    return document.activeElement.id !== "messageField" && chatWindowInitialized === true;
-
 }
 
 
@@ -344,39 +357,7 @@ function checkCurrentUserTyping() {
     }
 }
 
-function initializeOtherAsyncFunctions(user2Id) {
 
-    function getChatId() {
-        let url = "ChatController.php?requestName=fetchChatId";
-        url += "&user1Id=" + sessionUserId;
-        url += "&user2Id=" + user2Id;
-        getXmlHttpGetRequest(url).onreadystatechange = function () {
-            if (this.readyState === 4 && this.status === 200) {
-                chatWindow.chatId = this.responseText;
-
-            }
-        }
-    }
-
-    getChatId();
-
-    function initializeAsyncFunctions() {
-        intervalCheck = setInterval(fetchNewMessages, timeIntervalCheck, user2Id, this.messageContainer);
-        userIsTypingCheck = setInterval(checkUserIsTyping, timeIntervalCheckTyping);
-        currentUserIsTypingCheck = setInterval(checkCurrentUserTyping, timeIntervalCheckTyping);
-    }
-
-    initializeAsyncFunctions();
-}
-
-
-function toggleElement(element) {
-    if (element.style.display !== "none") {
-        element.style.display = "none";
-    } else {
-        element.style.display = "block";
-    }
-}
 
 
 

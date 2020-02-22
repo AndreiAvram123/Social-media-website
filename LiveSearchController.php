@@ -27,9 +27,9 @@ if (isset($_REQUEST["postsSearchQuery"])) {
     $dbManager = DataManager::getInstance();
 
     $fetchedSuggestions = $dbManager->fetchSearchSuggestions($query, $sortDate, $postCategory);
-    if(sizeof($fetchedSuggestions) >0 ){
+    if (sizeof($fetchedSuggestions) > 0) {
         echo json_encode($fetchedSuggestions);
-    }else{
+    } else {
         echo $defaultNoResultsMessage;
     }
 }

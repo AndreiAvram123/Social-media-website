@@ -18,13 +18,12 @@ class Post implements JsonSerializable
     private $postID;
     private $isFavorite;
 
-
     public function __construct($db_row)
     {
-        $this->postID = $db_row['post_id'];
+        $this->postID = ($db_row['post_id']);
         $this->postTitle = $db_row['post_title'];
         $this->postDate = $db_row['post_date'];
-        $this->postContent = $db_row['post_content'];
+        $this->postContent = substr($db_row['post_content'], 0, 700);
         $this->postCategoryName = $db_row['post_category_name'];
         $this->authorID = $db_row['post_author_id'];
         $this->postImage = $db_row['post_image'];
@@ -36,13 +35,14 @@ class Post implements JsonSerializable
     {
         return
             [
-                'postID'   => $this->getPostID(),
+                'postID' => $this->getPostID(),
                 'postTitle' => $this->getPostTitle(),
                 'postDate' => $this->getPostDate(),
-                'postAuthor' =>$this->getAuthorName(),
-                'postImage' =>$this->getPostImage()
-
-            ];
+                'postAuthor' => $this->getAuthorName(),
+                'postImage' => $this->getPostImage(),
+                'postCategory' => $this->getCategoryName(),
+                'postContent' =>$this->getPostContent()
+        ];
     }
 
     public function getPostID()

@@ -1,61 +1,73 @@
 let postsSuggestionContainer;
-initializeSuggestionsContainer();
 
-function initializeSuggestionsContainer() {
+initializePostSuggestionsContainer();
+
+
+function initializePostSuggestionsContainer() {
     postsSuggestionContainer = document.createElement("div");
     postsSuggestionContainer.setAttribute("id", this.id + "autocomplete-list");
     postsSuggestionContainer.setAttribute("class", "autocomplete-items");
 }
 
-function fetchFriendsSuggestions(query) {
-    let friendsList = document.getElementById("friend-postsSuggestionContainer");
-    let friendsSuggestionsContainer = document.getElementById("friends-suggestions-postsSuggestionContainer");
-
-    function addSuggestionToView(element) {
-        friendsSuggestionsContainer.innerHTML +=
-            '<div class="suggestion-friend-item clearfix">\n' +
-            '                        <img class="float-left" src="' + element.profilePicture + '"/>\n' +
+class FriendSuggestionItem {
+    constructor(elementData) {
+        let domParser = new DOMParser();
+        let htmlString = '<div class="suggestion-friend-item clearfix">\n' +
+            '                        <img class="float-left" src="' + elementData.profilePicture + '"/>\n' +
             '  <form method="get" action="ProfilePage.php">\n' +
             '\n' +
             '            <button type="submit" class="link-button" name="profileButton">\n' +
-            '               ' + element.username + '</button>\n' +
-            '            <input type="hidden" name="authorIDValue" value="' + element.userId + '">\n' +
+            '               ' + elementData.username + '</button>\n' +
+            '            <input type="hidden" name="authorIDValue" value="' + elementData.userId + '">\n' +
             '\n' +
             '        </form>\n' +
-            '                    </div>'
+            '                    </div>';
+        this.elementBody = domParser.parseFromString(htmlString, "text/html");
+
     }
 
+    getView() {
+        return this.elementBody;
+    }
+
+}
+
+function fetchFriendsSuggestions(event, query) {
+    let friendsList = document.getElementById("friends-suggestions-container");
+    let friendsSuggestionsContainer = document.getElementById("friend-container");
+
     function processResponse(jsonResponse) {
-        if (jsonResponse != null) {
+        if (jsonResponse !== undefined) {
             let jsonArray = JSON.parse(jsonResponse);
             jsonArray.forEach(element => {
-                addSuggestionToView(element)
+                let suggestionItem = new FriendSuggestionItem(element);
+                friendsSuggestionsContainer.appendChild(suggestionItem.getView());
             })
         }
     }
 
-    friendsSuggestionsContainer.innerHTML = "";
-    if (query.length > 1) {
-        friendsList.style.display = "none";
-        let url = "LiveSearchController.php?query=" + query;
+    if (event.keyCode >= '65' && event.keyCode <= '90') {
+        if (query.length > 1) {
+            friendsSuggestionsContainer.innerHTML = "";
+            friendsList.style.display = "none";
+            let url = "LiveSearchController.php?query=" + query;
 
-        getXmlHttpGetRequest(url).onreadystatechange = function () {
-            if (this.readyState === 4 && this.status === 200) {
-                if (this.responseText !== "No results") {
-                    processResponse(this.responseText);
-                } else {
-                    processResponse(null);
+            getXmlHttpGetRequest(url).onreadystatechange = function () {
+                if (this.readyState === 4 && this.status === 200) {
+                    if (this.responseText !== "No results") {
+                        processResponse(this.responseText);
+                    } else {
+                        processResponse(undefined);
+                    }
                 }
-            }
-        };
-    } else {
-        friendsList.style.display = "block";
+            };
+        } else {
+            friendsList.style.display = "block";
+        }
     }
 }
 
-
 function fetchPostSuggestions(query) {
-
     function getPostSuggestionsUrl() {
         //get the filters from the filter modal and display suggestions accordingly
         let sortDate = document.getElementById("postOrder").value;
