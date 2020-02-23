@@ -3,7 +3,7 @@ require_once("Restful/RestfulDatabase.php");
 require_once("Data/DataManager.php");
 
 $dbHandler = DataManager::getInstance();
-
+$responseObject = new stdClass();
 if (isset($_GET['recentPosts'])) {
     $data = $dbHandler->getRecentPostsSmallData();
     echo json_encode($data);
@@ -96,17 +96,68 @@ if (isset($_REQUEST['savedPosts'])) {
 }
 
 if (isset($_REQUEST['authenticateThirdPartyAccount'])) {
-
-    $responseObject = new stdClass();
-    if (isset($_REQUEST['userID']) && $_REQUEST['userID'] !== "") {
+    if (isset($_REQUEST['email']) && $_REQUEST['email'] !== "") {
         //if the user exists use 1
-        $responseObject->responseCode = 1;
-        //if the user does not exist use 0
-
+        $fetchedUser = $dbHandler->getUserFromEmail($_REQUEST['email']);
+        if ($fetchedUser != null) {
+            $responseObject->responseCode = 1;
+            $responseObject->userID = $fetchedUser->getUserId();
+            $responseObject->username = $fetchedUser->getUsername();
+        } else {
+            $responseObject->responseCode = 0;
+        }
     } else {
         $responseObject->responseCode = -1;
     }
     echo json_encode($responseObject);
 
+}
+
+if (isset($_REQUEST['createThirdPartyAccount'])) {
+    $jsonObject = decodePostData();
+    $accountID = $jsonObject->accountID;
+    $email = $jsonObject->email;
+    $username = $jsonObject->username;
+    $profilePictureURL = $jsonObject->profilePicture;
+    $date = date('Y-m-d H:i:s');
+    if ($accountID != null && $email != null && $username != null && $profilePictureURL != null) {
+        //generate random password
+        $randomPassword = generateRandomPassword();
+        $dbHandler->createUser($username, $email, $randomPassword, $date, $profilePictureURL);
+        $responseObject->responseCode = 2;
+        $fetchedUser = $dbHandler->getUserFromEmail($email);
+        sendEmailWithPassword($email,$randomPassword);
+        $responseObject->userID = $fetchedUser->getUserId();
+        $responseObject->username = $fetchedUser->getUsername();
+
+    } else {
+        $responseObject->responseCode = -1;
+    }
+    echo json_encode($responseObject);
+}
+function decodePostData()
+{
+    $json_str = file_get_contents('php://input');
+# Get as an object
+    return json_decode($json_str);
+}
+
+function generateRandomPassword()
+{
+    $length = 8;
+    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $charactersLength = strlen($characters);
+    $randomString = '';
+    for ($i = 0; $i < $length; $i++) {
+        $randomString .= $characters[rand(0, $charactersLength - 1)];
+    }
+    return $randomString;
+}
+
+function sendEmailWithPassword($email,$password){
+    $msg = "You recently authenticated with a third party service such as Google\n";
+    $msg .= "If you wish to use your account on the browser version please use the following password \n";
+    $msg .= $password;
+    mail($email,"Your password",$msg);
 }
 ?>

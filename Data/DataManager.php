@@ -143,22 +143,15 @@ class DataManager
     public function createUser($username, $email, $password, $creationDate, $imageLocation)
     {
         $encryptedPassword = md5($password);
-        if ($imageLocation === null) {
-            $query = "INSERT INTO users (user_id,username, email, password, creation_date)
-VALUES (NULL,?,?,?,?)";
-        } else {
-            $query = "INSERT INTO users (user_id,username, email, password, creation_date,profile_picture)
+        $query = "INSERT INTO users (user_id,username, email, password, creation_date,profile_picture)
 VALUES (NULL,?,?,?,?,?)";
 
-        }
         $result = $this->_dbHandler->prepare($query);
         $result->bindParam(1, $username);
         $result->bindParam(2, $email);
         $result->bindParam(3, $encryptedPassword);
         $result->bindParam(4, $creationDate);
-        if ($imageLocation !== null) {
-            $result->bindParam(5, $imageLocation);
-        }
+        $result->bindParam(5, $imageLocation);
         $result->execute();
 
     }
@@ -291,7 +284,11 @@ WHERE comment_post_id = '$postID'";
         $result->bindValue(':email', $email);
         $result->execute();
         $row = $result->fetch();
-        return new User($row);
+        if ($row != false) {
+            return new User($row);
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -413,7 +410,8 @@ WHERE comment_post_id = '$postID'";
     }
 //todo
 //implement this in the forum as well
-    public function getWatchListSmallData($userID){
+    public function getWatchListSmallData($userID)
+    {
         $query = "SELECT  post_id, post_author_id, post_title, post_image,username
          FROM forum_posts
          INNER JOIN users ON user_id = post_author_id
@@ -562,7 +560,12 @@ WHERE comment_post_id = '$postID'";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         $row = $result->fetch();
-        return new User($row);
+        if ($row === false) {
+            return null;
+        } else {
+            return new User($row);
+        }
+
     }
 
 
@@ -723,4 +726,6 @@ WHERE comment_post_id = '$postID'";
         }
         return $suggestions;
     }
+
+
 }
