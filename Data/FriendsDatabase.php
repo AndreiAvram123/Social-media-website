@@ -1,9 +1,14 @@
 <?php
 
+//todo
+//users now has an username field ...........
 require_once "Data/Database.php";
 require_once "Data/FriendRequest.php";
 require_once "Data/User.php";
+require_once "Data/Friend.php";
 require_once "Data/UserModelAsync.php";
+require_once "Data/Message.php";
+
 class FriendsDatabase
 {
 
@@ -35,12 +40,13 @@ class FriendsDatabase
         $query = "SELECT * FROM friend_requests WHERE receiver_id = '$user_id'";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
-        $friendRequests=[];
-        while($row = $result->fetch()){
+        $friendRequests = [];
+        while ($row = $result->fetch()) {
             $friendRequests[] = new FriendRequest($row);
         }
         return $friendRequests;
     }
+
     /**
      * Get an array of users(friends) by passing the id of the current
      * logged in user
@@ -57,6 +63,31 @@ class FriendsDatabase
         $friends = [];
         while ($row = $result->fetch()) {
             $friends[] = new User($row);
+        }
+        return $friends;
+    }
+
+    /**
+     * This function is used in order to fetch all the user friends along with
+     * the last message
+     * Create an inner join to join the sender id or the receiver id with the user id
+     *
+     * @param $user_id
+     * @return array
+     */
+    public function fetchAllFriendsWithLastMessage($user_id)
+    {
+        $query = "SELECT * FROM users
+WHERE user_id IN 
+        (SELECT user2_id from friends WHERE user1_id = '$user_id') OR
+         user_id IN (SELECT user1_id from friends WHERE user2_id = '$user_id')";
+        $result = $this->_dbHandler->prepare($query);
+        $result->execute();
+        $friends = [];
+        while ($row = $result->fetch()) {
+            $friend = new Friend($row);
+            $friend->setLastMessage($this->fetchLastMessage($user_id, $friend->getUserId()));
+            $friends[] = $friend;
         }
         return $friends;
     }
@@ -86,6 +117,7 @@ class FriendsDatabase
         $result->execute();
 
     }
+
     public function sendFriendRequest($sender_id, $receiver_id)
     {
         $query = "INSERT INTO friend_requests VALUES (NULL,'$sender_id','$receiver_id')";
@@ -98,8 +130,8 @@ class FriendsDatabase
         $query = "SELECT request_id FROM friend_requests";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
-        $ids=[];
-        while($row = $result->fetch()){
+        $ids = [];
+        while ($row = $result->fetch()) {
             $ids[] = $row["request_id"];
         }
         return $ids;
@@ -111,10 +143,10 @@ class FriendsDatabase
      * @param $senderId - the id of the user who sent the friend request
      * @param $receiverId - the id of the user who received the invitation
      */
-    public function acceptFriendRequest($senderId,$receiverId)
+    public function acceptFriendRequest($senderId, $receiverId)
     {
-        $this->addToFriendList($receiverId,$senderId);
-        $this->deleteFriendRequest($senderId,$receiverId);
+        $this->addToFriendList($receiverId, $senderId);
+        $this->deleteFriendRequest($senderId, $receiverId);
     }
 
     /**
@@ -129,6 +161,7 @@ class FriendsDatabase
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
     }
+
     /**
      * Use this method in order to reject a friend invitation
      * and persist the data in the database
@@ -137,7 +170,7 @@ class FriendsDatabase
      */
     public function rejectFriendRequest($senderId, $receiverId)
     {
-        $this->deleteFriendRequest($senderId,$receiverId);
+        $this->deleteFriendRequest($senderId, $receiverId);
     }
 
     /**
@@ -151,13 +184,28 @@ class FriendsDatabase
     public function getAllFriendsSuggestionsForQuery($query)
     {
         $query = "SELECT user_id,username,profile_picture FROM users WHERE username LIKE '$query%'";
-        $result = $this->_dbHandler ->prepare($query);
+        $result = $this->_dbHandler->prepare($query);
         $result->execute();
         $users = [];
-        while($row = $result->fetch()){
+        while ($row = $result->fetch()) {
             $users[] = new UserModelAsync($row);
         }
         return $users;
+    }
+
+    private function fetchLastMessage($current_user_id, $friend_user_id)
+    {
+        $query = $query = "SELECT * FROM messages WHERE (sender_id = '$current_user_id'
+       AND receiver_id = '$friend_user_id') OR (sender_id = '$current_user_id' AND receiver_id='$friend_user_id')
+       ORDER BY message_date DESC LIMIT 1";
+        $result = $this->_dbHandler->prepare($query);
+        $result->execute();
+        $row = $result->fetch();
+        if ($row == false) {
+            return null;
+        } else {
+            return new Message($row);
+        }
     }
 
 }

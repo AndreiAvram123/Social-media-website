@@ -87,6 +87,7 @@ class SessionManager
             $imageLocation = null;
             if (!empty($image)) {
                 $imageLocation = $databaseHandler->uploadImageToServer($image, $_FILES["profilePicture"]["tmp_name"], "images/users/");
+                $imageLocation = $_SERVER['DOCUMENT_ROOT'] . $imageLocation;
             }
             //the user will have a default image is he does not choose one
             $databaseHandler->createUser($username, $email, $password, $creationDate, $imageLocation);

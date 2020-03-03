@@ -1,16 +1,25 @@
 <?php
 require_once("Data/ChatDatabase.php");
+include "Data/Constants.php";
+
 $defaultNoResultsMessage = "No results";
+$responseObject = new stdClass();
 $chatDatabase = ChatDatabase::getInstance();
 
-if (isset($_REQUEST["messageContent"]) &&
-    isset($_REQUEST["receiverId"]) && isset($_REQUEST["currentUserId"])) {
-    $messageDate = time() * 1000;
-    $chatDatabase->insertNewMessage($_REQUEST["messageContent"],
-        $messageDate, $_REQUEST["currentUserId"], $_REQUEST["receiverId"]);
+if (isset($_REQUEST["requestName"]) && $_REQUEST["requestName"] == "sendMessage") {
 
+    if (isset($_REQUEST['messageContent']) &&
+        isset($_REQUEST['currentUserId']) && isset($_REQUEST['receiverId'])) {
+        $messageDate = time() * 1000;
+        $chatDatabase->insertNewMessage($_REQUEST['messageContent'],
+            $messageDate, $_REQUEST['currentUserId'], $_REQUEST['receiverId']);
+        //as a response give the client the last message id in order
+        //to eliminate the need of fetching the last message as well
+        $responseObject->lastMessageID = $chatDatabase->fetchLastMessageID($_REQUEST['currentUserId'], $_REQUEST['receiverId']);
+        $responseObject->lastMessageDate = $messageDate;
+        echo json_encode($responseObject);
+    }
 }
-
 
 // GET REQUESTS
 
@@ -22,7 +31,8 @@ if ($_REQUEST["requestName"] === "fetchOldMessages") {
     if (sizeof($oldMessages) > 0) {
         echo json_encode($oldMessages);
     } else {
-        echo $defaultNoResultsMessage;
+        $responseObject->responseCode = Constants::$defaultNoDataResponseCode;
+        echo json_encode($responseObject);
     }
 }
 
@@ -34,12 +44,7 @@ if (isset($_REQUEST["requestName"])) {
         $currentUserId = $_REQUEST["currentUserId"];
         $lastMessageID = $_REQUEST["lastMessageId"];
         $messages = $chatDatabase->getNewMessages($lastMessageID, $currentUserId, $receiverId);
-        if (sizeof($messages) > 0) {
-            echo json_encode($messages);
-        } else {
-            echo $defaultNoResultsMessage;
-        }
-
+        echo json_encode($messages);
 
     }
 

@@ -452,6 +452,8 @@ WHERE comment_post_id = '$postID'";
      * @param $user_id
      * @return array
      */
+    //todo
+    //needs refactoring for better optimisation
     public function getUserPosts($user_id)
     {
         $query = "SELECT  post_id, post_author_id, post_title, post_content, post_category_name, post_date, post_image,username FROM forum_posts
@@ -461,11 +463,11 @@ WHERE comment_post_id = '$postID'";
         $result->execute();
         $posts = [];
         while ($row = $result->fetch()) {
-
             $posts[] = new Post($row);
         }
         return $posts;
     }
+
 
     /**
      * This method is used in order to
@@ -725,6 +727,19 @@ WHERE comment_post_id = '$postID'";
 
         }
         return $suggestions;
+    }
+    public function getSmallDataUserPosts($user_id){
+        $query = "SELECT  post_id, post_author_id, post_title , post_date, post_image,username FROM forum_posts
+        INNER JOIN users ON user_id = post_author_id
+       WHERE post_author_id = '$user_id' LIMIT 10";
+
+        $result = $this->_dbHandler->prepare($query);
+        $result->execute();
+        $posts = [];
+        while ($row = $result->fetch()) {
+            $posts[] = new SmallDataPost($row);
+        }
+        return $posts;
     }
 
 

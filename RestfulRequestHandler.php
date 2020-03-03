@@ -1,13 +1,36 @@
 <?php
-require_once("Restful/RestfulDatabase.php");
+require_once("Data/FriendsDatabase.php");
 require_once("Data/DataManager.php");
-
 $dbHandler = DataManager::getInstance();
 $responseObject = new stdClass();
+
+
+
 if (isset($_GET['recentPosts'])) {
     $data = $dbHandler->getRecentPostsSmallData();
     echo json_encode($data);
 }
+if (isset($_GET['friends'])) {
+    $userID = null;
+    if (isset($_GET['userID']) && ($_GET['userID'] !== "")) {
+        $userID = $_GET['userID'];
+    }
+    if ($userID == null) {
+        $responseObject->message = "User id cannot be empty";
+        $responseObject->errorMessageID = Constants::$errorMessageURLNotValid;
+        echo json_encode($responseObject);
+    } else {
+        $dbFriends = FriendsDatabase::getInstance();
+        //check weather we should fetch the last message as well
+        if (isset($_GET['lastMessage'])) {
+            $friends = $dbFriends->fetchAllFriendsWithLastMessage($userID);
+            echo json_encode($friends);
+        }
+
+    }
+
+}
+
 
 //get the data on a specific post
 if (isset($_GET['postID'])) {
@@ -20,6 +43,7 @@ if (isset($_GET['postID'])) {
         }
     }
 }
+
 if (isset($_GET['suggestionQuery'])) {
     $suggestionQuery = $_GET['suggestionQuery'];
     $suggestions = $dbHandler->fetchSearchSuggestionsMobile($suggestionQuery);
@@ -113,6 +137,14 @@ if (isset($_REQUEST['authenticateThirdPartyAccount'])) {
 
 }
 
+if (isset($_REQUEST['addPostToFavorite'])) {
+    $postID = $_REQUEST['postID'];
+    $userID = $_REQUEST['userID'];
+    if ($postID != null && $userID != null) {
+        $dbHandler->addPostToFavorite($postID, $userID);
+    }
+}
+
 if (isset($_REQUEST['createThirdPartyAccount'])) {
     $jsonObject = decodePostData();
     $accountID = $jsonObject->accountID;
@@ -126,7 +158,7 @@ if (isset($_REQUEST['createThirdPartyAccount'])) {
         $dbHandler->createUser($username, $email, $randomPassword, $date, $profilePictureURL);
         $responseObject->responseCode = 2;
         $fetchedUser = $dbHandler->getUserFromEmail($email);
-        sendEmailWithPassword($email,$randomPassword);
+        sendEmailWithPassword($email, $randomPassword);
         $responseObject->userID = $fetchedUser->getUserId();
         $responseObject->username = $fetchedUser->getUsername();
 
@@ -135,6 +167,22 @@ if (isset($_REQUEST['createThirdPartyAccount'])) {
     }
     echo json_encode($responseObject);
 }
+
+if (isset($_REQUEST['myPosts'])) {
+    $userID = null;
+    if (isset($_REQUEST['userID']) && $_REQUEST['userID'] !== "") {
+        $userID = $_REQUEST['userID'];
+    }
+    if ($userID != null) {
+        $userPosts = $dbHandler->getSmallDataUserPosts($userID);
+        echo json_encode($userPosts);
+    } else {
+        $responseObject->responseCode = -1;
+        echo json_encode($responseObject);
+    }
+}
+
+
 function decodePostData()
 {
     $json_str = file_get_contents('php://input');
@@ -154,10 +202,12 @@ function generateRandomPassword()
     return $randomString;
 }
 
-function sendEmailWithPassword($email,$password){
+function sendEmailWithPassword($email, $password)
+{
     $msg = "You recently authenticated with a third party service such as Google\n";
     $msg .= "If you wish to use your account on the browser version please use the following password \n";
     $msg .= $password;
-    mail($email,"Your password",$msg);
+    mail($email, "Your password", $msg);
 }
+
 ?>

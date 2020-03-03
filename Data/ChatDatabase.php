@@ -74,14 +74,16 @@ class ChatDatabase
 
     public function getNewMessages($lastMessageId, $user1Id, $user2Id)
     {
-            $query = "SELECT * FROM messages WHERE '$lastMessageId' < message_id AND  
+        $query = "SELECT * FROM messages WHERE '$lastMessageId' < message_id AND  
                              ((receiver_id = '$user1Id' AND sender_id = '$user2Id')
                               OR (receiver_id ='$user2Id' AND sender_id = '$user1Id'))";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         return $this->getProcessedMessages($result);
     }
-    private function getProcessedMessages($result){
+
+    private function getProcessedMessages($result)
+    {
         $messages = [];
         while ($row = $result->fetch()) {
             $messages[] = new Message($row);
@@ -138,12 +140,24 @@ OR (user1_id = '$user2Id' AND user2_id='$user1Id')";
         $query = "SELECT * FROM messages WHERE  
                              ((receiver_id = '$user1Id' AND sender_id = '$user2Id')
                               OR (receiver_id ='$user2Id' AND sender_id = '$user1Id'))
-                              ORDER BY message_id DESC LIMIT 20 OFFSET $offset ";
+                              ORDER BY message_id DESC LIMIT 10 OFFSET $offset ";
 
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         return $this->getProcessedMessages($result);
 
+    }
+
+    public function fetchLastMessageID($user1Id, $user2Id)
+    {
+        $query = "SELECT  message_id FROM messages WHERE
+        ((receiver_id = '$user1Id' AND sender_id = '$user2Id')
+                              OR (receiver_id ='$user2Id' AND sender_id = '$user1Id'))
+ORDER BY message_id DESC LIMIT 1";
+        $result = $this->_dbHandler->prepare($query);
+        $result->execute();
+        $row = $result->fetch();
+        return $row['message_id'];
     }
 
 
