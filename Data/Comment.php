@@ -4,7 +4,7 @@
  * This class is used to create objects from a
  * comment row in the database
  */
-class Comment
+class Comment implements JsonSerializable
 {
     private $comment_id;
     private $comment_user_id;
@@ -25,6 +25,17 @@ class Comment
         $this->comment_text = $databaseRow['comment_text'];
         $this->comment_date = $databaseRow['comment_date'];
         $this->author = $databaseRow['username'];
+    }
+
+    public function jsonSerialize()
+    {
+        return
+            [
+                'commentID' => $this->getCommentId(),
+                'commentAuthor' => $this->getAuthor(),
+                'commentContent' => $this->getCommentText(),
+                'commentDate' => $this->getCommentDate(),
+            ];
     }
 
 

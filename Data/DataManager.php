@@ -4,6 +4,7 @@ require_once "Data/Comment.php";
 require_once "Data/Post.php";
 require_once "Data/User.php";
 require_once "Data/FriendRequest.php";
+require_once "Data/SmallDataPost.php";
 
 /**
  * This class is used to handle
@@ -60,7 +61,6 @@ class DataManager
         $posts = [];
         while ($row = $result->fetch()) {
             //limit the amount of text on the main page
-            $row['post_content'] = substr($row['post_content'], 0, 700);
             $posts[] = new Post($row);
         }
         return $posts;
@@ -143,22 +143,15 @@ class DataManager
     public function createUser($username, $email, $password, $creationDate, $imageLocation)
     {
         $encryptedPassword = md5($password);
-        if ($imageLocation === null) {
-            $query = "INSERT INTO users (user_id,username, email, password, creation_date)
-VALUES (NULL,?,?,?,?)";
-        } else {
-            $query = "INSERT INTO users (user_id,username, email, password, creation_date,profile_picture)
+        $query = "INSERT INTO users (user_id,username, email, password, creation_date,profile_picture)
 VALUES (NULL,?,?,?,?,?)";
 
-        }
         $result = $this->_dbHandler->prepare($query);
         $result->bindParam(1, $username);
         $result->bindParam(2, $email);
         $result->bindParam(3, $encryptedPassword);
         $result->bindParam(4, $creationDate);
-        if ($imageLocation !== null) {
-            $result->bindParam(5, $imageLocation);
-        }
+        $result->bindParam(5, $imageLocation);
         $result->execute();
 
     }
@@ -291,7 +284,11 @@ WHERE comment_post_id = '$postID'";
         $result->bindValue(':email', $email);
         $result->execute();
         $row = $result->fetch();
-        return new User($row);
+        if ($row != false) {
+            return new User($row);
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -314,7 +311,7 @@ WHERE comment_post_id = '$postID'";
         $query = "SELECT post_id, post_author_id, post_title, post_content, post_category_name, post_date, post_image,username FROM forum_posts
         INNER JOIN users ON users.user_id = forum_posts.post_author_id WHERE";
 
-         //add search filters
+        //add search filters
         if ($category !== "All") {
             $query = $query . "  post_category_name = '$category' AND ";
         }
@@ -396,6 +393,26 @@ WHERE comment_post_id = '$postID'";
         //all the posts from the posts table that have
         //that specific id
         $query = "SELECT  post_id, post_author_id, post_title, post_content, post_category_name, post_date, post_image,username
+         FROM forum_posts
+         INNER JOIN users ON user_id = post_author_id
+         WHERE post_id IN 
+        (SELECT post_id from favorite_posts WHERE user_id = :userId)";
+        $result = $this->_dbHandler->prepare($query);
+        $result->bindValue(':userId', $userId);
+        $result->execute();
+        $posts = [];
+        while ($row = $result->fetch()) {
+            $post = new Post($row);
+            $post->setAddedToWatchList(true);
+            $posts[] = $post;
+        }
+        return $posts;
+    }
+//todo
+//implement this in the forum as well
+    public function getWatchListSmallData($userID)
+    {
+        $query = "SELECT  post_id, post_author_id, post_title, post_image,username
          FROM forum_posts
          INNER JOIN users ON user_id = post_author_id
          WHERE post_id IN 
@@ -543,9 +560,13 @@ WHERE comment_post_id = '$postID'";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         $row = $result->fetch();
-        return new User($row);
-    }
+        if ($row === false) {
+            return null;
+        } else {
+            return new User($row);
+        }
 
+    }
 
 
     /**
@@ -635,10 +656,76 @@ WHERE comment_post_id = '$postID'";
     private function removePostOccurrenceInFavorites($postID)
     {
         $query = "DELETE FROM favorite_posts WHERE post_id = '$postID'";
+        $this->executeQuery($query);
+    }
+
+    private function executeQuery($query)
+    {
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
     }
 
+    public function fetchSearchSuggestions($searchQuery, $sortDate, $category)
+    {
+        $query = "SELECT post_id,post_title FROM forum_posts WHERE post_title LIKE '$searchQuery%' ";
+
+        if ($category !== null) {
+            $query .= "AND post_category_name = '$category'";
+        }
+        if ($sortDate !== null) {
+            if ($sortDate === "Newest posts first") {
+                $query = $query . " ORDER BY post_date DESC";
+            } else {
+                $query = $query . " ORDER BY post_date";
+            }
+        }
+        $query .= " LIMIT 10";
+        $result = $this->_dbHandler->prepare($query);
+        $result->execute();
+        $suggestions = [];
+
+        while ($row = $result->fetch()) {
+            $suggestion = new stdClass();
+            $suggestion->postID = md5($row['post_id']);
+            $suggestion->postTitle = $row['post_title'];
+            $jsonSuggestion = $suggestion;
+            $suggestions[] = $jsonSuggestion;
+
+        }
+        return $suggestions;
+
+
+    }
+
+
+    public function getRecentPostsSmallData()
+    {
+        $query = "SELECT forum_posts.post_id, forum_posts.post_title,forum_posts.post_image,username FROM forum_posts INNER JOIN
+          users ON users.user_id = forum_posts.post_author_id ORDER BY post_id DESC LIMIT 10";
+
+        $result = $this->_dbHandler->prepare($query);
+        $result->execute();
+        $posts = [];
+        while ($row = $result->fetch()) {
+            $posts[] = new SmallDataPost($row);
+        }
+        return $posts;
+    }
+
+    public function fetchSearchSuggestionsMobile($searchQuery)
+    {
+
+        $query = "SELECT forum_posts.post_id, forum_posts.post_title,forum_posts.post_image,username FROM forum_posts INNER JOIN
+          users ON users.user_id = forum_posts.post_author_id  WHERE post_title LIKE '$searchQuery%' LIMIT 8";
+        $result = $this->_dbHandler->prepare($query);
+        $result->execute();
+        $suggestions = [];
+        while ($row = $result->fetch()) {
+            $suggestions[] = new SmallDataPost($row);
+
+        }
+        return $suggestions;
+    }
 
 
 }

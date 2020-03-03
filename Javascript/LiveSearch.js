@@ -1,44 +1,150 @@
-function fetchFriendsSuggestions(query) {
-    let friendsList = document.getElementById("friend-container");
-    let friendsSuggestionsContainer = document.getElementById("friends-suggestions-container");
+let postsSuggestionContainer;
 
-    function addSuggestionToView(element) {
-        friendsSuggestionsContainer.innerHTML +=
-            '<div class="suggestion-friend-item clearfix">\n' +
-            '                        <img class="float-left" src="' + element.profilePicture + '"/>\n' +
+initializePostSuggestionsContainer();
+
+
+function initializePostSuggestionsContainer() {
+    postsSuggestionContainer = document.createElement("div");
+    postsSuggestionContainer.setAttribute("id", this.id + "autocomplete-list");
+    postsSuggestionContainer.setAttribute("class", "autocomplete-items");
+}
+
+class FriendSuggestionItem {
+    constructor(elementData) {
+        let domParser = new DOMParser();
+        let htmlString = '<div class="suggestion-friend-item clearfix">\n' +
+            '                        <img class="float-left" src="' + elementData.profilePicture + '"/>\n' +
             '  <form method="get" action="ProfilePage.php">\n' +
             '\n' +
             '            <button type="submit" class="link-button" name="profileButton">\n' +
-            '               ' + element.username + '</button>\n' +
-            '            <input type="hidden" name="authorIDValue" value="' + element.userId + '">\n' +
+            '               ' + elementData.username + '</button>\n' +
+            '            <input type="hidden" name="authorIDValue" value="' + elementData.userId + '">\n' +
             '\n' +
             '        </form>\n' +
-            '                    </div>'
+            '                    </div>';
+        this.elementBody = domParser.parseFromString(htmlString, "text/html");
+
     }
 
+    getView() {
+        return this.elementBody;
+    }
+
+}
+
+function fetchFriendsSuggestions(event, query) {
+    let friendsList = document.getElementById("friends-suggestions-container");
+    let friendsSuggestionsContainer = document.getElementById("friend-container");
+
     function processResponse(jsonResponse) {
-        if (jsonResponse != null) {
+        if (jsonResponse !== undefined) {
             let jsonArray = JSON.parse(jsonResponse);
             jsonArray.forEach(element => {
-                addSuggestionToView(element)
+                let suggestionItem = new FriendSuggestionItem(element);
+                friendsSuggestionsContainer.appendChild(suggestionItem.getView());
             })
         }
     }
 
-    friendsSuggestionsContainer.innerHTML = "";
+    if (event.keyCode >= '65' && event.keyCode <= '90') {
+        if (query.length > 1) {
+            friendsSuggestionsContainer.innerHTML = "";
+            friendsList.style.display = "none";
+            let url = "LiveSearchController.php?query=" + query;
+
+            getXmlHttpGetRequest(url).onreadystatechange = function () {
+                if (this.readyState === 4 && this.status === 200) {
+                    if (this.responseText !== "No results") {
+                        processResponse(this.responseText);
+                    } else {
+                        processResponse(undefined);
+                    }
+                }
+            };
+        } else {
+            friendsList.style.display = "block";
+        }
+    }
+}
+
+function fetchPostSuggestions(query) {
+    function getPostSuggestionsUrl() {
+        //get the filters from the filter modal and display suggestions accordingly
+        let sortDate = document.getElementById("postOrder").value;
+        let category = document.getElementById("postCategorySelector").value;
+        let url = "LiveSearchController.php?postsSearchQuery=" + query;
+        if (sortDate !== "None") {
+            url += "&sortDate=" + sortDate;
+        }
+        if (category !== "All") {
+            url += "&category=" + category;
+        }
+        return url;
+    }
+
     if (query.length > 1) {
-        friendsList.style.display = "none";
-        let url = "LiveSearchController.php?query=" + query;
+        let url = getPostSuggestionsUrl(query);
         getXmlHttpGetRequest(url).onreadystatechange = function () {
             if (this.readyState === 4 && this.status === 200) {
                 if (this.responseText !== "No results") {
-                    processResponse(this.responseText);
-                } else {
-                    processResponse(null);
+                    let jsonObject = JSON.parse(this.responseText);
+                    insertFetchedSuggestions(jsonObject);
                 }
             }
         };
     } else {
-        friendsList.style.display = "block";
+        postsSuggestionContainer.innerHTML = "";
     }
 }
+
+function performSearchByPostID(id) {
+    window.location.href = "CurrentPost.php?valuePostID=" + id;
+}
+
+function insertFetchedSuggestions(suggestionsJSONArray) {
+    let currentFocus;
+    /*execute a function when someone writes in the text field:*/
+    let searchField = document.getElementById("search-posts-field");
+    let suggestedItem, i, val = searchField.value;
+    /*close any already open lists of autocompleted values*/
+    clearSuggestionsList();
+    if (!val) {
+        return false;
+    }
+    currentFocus = -1;
+
+    //insert the suggestions postsSuggestionContainer as a child in the search field
+    searchField.parentNode.appendChild(postsSuggestionContainer);
+    //insert all available suggestions
+    suggestionsJSONArray.forEach(suggestion => {
+        let postTitle = suggestion.postTitle;
+        let postID = suggestion.postID;
+        /*check if the item starts with the same letters as the text field value:*/
+        /*create a DIV element for each matching element:*/
+        suggestedItem = document.createElement("DIV");
+        //make the matching letters bold
+        suggestedItem.innerHTML += postTitle;
+        /*execute a function when someone clicks on the item value (DIV element):*/
+        suggestedItem.addEventListener("click", function (e) {
+            performSearchByPostID(postID);
+        });
+        postsSuggestionContainer.appendChild(suggestedItem);
+
+    });
+
+
+//call this method in order to hide all auto - suggestions
+    function clearSuggestionsList() {
+        postsSuggestionContainer.innerHTML = "";
+    }
+}
+
+function getXmlHttpGetRequest(url) {
+    let xhttp = new XMLHttpRequest();
+    xhttp.open("GET", url, true);
+    xhttp.send();
+    return xhttp;
+}
+
+
+

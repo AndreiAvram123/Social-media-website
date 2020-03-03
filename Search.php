@@ -1,7 +1,5 @@
 <?php
-/**
- * This file is the controller used to handler the search action
- */
+
 require_once "Data/DataManager.php";
 session_start();
 $view = new stdClass();
@@ -16,7 +14,7 @@ if (isset($_POST['search-button'])) {
     $category = htmlentities($_POST['postCategoryFilter']);
     $maxNumberOfResults = htmlentities($_POST['postMaxResults']);
     $order = htmlentities($_POST['postOrder']);
-    $view->searchResults = $dbHandler->getSearchResult($searchQuery,$category,$order,$maxNumberOfResults);
+    $view->searchResults = $dbHandler->getSearchResult($searchQuery, $category, $order, $maxNumberOfResults);
 }
 
 include "Views/Search.phtml";

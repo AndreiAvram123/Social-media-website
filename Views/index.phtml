@@ -4,7 +4,6 @@ include "Views/commonLayouts/SearchForm.phtml";
 ?>
 
 
-
 <div class="row mt-5" xmlns="http://www.w3.org/1999/html">
 
     <div class="col">
@@ -31,7 +30,8 @@ include "Views/commonLayouts/SearchForm.phtml";
                            placeholder="Search for new people"
                            name="search-text"
                            aria-label="Search"
-                           onkeyup="fetchFriendsSuggestions(this.value)"
+                           id="friends-search-field"
+                           onkeyup="fetchFriendsSuggestions(event, this.value)"
                     >
                 </div>
                 <?php

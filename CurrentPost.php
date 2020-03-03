@@ -24,7 +24,7 @@ if (isset($_POST['removeFromFavoriteButton'])) {
 }
 
 
-if (isset($_GET["OpenPostButton"])) {
+if (isset($_GET["valuePostID"])) {
     $postIDEncrypted = $_GET["valuePostID"];
     //reset the post id set in the session
     $_SESSION["currentPostId"] = null;

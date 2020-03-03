@@ -31,7 +31,7 @@ $post = $view->post;
 
         </form>
         <?php
-    }else {
+    } else {
         ?>
         <span>Author: <?php echo $post->getAuthorName() ?></span>
         <?php
@@ -44,7 +44,7 @@ $post = $view->post;
     <img src="<?php
     if (isset($_SESSION['user_id'])) {
         echo $post->getPostImage();
-    }else{
+    } else {
         echo "images/posts/image_not_logged_in.png";
     }
 

@@ -4,14 +4,12 @@ let timeIntervalCheckTyping = 700;
 let intervalCheck;
 let userIsTypingCheck;
 let currentUserIsTypingCheck;
-let lastMessageId = null;
 let sessionUserId;
-let chatWindowInitialized = false;
-let chatId;
 let lastKeyPressedTime;
 let shouldFetchNewMessages = true;
 let defaultResponseNoData = "No results";
 let chatWindow;
+
 
 class ChatWindow {
     constructor(username, receiverId) {
@@ -22,7 +20,7 @@ class ChatWindow {
             '        <p class="text-center" style="color: white">' + username + '</p>\n' +
             '    </div>\n' +
             '    <div id="message-window-body">\n' +
-            '        <div class ="message-container container">\n' +
+            '        <div class ="message-container">\n' +
             '\n' +
             '        </div>\n' +
             '<p id="user-is-typing-hint" style="display: none">User is typing</p>' +
@@ -36,9 +34,35 @@ class ChatWindow {
             '    </div>\n' +
             '</div>';
         let domElement = domParser.parseFromString(chatString, "text/html");
-        this.chatWindow = domElement.documentElement;
-        this.userIsTypingHint = domElement.getElementById("user-is-typing-hint");
 
+        this.initializeDefaultParameters(receiverId);
+        this.initializeViews(domElement);
+        this.attachListeners(domElement, receiverId);
+        document.body.append(this.chatWindow);
+    }
+
+    initializeDefaultParameters(receiverId) {
+        this.receiverID = receiverId;
+        this.currentlyDisplayedMessages = 0;
+        this.fetchMessagesRequestSent = false;
+        this.noMoreOldMessagesToFetch = false;
+        this.chatWindowInitialized = false;
+    }
+
+    addOldMessagesToContainer(messages) {
+        let messageContainer = this.messageContainer;
+        messages.forEach((messageView) => {
+            if (messageContainer.childNodes.length > 0) {
+                messageContainer.insertBefore(messageView, this.messageContainer.childNodes[0]);
+            } else {
+                messageContainer.appendChild(messageView);
+            }
+            this.currentlyDisplayedMessages++;
+        });
+
+    }
+
+    attachListeners(domElement, receiverId) {
         domElement.getElementsByTagName("i")[0].addEventListener('click', event => removeChat(this.chatWindow));
         let imageSelector = domElement.getElementsByName("files[]")[0];
         let imageSelectIcon = domElement.getElementsByClassName("select-image-icon")[0];
@@ -46,44 +70,50 @@ class ChatWindow {
         imageSelector.addEventListener('change', event => {
             uploadImage(receiverId);
         });
-        document.body.append(this.chatWindow);
     }
 
-    playNotificationSound() {
-        let audioPlayer = document.getElementById("notificationAudio");
-        audioPlayer.play();
+    initializeViews(domElement) {
+        this.chatWindow = domElement.documentElement;
+        this.userIsTypingHint = domElement.getElementById("user-is-typing-hint");
+        this.messageContainer = domElement.getElementsByClassName("message-container")[0];
     }
 
-    addMessagesToChat(messagesJson) {
-        let messageContainer = this.chatWindow.getElementsByClassName("message-container")[0];
+    getViewsForMessages(messagesJson) {
         let playNotification = false;
+        let messagesViews = [];
         messagesJson.forEach(messageJson => {
             let messageView;
             if (messageJson.messageImage == null) {
-                messageView = document.createElement("span");
-                messageView.style.display = "block";
-                messageView.innerText = messageJson.messageContent;
+                messageView = this.getMessageTextView(messageJson);
             } else {
-                messageView = document.createElement("div");
-                messageView.className = "float-right";
-                let messageImage = document.createElement("img");
-                messageImage.src = messageJson.messageImage;
-                messageImage.className = "message-image";
-                messageView.appendChild(messageImage);
+                messageView = this.getMessageImageView(messageJson);
             }
             if (messageJson.senderId === sessionUserId) {
                 messageView.style.textAlign = "right";
             } else {
                 playNotification = true;
             }
+            messagesViews.push(messageView);
 
-            messageContainer.appendChild(messageView);
         });
-        scrollToLastMessage(messageContainer);
-        if (playNotification && shouldPlayNotificationSound()) {
-            chatWindow.playNotificationSound();
-        }
+        return messagesViews;
+    }
 
+    getMessageImageView(messageJson) {
+        let messageView = document.createElement("div");
+        messageView.className = "float-right";
+        let messageImage = document.createElement("img");
+        messageImage.src = messageJson.messageImage;
+        messageImage.className = "message-image";
+        messageView.appendChild(messageImage);
+        return messageView;
+    }
+
+    getMessageTextView(messageJson) {
+        let messageView = document.createElement("span");
+        messageView.style.display = "block";
+        messageView.innerText = messageJson.messageContent;
+        return messageView;
     }
 
     displayUserTypingHint(isTyping) {
@@ -94,30 +124,150 @@ class ChatWindow {
         }
     }
 
+
     stopAsyncFunctions() {
         clearInterval(intervalCheck);
         clearInterval(userIsTypingCheck);
         clearInterval(currentUserIsTypingCheck);
     }
 
+    getMessageContainerTopOffset() {
+        return this.messageContainer.scrollTop;
+    }
+
+    attachScrollListener() {
+        this.messageContainer.addEventListener('scroll', event => {
+            if (this.fetchMessagesRequestSent !== true && this.getMessageContainerTopOffset() <= 100) {
+                if (this.noMoreOldMessagesToFetch === false) {
+                    this.fetchMessagesRequestSent = true;
+                    fetchOldMessages(this.receiverID);
+                }
+            }
+        })
+    }
+
+
+    addNewMessagesToContainer(messages) {
+        messages.forEach((messageView) => {
+            this.messageContainer.appendChild(messageView);
+            this.currentlyDisplayedMessages++;
+        });
+        chatWindow.scrollToLastFetchedMessage();
+    }
+
+    scrollToLastFetchedMessage() {
+        this.messageContainer.scrollTop = this.messageContainer.scrollHeight;
+    }
 }
+
+function fetchOldMessages(receiverID) {
+    let url = "ChatController.php?requestName=fetchOldMessages";
+    url += "&currentUserId=" + sessionUserId;
+    url += "&receiverId=" + receiverID;
+    url += "&offset=" + chatWindow.currentlyDisplayedMessages;
+    getXmlHttpGetRequest(url).onreadystatechange = function () {
+        if (this.readyState === 4 && this.status === 200) {
+            if (this.responseText !== "No results") {
+                chatWindow.fetchMessagesRequestSent = false;
+                let jsonArray = JSON.parse(this.responseText);
+                chatWindow.addOldMessagesToContainer(chatWindow.getViewsForMessages(jsonArray));
+                //if the fetchOldMessages function has been called
+                //the first time then chatWindowInitialized is false
+                if (chatWindow.chatWindowInitialized === false) {
+                    chatWindow.chatWindowInitialized = true;
+                    chatWindow.lastMessageID = jsonArray[0].messageId;
+                    chatWindow.scrollToLastFetchedMessage();
+                    initializeOtherAsyncFunctions(receiverID);
+                    chatWindow.attachScrollListener();
+                }
+            }
+        } else {
+            this.noMoreOldMessagesToFetch = true;
+        }
+    }
+}
+
 
 function removeChat(chat) {
-    chatWindowInitialized = false;
-    lastMessageId = null;
     chatWindow.stopAsyncFunctions();
     document.body.removeChild(chat);
+}
+/**
+ * Call this method in order to create a new chat window
+ * It automatically resets the parameters in the database
+ * on close
+ * @param currentUserId
+ * @param receiverId
+ * @param username
+ */
+function startChat(currentUserId, receiverId, username) {
 
+    function resetDatabase() {
+        markCurrentUserAsTyping(false);
+    }
+
+    window.onbeforeunload = resetDatabase;
+    if (chatWindow === undefined ) {
+        sessionUserId = currentUserId;
+        chatWindow = new ChatWindow(username, receiverId);
+        (document.getElementById("messageField")).addEventListener('keyup', (event) => {
+            if (event.key === "Enter") {
+                sendMessage(receiverId);
+            } else {
+                if (event.key !== "Backspace") {
+                    markCurrentUserAsTyping(true);
+                }
+            }
+
+
+        });
+        fetchOldMessages(receiverId);
+    }
+}
+
+function initializeOtherAsyncFunctions(user2Id) {
+
+    function getChatId() {
+        let url = "ChatController.php?requestName=fetchChatId";
+        url += "&user1Id=" + sessionUserId;
+        url += "&user2Id=" + user2Id;
+        getXmlHttpGetRequest(url).onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 200) {
+                chatWindow.chatId = this.responseText;
+
+            }
+        }
+    }
+
+    getChatId();
+
+    function initializeAsyncFunctions() {
+        intervalCheck = setInterval(fetchNewMessages, timeIntervalCheck, user2Id, this.messageContainer);
+        userIsTypingCheck = setInterval(checkUserIsTyping, timeIntervalCheckTyping);
+        currentUserIsTypingCheck = setInterval(checkCurrentUserTyping, timeIntervalCheckTyping);
+    }
+
+    initializeAsyncFunctions();
 }
 
 
+function toggleElement(element) {
+    if (element.style.display !== "none") {
+        element.style.display = "none";
+    } else {
+        element.style.display = "block";
+    }
+}
+
+
+//*********************************************AJAX FUNCTION *************************************************
 function uploadImage(receiverId) {
     let url = "ChatController.php?requestName=UploadImage";
     let formData = new FormData();
     const files = document.querySelector('[type=file]').files;
 
-
     formData.append('files[]', files[0]);
+
     formData.append("receiverId", receiverId);
     formData.append("currentUserId", sessionUserId);
 
@@ -147,10 +297,10 @@ function sendMessage(receiverId) {
 function checkUserIsTyping() {
     let url = "ChatController.php?requestName=checkUserIsTyping";
     url += "&userId=" + sessionUserId;
-    url += "&chatId=" + chatId;
+    url += "&chatId=" + chatWindow.chatId;
     getXmlHttpGetRequest(url).onreadystatechange = function () {
         if (this.readyState === 4 && this.status === 200) {
-            if (this.responseText == 1) {
+            if (this.responseText === 1) {
                 chatWindow.displayUserTypingHint(true);
             } else {
                 chatWindow.displayUserTypingHint(false)
@@ -160,19 +310,20 @@ function checkUserIsTyping() {
     };
 }
 
-
-function fetchNewMessages(receiverId, container) {
+function fetchNewMessages(receiverId) {
     let url = "ChatController.php?requestName=fetchNewMessages";
-    url += "&lastMessageId=" + lastMessageId;
+    url += "&lastMessageId=" + chatWindow.lastMessageID;
     url += "&currentUserId=" + sessionUserId;
     url += "&receiverId=" + receiverId;
-    if (shouldFetchNewMessages === true) {
+    if (shouldFetchNewMessages === true && chatWindow.lastMessageID !== undefined) {
         shouldFetchNewMessages = false;
         getXmlHttpGetRequest(url).onreadystatechange = function () {
             if (this.readyState === 4 && this.status === 200) {
                 if (this.responseText !== defaultResponseNoData) {
-                    console.log(this.responseText);
-                    processMessages(this.responseText, container);
+                    let jsonArray = JSON.parse(this.responseText);
+                    chatWindow.lastMessageID = jsonArray[jsonArray.length - 1].messageId;
+                    let messagesViews = chatWindow.getViewsForMessages(jsonArray);
+                    chatWindow.addNewMessagesToContainer(messagesViews);
                 }
                 shouldFetchNewMessages = true;
             }
@@ -189,116 +340,20 @@ function getXmlHttpPostRequest(dataToSend) {
     return xhttp;
 }
 
-function getXmlHttpGetRequest(url) {
-    let xhttp = new XMLHttpRequest();
-    xhttp.open("GET", url, true);
-    xhttp.send();
-    return xhttp;
-}
-
-
-function startChat(currentUserId, receiverId, username) {
-
-    function resetDatabase() {
-        markCurrentUserAsTyping(false);
-    }
-
-    window.onbeforeunload = resetDatabase;
-
-    if (chatWindowInitialized === false) {
-        sessionUserId = currentUserId;
-        chatWindow = new ChatWindow(username, receiverId);
-        chatWindowInitialized = true;
-        (document.getElementById("messageField")).addEventListener('keyup', (event) => {
-            if (event.key === "Enter") {
-                sendMessage(receiverId);
-            } else {
-                if (event.key !== "Backspace") {
-                    markCurrentUserAsTyping(true);
-                }
-            }
-
-
-        });
-
-        initializeChatFunctions(receiverId, document.getElementsByClassName("message-container")[0]);
-    }
-
-}
 
 function markCurrentUserAsTyping(isTyping) {
-
-
     let dataToSend = "ChatController.php?requestName=markTyping";
     dataToSend += "&userId=" + sessionUserId;
-    dataToSend += "&chatId=" + chatId;
+    dataToSend += "&chatId=" + chatWindow.chatId;
     dataToSend += "&isTyping=" + isTyping;
     getXmlHttpGetRequest(dataToSend);
 }
 
 
-function shouldPlayNotificationSound() {
-    if (!document.hasFocus()) {
-        return true;
-    }
-    return document.activeElement.id !== "messageField" && chatWindowInitialized === true;
-
-}
-
-function processMessages(data) {
-    let jsonDataArray = JSON.parse(data);
-    chatWindow.addMessagesToChat(jsonDataArray);
-    //set the last message id
-    lastMessageId = jsonDataArray[jsonDataArray.length - 1].messageId;
-}
-
-
-function scrollToLastMessage(container) {
-    container.scrollTop = container.lastChild.offsetTop;
-}
-
 function checkCurrentUserTyping() {
     let currentTime = new Date().getTime();
     if (lastKeyPressedTime + 20 < currentTime) {
         markCurrentUserAsTyping(false);
-    }
-}
-
-function initializeChatFunctions(user2Id, container) {
-
-    function getChatId() {
-        let url = "ChatController.php?requestName=fetchChatId";
-        url += "&user1Id=" + sessionUserId;
-        url += "&user2Id=" + user2Id;
-        getXmlHttpGetRequest(url).onreadystatechange = function () {
-            if (this.readyState === 4 && this.status === 200) {
-                chatId = this.responseText;
-            }
-        }
-    }
-
-    getChatId();
-
-    function initializeAsyncFunctions() {
-        intervalCheck = setInterval(fetchNewMessages, timeIntervalCheck, user2Id, container);
-        userIsTypingCheck = setInterval(checkUserIsTyping, timeIntervalCheckTyping);
-        currentUserIsTypingCheck = setInterval(checkCurrentUserTyping, timeIntervalCheckTyping);
-
-    }
-
-    initializeAsyncFunctions();
-}
-
-function sendImage() {
-    let formData = new FormData();
-
-}
-
-function toggleElement(element) {
-    if (element.style.display !== "none") {
-        element.style.display = "none";
-    } else {
-        element.style.display = "block";
     }
 }
 
