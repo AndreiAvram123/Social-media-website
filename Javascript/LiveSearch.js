@@ -27,7 +27,7 @@ class FriendSuggestionItem {
     }
 
     getView() {
-        return this.elementBody;
+        return this.elementBody.getElementsByClassName("suggestion-friend-item clearfix")[0];
     }
 
 }
@@ -41,6 +41,7 @@ function fetchFriendsSuggestions(event, query) {
             let jsonArray = JSON.parse(jsonResponse);
             jsonArray.forEach(element => {
                 let suggestionItem = new FriendSuggestionItem(element);
+                console.log(suggestionItem.getView());
                 friendsSuggestionsContainer.appendChild(suggestionItem.getView());
             })
         }

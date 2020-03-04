@@ -1,6 +1,6 @@
 //check the database every third of  a second
 let timeIntervalCheck = 1500;
-let timeIntervalCheckTyping = 700;
+let timeIntervalCheckTyping = 1500;
 let intervalCheck;
 let userIsTypingCheck;
 let currentUserIsTypingCheck;
@@ -33,7 +33,6 @@ class ChatWindow {
             '    </div>\n' +
             '</div>';
         let domElement = domParser.parseFromString(chatString, "text/html");
-
         this.initializeDefaultParameters(receiverId);
         this.initializeViews(domElement);
         this.attachListeners(domElement, receiverId);
@@ -166,33 +165,44 @@ class ChatWindow {
         this.lastMessageID = messageJson.messageID;
     }
 
+    addNewImageMessage(messageJson) {
+        let messageView = this.getMessageImageView(messageJson);
+        this.messageContainer.appendChild(messageView);
+        this.lastMessageID = messageJson.lastMessageID;
+    }
+
+
+    //todo
+    //this method does not work all the time....
     scrollToLastFetchedMessage() {
         this.messageContainer.scrollTop = this.messageContainer.scrollHeight;
     }
 }
+
 
 function fetchOldMessages(receiverID) {
     let url = "ChatController.php?requestName=fetchOldMessages";
     url += "&currentUserId=" + sessionUserId;
     url += "&receiverId=" + receiverID;
     url += "&offset=" + chatWindow.currentlyDisplayedMessages;
-    getXmlHttpGetRequest(url).onreadystatechange = function () {
-        if (this.readyState === 4 && this.status === 200) {
-            if (this.responseText !== "No results") {
-                chatWindow.fetchMessagesRequestSent = false;
-                let jsonArray = JSON.parse(this.responseText);
-                chatWindow.addOldMessagesToContainer(chatWindow.getViewsForMessages(jsonArray));
-                //if the fetchOldMessages function has been called
-                //the first time then chatWindowInitialized is false
-                chatWindow.lastMessageID = jsonArray[0].messageId;
-                chatWindow.scrollToLastFetchedMessage();
-                initializeOtherAsyncFunctions(receiverID);
-                chatWindow.attachScrollListener();
-            }
-        } else {
-            this.noMoreOldMessagesToFetch = true;
+    fetch(url).then(function (response) {
+        return response.text();
+    }).then(data => {
+        let jsonArray = JSON.parse(data);
+        chatWindow.fetchMessagesRequestSent = false;
+        if (jsonArray.length > 0) {
+            chatWindow.addOldMessagesToContainer(chatWindow.getViewsForMessages(jsonArray));
+            //if the fetchOldMessages function has been called
+            //the first time then chatWindowInitialized is false
+            chatWindow.lastMessageID = jsonArray[0].messageId;
+            chatWindow.scrollToLastFetchedMessage();
         }
-    }
+
+        initializeOtherAsyncFunctions(receiverID);
+        chatWindow.attachScrollListener();
+    });
+
+
 }
 
 
@@ -220,12 +230,13 @@ function startChat(currentUserId, receiverId, username) {
     if (chatWindow === undefined) {
         sessionUserId = currentUserId;
         chatWindow = new ChatWindow(username, receiverId);
+        lastKeyPressedTime = new Date().getTime() - 3000;
         (document.getElementById("messageField")).addEventListener('keyup', (event) => {
             if (event.key === "Enter") {
                 sendMessage(receiverId);
             } else {
                 if (event.key !== "Backspace") {
-                    markCurrentUserAsTyping(true);
+                    lastKeyPressedTime = new Date().getTime();
                 }
             }
 
@@ -241,19 +252,20 @@ function initializeOtherAsyncFunctions(user2Id) {
         let url = "ChatController.php?requestName=fetchChatId";
         url += "&user1Id=" + sessionUserId;
         url += "&user2Id=" + user2Id;
-        getXmlHttpGetRequest(url).onreadystatechange = function () {
-            if (this.readyState === 4 && this.status === 200) {
-                chatWindow.chatId = this.responseText;
 
-            }
-        }
+        fetch(url).then(function (response) {
+            return response.text();
+        }).then(data => {
+            chatWindow.chatId = data;
+        });
+
     }
 
     getChatId();
 
     function initializeAsyncFunctions() {
         intervalCheck = setInterval(fetchNewMessages, timeIntervalCheck, user2Id, this.messageContainer);
-        userIsTypingCheck = setInterval(checkUserIsTyping, timeIntervalCheckTyping);
+        userIsTypingCheck = setInterval(checkUser2IsTyping, timeIntervalCheckTyping);
         currentUserIsTypingCheck = setInterval(checkCurrentUserTyping, timeIntervalCheckTyping);
     }
 
@@ -283,9 +295,13 @@ function uploadImage(receiverId) {
         method: 'POST',
         body: formData,
     }).then(function (response) {
-        return response.text()
+        return response.text();
     }).then(function (data) {
-        console.log(data);
+        //prepare message
+        let responseObject = JSON.parse(data);
+        responseObject.receiverId = receiverId;
+        responseObject.senderId = sessionUserId;
+        chatWindow.addNewImageMessage(responseObject);
     })
 }
 
@@ -293,6 +309,7 @@ function sendMessage(receiverId) {
     let messageField = document.getElementById("messageField");
     let message = messageField.value.trim();
     if (message !== "") {
+        shouldFetchNewMessages = false;
         let formData = new FormData();
         let url = "ChatController.php?requestName=sendMessage";
         formData.append("receiverId", receiverId);
@@ -313,6 +330,7 @@ function sendMessage(receiverId) {
             responseObject.receiverId = receiverId;
             responseObject.senderId = sessionUserId;
             chatWindow.addNewTextMessage(responseObject);
+            shouldFetchNewMessages = true;
         });
 
         messageField.value = "";
@@ -320,20 +338,17 @@ function sendMessage(receiverId) {
 }
 
 
-function checkUserIsTyping() {
-    let url = "ChatController.php?requestName=checkUserIsTyping";
+function checkUser2IsTyping() {
+    let url = "ChatController.php?requestName=checkUser2IsTyping";
     url += "&userId=" + sessionUserId;
     url += "&chatId=" + chatWindow.chatId;
-    getXmlHttpGetRequest(url).onreadystatechange = function () {
-        if (this.readyState === 4 && this.status === 200) {
-            if (this.responseText === 1) {
-                chatWindow.displayUserTypingHint(true);
-            } else {
-                chatWindow.displayUserTypingHint(false)
-            }
-        }
+    fetch(url).then(function (response) {
+        return response.text();
+    }).then(data => {
+        let responseObject = JSON.parse(data);
+        chatWindow.displayUserTypingHint(responseObject.userIsTyping);
+    });
 
-    };
 }
 
 function fetchNewMessages(receiverId) {
@@ -361,20 +376,28 @@ function fetchNewMessages(receiverId) {
 }
 
 
-
 function markCurrentUserAsTyping(isTyping) {
-    let dataToSend = "ChatController.php?requestName=markTyping";
-    dataToSend += "&userId=" + sessionUserId;
-    dataToSend += "&chatId=" + chatWindow.chatId;
-    dataToSend += "&isTyping=" + isTyping;
-    getXmlHttpGetRequest(dataToSend);
+    let url = "ChatController.php?requestName=markTyping";
+    let formData = new FormData();
+    formData.append("userId", sessionUserId);
+    formData.append("chatId", chatWindow.chatId);
+    formData.append("isTyping", isTyping);
+    fetch(url, {
+        method: 'POST',
+        body: formData,
+    }).then(function (response) {
+        return response.text();
+    });
+
 }
 
 
 function checkCurrentUserTyping() {
     let currentTime = new Date().getTime();
-    if (lastKeyPressedTime + 20 < currentTime) {
+    if (lastKeyPressedTime + 2000 < currentTime) {
         markCurrentUserAsTyping(false);
+    } else {
+        markCurrentUserAsTyping(true);
     }
 }
 

@@ -118,7 +118,12 @@ OR (user1_id = '$user2Id' AND user2_id='$user1Id')";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         $row = $result->fetch();
-        return $row['chat_id'];
+        if ($row == false) {
+            return null;
+        } else {
+            return $row['chat_id'];
+        }
+
     }
 
     public function setUserIsTyping($chatId, $userId, $isTyping)
@@ -132,7 +137,12 @@ OR (user1_id = '$user2Id' AND user2_id='$user1Id')";
         $query = "SELECT user_is_typing FROM chat_live_functions WHERE chat_id = '$chatId' AND user_id != '$currentUserId'";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
-        return ($result->fetch())["user_is_typing"];
+        $row = $result->fetch();
+        if($row["user_is_typing"] == 1){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     public function fetchOldMessages($user1Id, $user2Id, $offset)
