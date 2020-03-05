@@ -147,15 +147,13 @@ class ChatWindow {
 
     addNewMessagesToContainer(messagesJson) {
         messagesJson.forEach((message) => {
-            let messageView;
             if (message.messageImage == null) {
-                messageView = this.getMessageTextView(message)
+                this.addNewTextMessage(message)
             } else {
-                messageView = this.getMessageImageView(message);
+                this.addNewImageMessage(message);
             }
-            this.currentlyDisplayedMessages++;
-            this.messageContainer.appendChild(messageView);
         });
+        this.lastMessageID = messagesJson[messagesJson.length - 1].messageID;
         chatWindow.scrollToLastFetchedMessage();
     }
 
@@ -163,12 +161,14 @@ class ChatWindow {
         let messageView = this.getMessageTextView(messageJson, messageJson.senderId);
         this.messageContainer.appendChild(messageView);
         this.lastMessageID = messageJson.messageID;
+        this.currentlyDisplayedMessages++;
     }
 
     addNewImageMessage(messageJson) {
         let messageView = this.getMessageImageView(messageJson);
         this.messageContainer.appendChild(messageView);
         this.lastMessageID = messageJson.lastMessageID;
+        this.currentlyDisplayedMessages++;
     }
 
 
