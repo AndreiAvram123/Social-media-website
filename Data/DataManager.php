@@ -60,11 +60,23 @@ class DataManager
         $result->execute();
         $posts = [];
         while ($row = $result->fetch()) {
-            //limit the amount of text on the main page
             $posts[] = new Post($row);
         }
         return $posts;
     }
+    public function getMorePosts($lastPostID){
+        $query = "SELECT forum_posts.post_id, post_author_id, post_title, post_content, post_category_name, post_date, post_image, username
+ FROM forum_posts INNER JOIN users ON users.user_id = forum_posts.post_author_id  WHERE '$lastPostID' < forum_posts.post_id
+ ORDER BY post_date DESC LIMIT $this->postPerPage";
+        $result = $this->_dbHandler->prepare($query);
+        $result->execute();
+        $posts = [];
+        while ($row = $result->fetch()) {
+            $posts[] = new Post($row);
+        }
+        return $posts;
+    }
+
 
     /**
      * This method is used in order to get the user
@@ -408,27 +420,6 @@ WHERE comment_post_id = '$postID'";
         }
         return $posts;
     }
-//todo
-//implement this in the forum as well
-    public function getWatchListSmallData($userID)
-    {
-        $query = "SELECT  post_id, post_author_id, post_title, post_image,username
-         FROM forum_posts
-         INNER JOIN users ON user_id = post_author_id
-         WHERE post_id IN 
-        (SELECT post_id from favorite_posts WHERE user_id = :userId)";
-        $result = $this->_dbHandler->prepare($query);
-        $result->bindValue(':userId', $userId);
-        $result->execute();
-        $posts = [];
-        while ($row = $result->fetch()) {
-            $post = new Post($row);
-            $post->setAddedToWatchList(true);
-            $posts[] = $post;
-        }
-        return $posts;
-    }
-
     /**
      * @param $postID
      * Use this function in order to remove a specific
@@ -700,19 +691,6 @@ WHERE comment_post_id = '$postID'";
     }
 
 
-    public function getRecentPostsSmallData()
-    {
-        $query = "SELECT forum_posts.post_id, forum_posts.post_title,forum_posts.post_image,username FROM forum_posts INNER JOIN
-          users ON users.user_id = forum_posts.post_author_id ORDER BY post_id DESC LIMIT 10";
-
-        $result = $this->_dbHandler->prepare($query);
-        $result->execute();
-        $posts = [];
-        while ($row = $result->fetch()) {
-            $posts[] = new SmallDataPost($row);
-        }
-        return $posts;
-    }
 
     public function fetchSearchSuggestionsMobile($searchQuery)
     {

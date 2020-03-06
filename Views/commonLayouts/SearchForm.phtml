@@ -1,4 +1,7 @@
-<form  method="post" action="Search.php">
+<?php
+require_once("Api/ApiKeyManager.php");
+?>
+<form method="post" action="Search.php">
     <div class="input-group md-form form-sm form-2 pl-0 search-box">
         <input class="form-control mr-sm-2" type="search" autocomplete="off" placeholder="Search posts..."
                name="search-posts-field"
@@ -11,12 +14,14 @@
         </button>
         <div class="input-group-append">
             <button type="submit" class="input-group-text lime lighten-2" name="search-button"><i
-                    class="fa fa-search text-grey"
-                    aria-hidden="true"></i></button>
+                        class="fa fa-search text-grey"
+                        aria-hidden="true"></i></button>
         </div>
         <?php
         include_once "Modals/FiltersModal.phtml";
         ?>
+        <script src='Javascript/ChatManager.js'></script>
+        <script>apiKey = '<?php echo ApiKeyManager:: ?>'</script>
     </div>
 
 </form>

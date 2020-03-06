@@ -16,17 +16,13 @@ $view->categories = $dbManager->getAllCategories();
 if (isset($_POST["addPostButton"])) {
     $databaseHandler = DataManager::getInstance();
     //get all the necessary data from the view
-    $postTitle = $_POST["postTitle"];
-    $postCategoryName = $_POST["postCategory"];
-    $postContent = $_POST["postContent"];
+    $postTitle = htmlentities($_POST["postTitle"]);
+    $postCategoryName = htmlentities($_POST["postCategory"]);
+    $postContent = htmlentities($_POST["postContent"]);
     $postDate = date('Y-m-d H:i:s');
     $postImage = $_FILES["fileToUpload"]["name"];
-    //filter malicious code
-    $captchaValue = htmlentities($_POST['captchaValueEntered']);
+
     //check if the captcha code is valid or not
-    if ($captchaValue !== $_SESSION['captcha_code']) {
-        $view->warningMessage = "Invalid code, please try again";
-    } else {
         //returns true if valid
         //else returns error message
         $result = $validator->arePostDetailsValid($postTitle, $postContent, $postImage);
@@ -38,7 +34,7 @@ if (isset($_POST["addPostButton"])) {
         } else {
             $view->warningMessage = $result;
         }
-    }
+
 }
 
 include "Views/AddPost.phtml";

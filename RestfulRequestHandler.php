@@ -1,15 +1,25 @@
 <?php
 require_once("Data/FriendsDatabase.php");
 require_once("Data/DataManager.php");
+require_once("utilities/InputValidator.php");
 $dbHandler = DataManager::getInstance();
 $responseObject = new stdClass();
 
 
-
 if (isset($_GET['recentPosts'])) {
-    $data = $dbHandler->getRecentPostsSmallData();
-    echo json_encode($data);
+
+    if (isset($_GET['lastPostID']) && InputValidator::isNumericParameterValid($_GET['lastPostID'])) {
+        $lastPostID = $_GET['lastPostID'];
+        $data = $dbHandler->getMorePosts($lastPostID);
+        echo json_encode($data);
+    } else {
+        $data = $dbHandler->getPosts(1);
+        echo json_encode($data);
+    }
+
 }
+
+
 if (isset($_GET['friends'])) {
     $userID = null;
     if (isset($_GET['userID']) && ($_GET['userID'] !== "")) {
