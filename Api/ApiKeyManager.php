@@ -21,12 +21,18 @@ class ApiKeyManager
         $this->apiKeyDb = ApiKeyDatabase::getInstance();
     }
 
-    public function getApiKeyForAddress($ip)
+    public function getApiKeyForWebsiteAccess($ip)
     {
         $apiKey = $this->apiKeyDb->fetchApiKeyForIPAddress($ip);
         if ($apiKey == null) {
-
+            $apiKey = $this->apiKeyDb->generateApiKeyForIPAddress($ip);
         }
+        return $apiKey;
+    }
+
+
+    public function fetchApiKey($ip){
+        return $this->apiKeyDb->fetchApiKeyForIPAddress($ip);
     }
 
 

@@ -8,7 +8,6 @@ let sessionUserId;
 let lastKeyPressedTime;
 let shouldFetchNewMessages = true;
 let chatWindow;
-let apiKey;
 
 class ChatWindow {
     constructor(username, receiverId) {

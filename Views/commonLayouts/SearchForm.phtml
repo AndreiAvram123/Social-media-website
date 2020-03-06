@@ -21,7 +21,7 @@ require_once("Api/ApiKeyManager.php");
         include_once "Modals/FiltersModal.phtml";
         ?>
         <script src='Javascript/ChatManager.js'></script>
-        <script>apiKey = '<?php echo ApiKeyManager:: ?>'</script>
+        <script>apiKey = '<?php echo ApiKeyManager::getInstance()->getApiKeyForWebsiteAccess($_SERVER['REMOTE_ADDR']) ?>'</script>
     </div>
 
 </form>

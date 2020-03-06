@@ -1,3 +1,5 @@
+let apiKey;
+
 let postsSuggestionContainer;
 
 initializePostSuggestionsContainer();
@@ -61,7 +63,7 @@ function fetchFriendsSuggestions(event, query) {
 
     if ((event.keyCode >= '65' && event.keyCode <= '90') || event.keyCode == 8) {
         if (query.length > 1) {
-            let url = "LiveSearchController.php?query=" + query;
+            let url = "LiveSearchController.php?query=" + query +  "&apiKey=" + apiKey;
             fetch(url).then(function (response) {
                 return response.text();
             }).then(data => {
@@ -75,11 +77,12 @@ function fetchFriendsSuggestions(event, query) {
 }
 
 function fetchPostSuggestions(query) {
+
     function getPostSuggestionsUrl() {
         //get the filters from the filter modal and display suggestions accordingly
         let sortDate = document.getElementById("postOrder").value;
         let category = document.getElementById("postCategorySelector").value;
-        let url = "LiveSearchController.php?postsSearchQuery=" + query;
+        let url = "LiveSearchController.php?postsSearchQuery=" + query +  "&apiKey=" + apiKey;
         if (sortDate !== "None") {
             url += "&sortDate=" + sortDate;
         }
@@ -116,7 +119,6 @@ function insertFetchedSuggestions(suggestionsJSONArray) {
     if (!val) {
         return false;
     }
-    currentFocus = -1;
 
     //insert the suggestions postsSuggestionContainer as a child in the search field
     searchField.parentNode.appendChild(postsSuggestionContainer);
@@ -143,13 +145,3 @@ function insertFetchedSuggestions(suggestionsJSONArray) {
         postsSuggestionContainer.innerHTML = "";
     }
 }
-
-function getXmlHttpGetRequest(url) {
-    let xhttp = new XMLHttpRequest();
-    xhttp.open("GET", url, true);
-    xhttp.send();
-    return xhttp;
-}
-
-
-
