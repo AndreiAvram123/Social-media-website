@@ -9,9 +9,12 @@ let lastKeyPressedTime;
 let shouldFetchNewMessages = true;
 let chatWindow;
 
+
 class ChatWindow {
     constructor(username, receiverId) {
+        //use a dom parser to convert html into a document element
         let domParser = new DOMParser();
+        //the html element for a chat window
         let chatString = '<div class="message-window" >\n' +
             '<i class="fas fa-times float-right"></i>' +
             '    <div class="message-header" onclick="toggleElement(document.getElementById(' + '\'' + 'message-window-body' + '\')' + ')">' +
@@ -32,12 +35,19 @@ class ChatWindow {
             '    </div>\n' +
             '</div>';
         let domElement = domParser.parseFromString(chatString, "text/html");
+        this.messageFactory = new MessageFactory();
         this.initializeDefaultParameters(receiverId);
         this.initializeViews(domElement);
         this.attachListeners(domElement, receiverId);
         document.body.append(this.chatWindow);
     }
 
+    /**
+     * This method is used to initialize specific default
+     * parameters that are necessary for a chat window
+     * to function
+     * @param receiverId
+     */
     initializeDefaultParameters(receiverId) {
         this.receiverID = receiverId;
         this.currentlyDisplayedMessages = 0;
@@ -45,20 +55,36 @@ class ChatWindow {
         this.noMoreOldMessagesToFetch = false;
     }
 
+    addNewMessage(messageJson) {
+        let messageView = this.messageFactory.createMessageElement(messageJson);
+        this.messageContainer.appendChild(messageView);
+    }
 
     addOldMessagesToContainer(messages) {
-        let messageContainer = this.messageContainer;
-        messages.forEach((messageView) => {
-            if (messageContainer.childNodes.length > 0) {
-                messageContainer.insertBefore(messageView, this.messageContainer.childNodes[0]);
+        messages.forEach((message) => {
+            let messageView = this.messageFactory.createMessageElement(message);
+
+            if (this.messageContainer.childNodes.length > 0) {
+                this.messageContainer.insertBefore(messageView, this.messageContainer.childNodes[0]);
             } else {
-                messageContainer.appendChild(messageView);
+                this.messageContainer.appendChild(messageView);
             }
             this.currentlyDisplayedMessages++;
         });
+
+        if (this.lastMessageID === undefined || this.lastMessageID < messages[0].lastMessageID) {
+            this.lastMessageID = messages[0].lastMessageID;
+            chatWindow.scrollToLastFetchedMessage();
+        }
     }
 
 
+    /**
+     * This method is used to attach listeners
+     * to the chat window
+     * @param domElement
+     * @param receiverId
+     */
     attachListeners(domElement, receiverId) {
         domElement.getElementsByTagName("i")[0].addEventListener('click', event => removeChat(this.chatWindow));
         let imageSelector = domElement.getElementsByName("files[]")[0];
@@ -75,43 +101,42 @@ class ChatWindow {
         this.messageContainer = domElement.getElementsByClassName("message-container")[0];
     }
 
-    getViewsForMessages(messagesJson) {
-        let messagesViews = [];
-        messagesJson.forEach(messageJson => {
-            let messageView;
-            if (messageJson.messageImage == null) {
-                messageView = this.getMessageTextView(messageJson, messageJson.senderId);
-            } else {
-                messageView = this.getMessageImageView(messageJson, messageJson.senderId);
-            }
+    // getViewsForMessages(messagesJson) {
+    //     let messagesViews = [];
+    //     messagesJson.forEach(messageJson => {
+    //         let messageView;
+    //         if (messageJson.messageImage == null) {
+    //             messageView = this.getMessageTextView(messageJson, messageJson.senderId);
+    //         } else {
+    //             messageView = this.getMessageImageView(messageJson, messageJson.senderId);
+    //         }
+    //
+    //         messagesViews.push(messageView);
+    //
+    //     });
+    //     return messagesViews;
+    // }
 
-            messagesViews.push(messageView);
+    // getMessageImageView(messageJson) {
+    //     let messageHtml = '<div><img src="images/chatImages/' + messageJson.messageImage + '"class="message-image"></div>';
+    //     let domParser = new DOMParser();
+    //     let messageView = domParser.parseFromString(messageHtml, "text/html").getElementsByTagName('div')[0];
+    //
+    //     if (messageJson.senderId === sessionUserId) {
+    //         messageView.style.textAlign = "right";
+    //     }
+    //     return messageView;
+    // }
 
-        });
-        return messagesViews;
-    }
-
-    getMessageImageView(messageJson) {
-        let messageView = document.createElement("div");
-        if (messageJson.senderId === sessionUserId) {
-            messageView.className = "float-right";
-        }
-        let messageImage = document.createElement("img");
-        messageImage.src = messageJson.messageImage;
-        messageImage.className = "message-image";
-        messageView.appendChild(messageImage);
-        return messageView;
-    }
-
-    getMessageTextView(messageJson) {
-        let messageView = document.createElement("span");
-        messageView.style.display = "block";
-        messageView.innerText = messageJson.messageContent;
-        if (messageJson.senderId === sessionUserId) {
-            messageView.style.textAlign = "right";
-        }
-        return messageView;
-    }
+    // getMessageTextView(messageJson) {
+    //     let messageView = document.createElement("span");
+    //     messageView.style.display = "block";
+    //     messageView.innerText = messageJson.messageContent;
+    //     if (messageJson.senderId === sessionUserId) {
+    //         messageView.style.textAlign = "right";
+    //     }
+    //     return messageView;
+    // }
 
     displayUserTypingHint(isTyping) {
         if (isTyping === true) {
@@ -146,62 +171,89 @@ class ChatWindow {
 
     addNewMessagesToContainer(messagesJson) {
         messagesJson.forEach((message) => {
-            if (message.messageImage == null) {
-                this.addNewTextMessage(message)
-            } else {
-                this.addNewImageMessage(message);
-            }
+            // if (message.messageImage == null) {
+            //     this.addNewTextMessage(message)
+            // } else {
+            //     this.addNewImageMessage(message);
+            // }
+            this.messageContainer.appendChild(message)
         });
         this.lastMessageID = messagesJson[messagesJson.length - 1].messageID;
         chatWindow.scrollToLastFetchedMessage();
     }
 
-    addNewTextMessage(messageJson) {
-        let messageView = this.getMessageTextView(messageJson, messageJson.senderId);
-        this.messageContainer.appendChild(messageView);
-        this.lastMessageID = messageJson.messageID;
-        this.currentlyDisplayedMessages++;
-    }
+    // addNewTextMessage(messageJson) {
+    //     let messageView = this.getMessageTextView(messageJson, messageJson.senderId);
+    //     this.messageContainer.appendChild(messageView);
+    //     this.lastMessageID = messageJson.messageID;
+    //     this.currentlyDisplayedMessages++;
+    //     this.scrollToLastFetchedMessage();
+    // }
 
-    addNewImageMessage(messageJson) {
-        let messageView = this.getMessageImageView(messageJson);
-        this.messageContainer.appendChild(messageView);
-        this.lastMessageID = messageJson.lastMessageID;
-        this.currentlyDisplayedMessages++;
-    }
+    // addNewImageMessage(messageJson) {
+    //     let messageView = this.getMessageImageView(messageJson);
+    //     this.messageContainer.appendChild(messageView);
+    //     this.lastMessageID = messageJson.lastMessageID;
+    //     this.currentlyDisplayedMessages++;
+    // }
 
 
-    //todo
-    //this method does not work all the time....
     scrollToLastFetchedMessage() {
         this.messageContainer.scrollTop = this.messageContainer.scrollHeight;
     }
 }
 
+/**
+ * Factory class in order to create
+ * different types of messages
+ */
+class MessageFactory {
 
-function fetchOldMessages(receiverID) {
-    let url = "ChatController.php?requestName=fetchOldMessages";
-    url += "&currentUserId=" + sessionUserId;
-    url += "&receiverId=" + receiverID;
-    url += "&offset=" + chatWindow.currentlyDisplayedMessages;
-    fetch(url).then(function (response) {
-        return response.text();
-    }).then(data => {
-        let jsonArray = JSON.parse(data);
-        chatWindow.fetchMessagesRequestSent = false;
-        if (jsonArray.length > 0) {
-            chatWindow.addOldMessagesToContainer(chatWindow.getViewsForMessages(jsonArray));
-            //if the fetchOldMessages function has been called
-            //the first time then chatWindowInitialized is false
-            chatWindow.lastMessageID = jsonArray[0].messageId;
-            chatWindow.scrollToLastFetchedMessage();
+    createMessageElement(messageJson) {
+
+        if (messageJson.messageImage !== null) {
+            let imageMessage = new ImageMessage(messageJson);
+            return imageMessage.messageView;
+        } else {
+            let textMessage = new TextMessage(messageJson);
+            return textMessage.messageView;
         }
-
-        initializeOtherAsyncFunctions(receiverID);
-        chatWindow.attachScrollListener();
-    });
+    }
+}
 
 
+class ImageMessage {
+    constructor(messageJson) {
+        let messageHtml = '<div><img src="images/chatImages/' + messageJson.messageImage + '"class="message-image"></div>';
+        let domParser = new DOMParser();
+        let messageView = domParser.parseFromString(messageHtml, "text/html").getElementsByTagName('div')[0];
+        if (messageJson.senderId === sessionUserId) {
+            messageView.style.textAlign = "right";
+        }
+        this.messageView = messageView;
+    }
+
+    getView() {
+        return this.messageView;
+    }
+
+}
+
+
+class TextMessage {
+    constructor(messageJson) {
+        let messageHtml = '<span style="display: block; ">' + messageJson.messageContent + '</span>';
+        let domParser = new DOMParser();
+        let messageView = domParser.parseFromString(messageHtml, "text/html").getElementsByTagName('span')[0];
+        if (messageJson.senderId === sessionUserId) {
+            messageView.style.textAlign = "right";
+        }
+        this.messageView = messageView;
+    }
+
+    getView() {
+        return this.messageView;
+    }
 }
 
 
@@ -300,18 +352,27 @@ function uploadImage(receiverId) {
         let responseObject = JSON.parse(data);
         responseObject.receiverId = receiverId;
         responseObject.senderId = sessionUserId;
-        chatWindow.addNewImageMessage(responseObject);
+        chatWindow.addNewMessage(responseObject);
     })
 }
 
-function sendMessage(receiverId) {
+/**
+ * This function is used to send a message to the user with the specified receiverID
+ *
+ * we should cache the message to be inserted and wait until
+ * the server has confirmed that the message arrived successfully
+ * A little optimisation : the server will only give us back the message id
+ * and date and not the whole message
+ * @param receiverID
+ */
+function sendMessage(receiverID) {
     let messageField = document.getElementById("messageField");
     let message = messageField.value.trim();
     if (message !== "") {
         shouldFetchNewMessages = false;
         let formData = new FormData();
         let url = "ChatController.php?requestName=sendMessage";
-        formData.append("receiverId", receiverId);
+        formData.append("receiverId", receiverID);
         formData.append("currentUserId", sessionUserId);
         formData.append("messageContent", message);
         fetch(url, {
@@ -320,15 +381,11 @@ function sendMessage(receiverId) {
         }).then(function (response) {
             return response.text();
         }).then(function (data) {
-            //we should prepare the message to be inserted once
-            //the server has confirmed that the message arrived successfully
-            //A little optimisation : the server will only give us back the message id
-            //and date and not the whole message
             let responseObject = JSON.parse(data);
             responseObject.messageContent = message;
-            responseObject.receiverId = receiverId;
+            responseObject.receiverId = receiverID;
             responseObject.senderId = sessionUserId;
-            chatWindow.addNewTextMessage(responseObject);
+            chatWindow.addNewMessage(responseObject);
             shouldFetchNewMessages = true;
         });
 
@@ -398,6 +455,35 @@ function checkCurrentUserTyping() {
     } else {
         markCurrentUserAsTyping(true);
     }
+}
+
+
+/**
+ * This method is used in order to fetch old messages in a chat
+ * Depending on the global variable currentlyDisplayedMessages
+ * @param receiverID
+ */
+function fetchOldMessages(receiverID) {
+    let url = "ChatController.php?requestName=fetchOldMessages";
+    url += "&currentUserId=" + sessionUserId;
+    url += "&receiverId=" + receiverID;
+    url += "&offset=" + chatWindow.currentlyDisplayedMessages;
+    fetch(url).then(function (response) {
+        return response.text();
+    }).then(data => {
+        let jsonArray = JSON.parse(data);
+        chatWindow.fetchMessagesRequestSent = false;
+        if (jsonArray.length > 0) {
+            chatWindow.addOldMessagesToContainer(jsonArray);
+            //if the fetchOldMessages function has been called
+            //the first time then chatWindowInitialized is false
+        }
+
+        initializeOtherAsyncFunctions(receiverID);
+        chatWindow.attachScrollListener();
+    });
+
+
 }
 
 
