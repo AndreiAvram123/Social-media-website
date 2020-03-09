@@ -2,6 +2,7 @@
 require_once("Data/FriendsDatabase.php");
 require_once("Data/DataManager.php");
 require_once("utilities/InputValidator.php");
+
 $dbHandler = DataManager::getInstance();
 $responseObject = new stdClass();
 
@@ -219,5 +220,6 @@ function sendEmailWithPassword($email, $password)
     $msg .= $password;
     mail($email, "Your password", $msg);
 }
+
 
 ?>

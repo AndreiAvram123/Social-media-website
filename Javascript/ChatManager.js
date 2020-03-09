@@ -58,6 +58,7 @@ class ChatWindow {
     addNewMessage(messageJson) {
         let messageView = this.messageFactory.createMessageElement(messageJson);
         this.messageContainer.appendChild(messageView);
+        this.notifyNewMessageAdded(messageJson)
     }
 
     addOldMessagesToContainer(messages) {
@@ -71,9 +72,12 @@ class ChatWindow {
             }
             this.currentlyDisplayedMessages++;
         });
+        this.notifyNewMessageAdded(messages[0]);
+    }
 
-        if (this.lastMessageID === undefined || this.lastMessageID < messages[0].lastMessageID) {
-            this.lastMessageID = messages[0].lastMessageID;
+    notifyNewMessageAdded(lastMessageID) {
+        if (this.lastMessageID === undefined || this.lastMessageID < lastMessageID) {
+            this.lastMessageID = lastMessageID;
             chatWindow.scrollToLastFetchedMessage();
         }
     }
@@ -100,43 +104,6 @@ class ChatWindow {
         this.userIsTypingHint = domElement.getElementById("user-is-typing-hint");
         this.messageContainer = domElement.getElementsByClassName("message-container")[0];
     }
-
-    // getViewsForMessages(messagesJson) {
-    //     let messagesViews = [];
-    //     messagesJson.forEach(messageJson => {
-    //         let messageView;
-    //         if (messageJson.messageImage == null) {
-    //             messageView = this.getMessageTextView(messageJson, messageJson.senderId);
-    //         } else {
-    //             messageView = this.getMessageImageView(messageJson, messageJson.senderId);
-    //         }
-    //
-    //         messagesViews.push(messageView);
-    //
-    //     });
-    //     return messagesViews;
-    // }
-
-    // getMessageImageView(messageJson) {
-    //     let messageHtml = '<div><img src="images/chatImages/' + messageJson.messageImage + '"class="message-image"></div>';
-    //     let domParser = new DOMParser();
-    //     let messageView = domParser.parseFromString(messageHtml, "text/html").getElementsByTagName('div')[0];
-    //
-    //     if (messageJson.senderId === sessionUserId) {
-    //         messageView.style.textAlign = "right";
-    //     }
-    //     return messageView;
-    // }
-
-    // getMessageTextView(messageJson) {
-    //     let messageView = document.createElement("span");
-    //     messageView.style.display = "block";
-    //     messageView.innerText = messageJson.messageContent;
-    //     if (messageJson.senderId === sessionUserId) {
-    //         messageView.style.textAlign = "right";
-    //     }
-    //     return messageView;
-    // }
 
     displayUserTypingHint(isTyping) {
         if (isTyping === true) {
@@ -171,32 +138,11 @@ class ChatWindow {
 
     addNewMessagesToContainer(messagesJson) {
         messagesJson.forEach((message) => {
-            // if (message.messageImage == null) {
-            //     this.addNewTextMessage(message)
-            // } else {
-            //     this.addNewImageMessage(message);
-            // }
             this.messageContainer.appendChild(message)
         });
         this.lastMessageID = messagesJson[messagesJson.length - 1].messageID;
         chatWindow.scrollToLastFetchedMessage();
     }
-
-    // addNewTextMessage(messageJson) {
-    //     let messageView = this.getMessageTextView(messageJson, messageJson.senderId);
-    //     this.messageContainer.appendChild(messageView);
-    //     this.lastMessageID = messageJson.messageID;
-    //     this.currentlyDisplayedMessages++;
-    //     this.scrollToLastFetchedMessage();
-    // }
-
-    // addNewImageMessage(messageJson) {
-    //     let messageView = this.getMessageImageView(messageJson);
-    //     this.messageContainer.appendChild(messageView);
-    //     this.lastMessageID = messageJson.lastMessageID;
-    //     this.currentlyDisplayedMessages++;
-    // }
-
 
     scrollToLastFetchedMessage() {
         this.messageContainer.scrollTop = this.messageContainer.scrollHeight;
@@ -210,7 +156,6 @@ class ChatWindow {
 class MessageFactory {
 
     createMessageElement(messageJson) {
-
         if (messageJson.messageImage !== null) {
             let imageMessage = new ImageMessage(messageJson);
             return imageMessage.messageView;
@@ -238,7 +183,6 @@ class ImageMessage {
     }
 
 }
-
 
 class TextMessage {
     constructor(messageJson) {
@@ -385,6 +329,7 @@ function sendMessage(receiverID) {
             responseObject.messageContent = message;
             responseObject.receiverId = receiverID;
             responseObject.senderId = sessionUserId;
+            responseObject.messageImage = null;
             chatWindow.addNewMessage(responseObject);
             shouldFetchNewMessages = true;
         });

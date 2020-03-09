@@ -150,7 +150,7 @@ OR (user1_id = '$user2Id' AND user2_id='$user1Id')";
         $query = "SELECT * FROM messages WHERE  
                              ((receiver_id = '$user1Id' AND sender_id = '$user2Id')
                               OR (receiver_id ='$user2Id' AND sender_id = '$user1Id'))
-                              ORDER BY message_id DESC LIMIT 10 OFFSET $offset ";
+                              ORDER BY message_id DESC LIMIT 20 OFFSET $offset ";
 
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
