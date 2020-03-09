@@ -35,7 +35,7 @@ class Post implements JsonSerializable
     {
         return
             [
-                'postID' => $this->getPostID(),
+                'postID' => (int)$this->getPostID(),
                 'postTitle' => $this->getPostTitle(),
                 'postDate' => $this->getPostDate(),
                 'postAuthor' => $this->getAuthorName(),

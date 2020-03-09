@@ -9,7 +9,7 @@ $view->categories = $dbHandler->getAllCategories();
 
 if (isset($_POST['search-button'])) {
     //make sure that the user has not inserted any code in the search box
-    $searchQuery = htmlentities($_POST['search-text']);
+    $searchQuery = htmlentities($_POST['search-posts-field']);
     //get query filters
     $category = htmlentities($_POST['postCategoryFilter']);
     $maxNumberOfResults = htmlentities($_POST['postMaxResults']);

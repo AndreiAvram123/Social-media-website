@@ -74,14 +74,16 @@ class ChatDatabase
 
     public function getNewMessages($lastMessageId, $user1Id, $user2Id)
     {
-            $query = "SELECT * FROM messages WHERE '$lastMessageId' < message_id AND  
+        $query = "SELECT * FROM messages WHERE '$lastMessageId' < message_id AND  
                              ((receiver_id = '$user1Id' AND sender_id = '$user2Id')
                               OR (receiver_id ='$user2Id' AND sender_id = '$user1Id'))";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         return $this->getProcessedMessages($result);
     }
-    private function getProcessedMessages($result){
+
+    private function getProcessedMessages($result)
+    {
         $messages = [];
         while ($row = $result->fetch()) {
             $messages[] = new Message($row);
@@ -116,7 +118,12 @@ OR (user1_id = '$user2Id' AND user2_id='$user1Id')";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         $row = $result->fetch();
-        return $row['chat_id'];
+        if ($row == false) {
+            return null;
+        } else {
+            return $row['chat_id'];
+        }
+
     }
 
     public function setUserIsTyping($chatId, $userId, $isTyping)
@@ -130,7 +137,12 @@ OR (user1_id = '$user2Id' AND user2_id='$user1Id')";
         $query = "SELECT user_is_typing FROM chat_live_functions WHERE chat_id = '$chatId' AND user_id != '$currentUserId'";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
-        return ($result->fetch())["user_is_typing"];
+        $row = $result->fetch();
+        if($row["user_is_typing"] == 1){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     public function fetchOldMessages($user1Id, $user2Id, $offset)
@@ -144,6 +156,18 @@ OR (user1_id = '$user2Id' AND user2_id='$user1Id')";
         $result->execute();
         return $this->getProcessedMessages($result);
 
+    }
+
+    public function fetchLastMessageID($user1Id, $user2Id)
+    {
+        $query = "SELECT  message_id FROM messages WHERE
+        ((receiver_id = '$user1Id' AND sender_id = '$user2Id')
+                              OR (receiver_id ='$user2Id' AND sender_id = '$user1Id'))
+ORDER BY message_id DESC LIMIT 1";
+        $result = $this->_dbHandler->prepare($query);
+        $result->execute();
+        $row = $result->fetch();
+        return $row['message_id'];
     }
 
 

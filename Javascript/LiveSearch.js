@@ -1,3 +1,5 @@
+let apiKey;
+
 let postsSuggestionContainer;
 
 initializePostSuggestionsContainer();
@@ -26,53 +28,61 @@ class FriendSuggestionItem {
 
     }
 
+    /**
+     * Return the view associated with this object
+     * @returns {Element}
+     */
     getView() {
-        return this.elementBody;
+        return this.elementBody.getElementsByClassName("suggestion-friend-item clearfix")[0];
     }
 
 }
 
 function fetchFriendsSuggestions(event, query) {
-    let friendsList = document.getElementById("friends-suggestions-container");
-    let friendsSuggestionsContainer = document.getElementById("friend-container");
+    let friendsSuggestionsContainer = document.getElementById("friends-suggestions-container");
+    let friendsList = document.getElementById("friend-container");
 
-    function processResponse(jsonResponse) {
-        if (jsonResponse !== undefined) {
-            let jsonArray = JSON.parse(jsonResponse);
-            jsonArray.forEach(element => {
-                let suggestionItem = new FriendSuggestionItem(element);
-                friendsSuggestionsContainer.appendChild(suggestionItem.getView());
-            })
-        }
+    function closeFriendsSuggestionsContainer() {
+        friendsList.style.display = "block";
+        friendsSuggestionsContainer.style.display = "none";
     }
 
-    if (event.keyCode >= '65' && event.keyCode <= '90') {
-        if (query.length > 1) {
-            friendsSuggestionsContainer.innerHTML = "";
-            friendsList.style.display = "none";
-            let url = "LiveSearchController.php?query=" + query;
+    function openFriendsSuggestionsContainer() {
+        friendsList.style.display = "none";
+        friendsSuggestionsContainer.style.display = "block";
+        friendsSuggestionsContainer.innerHTML = "";
+    }
 
-            getXmlHttpGetRequest(url).onreadystatechange = function () {
-                if (this.readyState === 4 && this.status === 200) {
-                    if (this.responseText !== "No results") {
-                        processResponse(this.responseText);
-                    } else {
-                        processResponse(undefined);
-                    }
-                }
-            };
+    function processResponse(jsonArray) {
+        openFriendsSuggestionsContainer();
+        jsonArray.forEach(element => {
+            let suggestionItem = new FriendSuggestionItem(element);
+            friendsSuggestionsContainer.appendChild(suggestionItem.getView());
+        })
+    }
+
+    if ((event.keyCode >= '65' && event.keyCode <= '90') || event.keyCode == 8) {
+        if (query.length > 1) {
+            let url = "LiveSearchController.php?query=" + query +  "&apiKey=" + apiKey;
+            fetch(url).then(function (response) {
+                return response.text();
+            }).then(data => {
+                processResponse(JSON.parse(data));
+            });
+
         } else {
-            friendsList.style.display = "block";
+            closeFriendsSuggestionsContainer();
         }
     }
 }
 
 function fetchPostSuggestions(query) {
+
     function getPostSuggestionsUrl() {
         //get the filters from the filter modal and display suggestions accordingly
         let sortDate = document.getElementById("postOrder").value;
         let category = document.getElementById("postCategorySelector").value;
-        let url = "LiveSearchController.php?postsSearchQuery=" + query;
+        let url = "LiveSearchController.php?postsSearchQuery=" + query +  "&apiKey=" + apiKey;
         if (sortDate !== "None") {
             url += "&sortDate=" + sortDate;
         }
@@ -84,14 +94,12 @@ function fetchPostSuggestions(query) {
 
     if (query.length > 1) {
         let url = getPostSuggestionsUrl(query);
-        getXmlHttpGetRequest(url).onreadystatechange = function () {
-            if (this.readyState === 4 && this.status === 200) {
-                if (this.responseText !== "No results") {
-                    let jsonObject = JSON.parse(this.responseText);
-                    insertFetchedSuggestions(jsonObject);
-                }
-            }
-        };
+        fetch(url).then(function (response) {
+            return response.text();
+        }).then(data => {
+            let jsonObject = JSON.parse(data);
+            insertFetchedSuggestions(jsonObject);
+        });
     } else {
         postsSuggestionContainer.innerHTML = "";
     }
@@ -111,7 +119,6 @@ function insertFetchedSuggestions(suggestionsJSONArray) {
     if (!val) {
         return false;
     }
-    currentFocus = -1;
 
     //insert the suggestions postsSuggestionContainer as a child in the search field
     searchField.parentNode.appendChild(postsSuggestionContainer);
@@ -138,13 +145,3 @@ function insertFetchedSuggestions(suggestionsJSONArray) {
         postsSuggestionContainer.innerHTML = "";
     }
 }
-
-function getXmlHttpGetRequest(url) {
-    let xhttp = new XMLHttpRequest();
-    xhttp.open("GET", url, true);
-    xhttp.send();
-    return xhttp;
-}
-
-
-

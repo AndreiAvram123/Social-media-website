@@ -1,5 +1,4 @@
 <?php
-
 session_start();
 require_once "Data/SessionManager.php";
 require_once "Management/UserAccountManager.php";

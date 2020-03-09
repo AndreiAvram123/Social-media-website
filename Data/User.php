@@ -13,6 +13,7 @@ class User
     private $joinDate;
     private $profilePicture;
     private $isEmailVerified;
+    private $lastMessage;
 
     public function __construct($db_row)
     {
@@ -25,9 +26,20 @@ class User
 
     }
 
-    /**
-     * @return mixed
-     */
+
+    public function setLastMessage($lastMessage)
+    {
+        $this->lastMessage = $lastMessage;
+    }
+
+
+    public function getLastMessage()
+    {
+        return $this->lastMessage;
+    }
+
+
+
     public function isEmailVerified()
     {
         return $this->isEmailVerified;
