@@ -64,7 +64,9 @@ class DataManager
         }
         return $posts;
     }
-    public function getMorePosts($lastPostID){
+
+    public function getMorePosts($lastPostID)
+    {
         $query = "SELECT forum_posts.post_id, post_author_id, post_title, post_content, post_category_name, post_date, post_image, username
  FROM forum_posts INNER JOIN users ON users.user_id = forum_posts.post_author_id  WHERE '$lastPostID' < forum_posts.post_id
  ORDER BY post_date DESC LIMIT $this->postPerPage";
@@ -420,6 +422,7 @@ WHERE comment_post_id = '$postID'";
         }
         return $posts;
     }
+
     /**
      * @param $postID
      * Use this function in order to remove a specific
@@ -691,7 +694,6 @@ WHERE comment_post_id = '$postID'";
     }
 
 
-
     public function fetchSearchSuggestionsMobile($searchQuery)
     {
 
@@ -706,7 +708,9 @@ WHERE comment_post_id = '$postID'";
         }
         return $suggestions;
     }
-    public function getSmallDataUserPosts($user_id){
+
+    public function getSmallDataUserPosts($user_id)
+    {
         $query = "SELECT  post_id, post_author_id, post_title , post_date, post_image,username FROM forum_posts
         INNER JOIN users ON user_id = post_author_id
        WHERE post_author_id = '$user_id' LIMIT 10";
@@ -718,6 +722,18 @@ WHERE comment_post_id = '$postID'";
             $posts[] = new SmallDataPost($row);
         }
         return $posts;
+    }
+
+    public function fetchLastUserComment($commentUserID)
+    {
+        $query = "SELECT * FROM comments 
+   INNER JOIN users ON user_id = comment_user_id
+WHERE comment_user_id = '$commentUserID' 
+ORDER BY comment_id DESC LIMIT 1";
+        $result = $this->_dbHandler->prepare($query);
+        $result->execute();
+        $row = $result->fetch();
+        return new Comment($row);
     }
 
 

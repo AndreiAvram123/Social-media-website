@@ -62,27 +62,21 @@ if (isset($_GET['suggestionQuery'])) {
 }
 if (isset($_REQUEST['uploadComment'])) {
     $commentUserID = null;
-    $commentDate = null;
-    $commentText = null;
+    $commentDate = date('Y-m-d H:i:s');
+    $commentContent = null;
     $commentPostID = null;
     $responseObject = new stdClass();
     $responseObject->message = "";
-    # Get JSON as a string
-    $json_str = file_get_contents('php://input');
-# Get as an object
-    $json_obj = json_decode($json_str);
-    if (isset($json_obj->commentUserID) && $json_obj->commentUserID !== "") {
+
+    $json_obj = decodePostData();
+    if (isset($json_obj->commentUserID) && ($json_obj->commentUserID !== "")) {
         $commentUserID = $json_obj->commentUserID;
     } else {
         $responseObject->message .= "\n Comment user id cannot be null or empty";
     }
-    if (isset($json_obj->commentDate) && $json_obj->commentDate !== "") {
-        $commentDate = $json_obj->commentDate;
-    } else {
-        $responseObject->message .= "\n Comment date  cannot be null or empty";
-    }
-    if (isset($json_obj->commentText) && $json_obj->commentText !== "") {
-        $commentText = $json_obj->commentText;
+
+    if (isset($json_obj->commentContent) && $json_obj->commentContent !== "") {
+        $commentContent = $json_obj->commentContent;
     } else {
         $responseObject->message .= "\n Comment text  cannot be null or empty";
     }
@@ -91,11 +85,14 @@ if (isset($_REQUEST['uploadComment'])) {
     } else {
         $responseObject->message .= "\n Comment post id  cannot be null or empty";
     }
-    if ($commentUserID != null && $commentDate != null && $commentText != null && $commentPostID != null) {
-        $dbHandler->uploadComment($commentUserID, $commentPostID, $commentText, $commentDate);
-        $responseObject->message = "Success";
+    if ($commentUserID != null && $commentDate != null && $commentContent != null && $commentPostID != null) {
+        $dbHandler->uploadComment($commentUserID, $commentPostID, $commentContent, $commentDate);
+        $lastComment = $dbHandler->fetchLastUserComment($commentUserID);
+        echo json_encode($lastComment);
+    } else {
+        echo json_encode($responseObject);
     }
-    echo json_encode($responseObject);
+
 
 }
 
