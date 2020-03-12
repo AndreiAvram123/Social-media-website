@@ -6,6 +6,7 @@ require_once "Data/User.php";
 require_once "Data/models/LowDataPost.php";
 require_once "Data/FriendRequest.php";
 require_once "Data/SmallDataPost.php";
+require_once "utilities/CommonFunctions.php";
 
 /**
  * This class is used to handle

@@ -1,4 +1,4 @@
-<?php
+f<?php
 /**
  * This file is used as a controller when the user
  * has pressed the see Post button. It gathers all the necessary
@@ -6,6 +6,7 @@
  */
 
 require_once "Data/DataManager.php";
+include_once "utilities/CommonFunctions.php";
 session_start();
 $view = new stdClass();
 $view->pageTitle = "OpenedPost";
@@ -29,7 +30,7 @@ if (isset($_GET["valuePostID"])) {
     //reset the post id set in the session
     $_SESSION["currentPostId"] = null;
     foreach ($dbHandler->getAllPostsIDs() as $postID) {
-        if ($postIDEncrypted === md5($postID)) {
+        if ($postIDEncrypted === CommonFunctions::encodeWithSha512($postID)) {
             //store the post id in the session
             $_SESSION["currentPostId"] = $postID;
         }
@@ -61,7 +62,7 @@ if ($currentPostID == null) {
         }
     }
 
-       //handle the new comment
+    //handle the new comment
     if (isset($_POST['postReviewButton'])) {
         //filter malicious code
         $comment_text = htmlentities($_POST['comment_text']);
@@ -72,7 +73,7 @@ if ($currentPostID == null) {
             $dbHandler->uploadComment($comment_user_id,
                 $comment_post_id, $comment_text, $comment_date);
             //make sure that users cannot refresh the page and add the comment again
-            echo  '<meta http-equiv="refresh" content="0; url=CurrentPost.php">';
+            echo '<meta http-equiv="refresh" content="0; url=CurrentPost.php">';
         } else {
             $view->warningMessage = "Please include some text for your comment!!";
         }

@@ -1,5 +1,5 @@
 <?php
-
+include_once "utilities/CommonFunctions.php";
 
 class LowDataPost implements JsonSerializable
 {
@@ -9,7 +9,7 @@ class LowDataPost implements JsonSerializable
 
     public function __construct($db_row)
     {
-        $this->postID = md5($db_row['post_id']);
+        $this->postID = CommonFunctions::encodeWithSha512($db_row['post_id']);
         $this->postTitle = $db_row['post_title'];
         $this->postImage = $db_row['post_image'];
     }
@@ -30,13 +30,11 @@ class LowDataPost implements JsonSerializable
     }
 
 
-
-
     public function jsonSerialize()
     {
         return
             [
-                'postID' =>  $this->getPostID(),
+                'postID' => $this->getPostID(),
                 'postTitle' => $this->getPostTitle(),
                 'postImage' => $this->getPostImage(),
             ];
