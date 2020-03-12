@@ -1,4 +1,4 @@
-f<?php
+<?php
 /**
  * This file is used as a controller when the user
  * has pressed the see Post button. It gathers all the necessary
