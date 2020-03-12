@@ -3,6 +3,7 @@ require_once "Data/Database.php";
 require_once "Data/Comment.php";
 require_once "Data/Post.php";
 require_once "Data/User.php";
+require_once "Data/models/LowDataPost.php";
 require_once "Data/FriendRequest.php";
 require_once "Data/SmallDataPost.php";
 
@@ -446,8 +447,6 @@ WHERE comment_post_id = '$postID'";
      * @param $user_id
      * @return array
      */
-    //todo
-    //needs refactoring for better optimisation
     public function getUserPosts($user_id)
     {
         $query = "SELECT  post_id, post_author_id, post_title, post_content, post_category_name, post_date, post_image,username FROM forum_posts
@@ -663,7 +662,7 @@ WHERE comment_post_id = '$postID'";
 
     public function fetchSearchSuggestions($searchQuery, $sortDate, $category)
     {
-        $query = "SELECT post_id,post_title FROM forum_posts WHERE post_title LIKE '$searchQuery%' ";
+        $query = "SELECT post_id,post_title,post_image FROM forum_posts WHERE post_title LIKE ':searchQuery' ";
 
         if ($category !== null) {
             $query .= "AND post_category_name = '$category'";
@@ -677,52 +676,18 @@ WHERE comment_post_id = '$postID'";
         }
         $query .= " LIMIT 10";
         $result = $this->_dbHandler->prepare($query);
+        $result->bindValue(':searchQuery', $searchQuery . '%');
+
         $result->execute();
         $suggestions = [];
-
         while ($row = $result->fetch()) {
-            $suggestion = new stdClass();
-            $suggestion->postID = md5($row['post_id']);
-            $suggestion->postTitle = $row['post_title'];
-            $jsonSuggestion = $suggestion;
-            $suggestions[] = $jsonSuggestion;
-
+            $suggestions[] = new LowDataPost($row);
         }
         return $suggestions;
 
 
     }
 
-
-    public function fetchSearchSuggestionsMobile($searchQuery)
-    {
-
-        $query = "SELECT forum_posts.post_id, forum_posts.post_title,forum_posts.post_image,username FROM forum_posts INNER JOIN
-          users ON users.user_id = forum_posts.post_author_id  WHERE post_title LIKE '$searchQuery%' LIMIT 8";
-        $result = $this->_dbHandler->prepare($query);
-        $result->execute();
-        $suggestions = [];
-        while ($row = $result->fetch()) {
-            $suggestions[] = new SmallDataPost($row);
-
-        }
-        return $suggestions;
-    }
-
-    public function getSmallDataUserPosts($user_id)
-    {
-        $query = "SELECT  post_id, post_author_id, post_title , post_date, post_image,username FROM forum_posts
-        INNER JOIN users ON user_id = post_author_id
-       WHERE post_author_id = '$user_id' LIMIT 10";
-
-        $result = $this->_dbHandler->prepare($query);
-        $result->execute();
-        $posts = [];
-        while ($row = $result->fetch()) {
-            $posts[] = new SmallDataPost($row);
-        }
-        return $posts;
-    }
 
     public function fetchLastUserComment($commentUserID)
     {

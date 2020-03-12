@@ -57,7 +57,7 @@ if (isset($_GET['postID'])) {
 
 if (isset($_GET['suggestionQuery'])) {
     $suggestionQuery = $_GET['suggestionQuery'];
-    $suggestions = $dbHandler->fetchSearchSuggestionsMobile($suggestionQuery);
+    $suggestions = $dbHandler->fetchSearchSuggestions($suggestionQuery,null,null);
     echo json_encode($suggestions);
 }
 if (isset($_REQUEST['uploadComment'])) {
@@ -182,7 +182,7 @@ if (isset($_REQUEST['myPosts'])) {
         $userID = $_REQUEST['userID'];
     }
     if ($userID != null) {
-        $userPosts = $dbHandler->getSmallDataUserPosts($userID);
+        $userPosts = $dbHandler->getUserPosts($userID);
         echo json_encode($userPosts);
     } else {
         $responseObject->responseCode = -1;

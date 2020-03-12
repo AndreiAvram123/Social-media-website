@@ -32,18 +32,18 @@
                 //include options for the profile if the user is logged in
                 if (isset($_SESSION['user_id'])) {
 
-                ?>
-                <!--List items that should be shown if the user is logged in -->
-                <li class="nav-item">
-                    <a class="nav-link" href="MyPosts.php">My Posts <span class="sr-only"></span></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="WatchList.php">Watch list <span class="sr-only"></span></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="Friends.php">All Friends <span class="sr-only"></span></a>
-                </li>
-                <?php
+                    ?>
+                    <!--List items that should be shown if the user is logged in -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="MyPosts.php">My Posts <span class="sr-only"></span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="WatchList.php">Watch list <span class="sr-only"></span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="Friends.php">All Friends <span class="sr-only"></span></a>
+                    </li>
+                    <?php
                 }
                 ?>
 
@@ -75,6 +75,13 @@
     //the confirmation modal is mainly used to ask the user
     //for confirmation for certain actions such as signing out
     include_once "Modals/ConfimationModal.phtml";
+    if (isset($view->apiKey)) {
+
+        ?>
+        <script>var apiKey = '<?php echo $view->apiKey ?>'</script>
+        <?php
+
+    }
     ?>
     <!--Include JQuery in order for bootstrap to properly work
        Getting the files from cache via link is more efficient than actually

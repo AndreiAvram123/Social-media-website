@@ -21,7 +21,7 @@ class ApiKeyManager
         $this->apiKeyDb = ApiKeyDatabase::getInstance();
     }
 
-    public function getApiKeyForWebsiteAccess($ip)
+    public function obtainApiKey($ip)
     {
         $apiKey = $this->apiKeyDb->fetchApiKeyForIPAddress($ip);
         if ($apiKey == null) {
