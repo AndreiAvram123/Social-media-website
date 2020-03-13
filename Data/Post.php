@@ -1,4 +1,5 @@
 <?php
+require_once "Data/models/LowDataPost.php";
 
 /**
  * This class is used to create Post object
@@ -6,49 +7,44 @@
  * database
  *
  */
-class Post implements JsonSerializable
+class Post extends LowDataPost implements JsonSerializable
 {
     private $authorName;
     private $authorID;
-    private $postTitle;
     private $postDate;
     private $postContent;
-    private $postImage;
     private $postCategoryName;
-    private $postID;
+
     private $isFavorite;
 
     public function __construct($db_row)
     {
-        $this->postID = ($db_row['post_id']);
-        $this->postTitle = $db_row['post_title'];
+
+        parent::__construct($db_row);
+
         $this->postDate = $db_row['post_date'];
         $this->postContent = substr($db_row['post_content'], 0, 700);
         $this->postCategoryName = $db_row['post_category_name'];
         $this->authorID = $db_row['post_author_id'];
-        $this->postImage = $db_row['post_image'];
         $this->authorName = $db_row['username'];
         $this->isFavorite = FALSE;
     }
 
     public function jsonSerialize()
     {
+
         return
             [
                 'postID' => (int)$this->getPostID(),
                 'postTitle' => $this->getPostTitle(),
+                'postImage' => $this->getPostImage(),
                 'postDate' => $this->getPostDate(),
                 'postAuthor' => $this->getAuthorName(),
-                'postImage' => $this->getPostImage(),
                 'postCategory' => $this->getCategoryName(),
-                'postContent' =>$this->getPostContent()
-        ];
+                'postContent' => $this->getPostContent()
+            ];
     }
 
-    public function getPostID()
-    {
-        return $this->postID;
-    }
 
 
     public function getAuthorID()
@@ -69,10 +65,6 @@ class Post implements JsonSerializable
     }
 
 
-    public function getPostTitle()
-    {
-        return $this->postTitle;
-    }
 
 
     public function getPostDate()
@@ -86,10 +78,6 @@ class Post implements JsonSerializable
         return $this->postContent;
     }
 
-    public function getPostImage()
-    {
-        return $this->postImage;
-    }
 
 
     public function getIsFavorite()

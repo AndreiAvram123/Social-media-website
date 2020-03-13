@@ -169,7 +169,7 @@ class MessageFactory {
 
 class ImageMessage {
     constructor(messageJson) {
-        let messageHtml = '<div><img src="images/chatImages/' + messageJson.messageImage + '"class="message-image"></div>';
+        let messageHtml = '<div><img src="' + messageJson.messageImage + '"class="message-image"></div>';
         let domParser = new DOMParser();
         let messageView = domParser.parseFromString(messageHtml, "text/html").getElementsByTagName('div')[0];
         if (messageJson.senderId === sessionUserId) {
