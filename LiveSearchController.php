@@ -3,6 +3,9 @@ require_once("Data/FriendsDatabase.php");
 require_once("Data/DataManager.php");
 require_once("Api/ApiKeyManager.php");
 include_once("utilities/CommonFunctions.php");
+
+
+
 $apiManager = ApiKeyManager::getInstance();
 $responseObject = new stdClass();
 $apiKey = null;
