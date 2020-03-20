@@ -21,7 +21,6 @@ class Post extends LowDataPost implements JsonSerializable
     {
 
         parent::__construct($db_row);
-
         $this->postDate = $db_row['post_date'];
         $this->postContent = substr($db_row['post_content'], 0, 700);
         $this->postCategoryName = $db_row['post_category_name'];

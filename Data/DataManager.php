@@ -663,7 +663,7 @@ WHERE comment_post_id = '$postID'";
 
     public function fetchSearchSuggestions($searchQuery, $sortDate, $category)
     {
-        $query = "SELECT post_id,post_title,post_image FROM forum_posts WHERE post_title LIKE ':searchQuery' ";
+        $query = "SELECT post_id,post_title,post_image FROM forum_posts WHERE post_title LIKE :searchQuery";
 
         if ($category !== null) {
             $query .= "AND post_category_name = '$category'";
@@ -700,6 +700,15 @@ ORDER BY comment_id DESC LIMIT 1";
         $result->execute();
         $row = $result->fetch();
         return new Comment($row);
+    }
+
+    public function fetchLastUserPost($postAuthorID)
+    {
+        $query = "SELECT * FROM forum_posts WHERE post_author_id = '$postAuthorID' ORDER BY post_id DESC LIMIT 1";
+        $result = $this->_dbHandler->prepare($query);
+        $result->execute();
+        $row = $result->fetch();
+        return new Post($row);
     }
 
 

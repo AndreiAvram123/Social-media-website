@@ -71,18 +71,8 @@
 </header>
 
 <div class="container mt-3 mb-3">
-    <?php
-    //the confirmation modal is mainly used to ask the user
-    //for confirmation for certain actions such as signing out
-    include_once "Modals/ConfimationModal.phtml";
-    if (isset($view->apiKey)) {
 
-        ?>
-        <script>var apiKey = '<?php echo $view->apiKey ?>'</script>
-        <?php
 
-    }
-    ?>
     <!--Include JQuery in order for bootstrap to properly work
        Getting the files from cache via link is more efficient than actually
        storing them on the server

@@ -1,6 +1,13 @@
 <?php
 include "Views/pageElements/Header.phtml";
 include "Views/commonLayouts/SearchForm.phtml";
+if (isset($view->apiKey)) {
+
+    ?>
+    <script>var apiKey = '<?php echo $view->apiKey ?>'</script>
+    <?php
+
+}
 ?>
 
 

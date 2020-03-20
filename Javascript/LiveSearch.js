@@ -61,7 +61,7 @@ function fetchFriendsSuggestions(event, query) {
 
     if ((event.keyCode >= '65' && event.keyCode <= '90') || event.keyCode == 8) {
         if (query.length > 1) {
-            let url = "LiveSearchController.php?query=" + query + "&apiKey=" + apiKey;
+            let url = "LiveSearchController.php?query=" + query  +"&apiKey=" + apiKey ;
             fetch(url).then(function (response) {
                 return response.text();
             }).then(data => {
@@ -80,7 +80,7 @@ function fetchPostSuggestions(query) {
         //get the filters from the filter modal and display suggestions accordingly
         let sortDate = document.getElementById("postOrder").value;
         let category = document.getElementById("postCategorySelector").value;
-        let url = "LiveSearchController.php?postsSearchQuery=" + query + "&apiKey=" + apiKey;
+        let url = "LiveSearchController.php?postsSearchQuery=" + query + "&encrypted=true"+ "&apiKey=" + apiKey;
         if (sortDate !== "None") {
             url += "&sortDate=" + sortDate;
         }

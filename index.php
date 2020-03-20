@@ -5,6 +5,8 @@ require_once "Data/DataManager.php";
 require_once "Data/ChatManager.php";
 require_once "Data/FriendsDatabase.php";
 require_once("Api/ApiKeyManager.php");
+require_once "utilities/CommonFunctions.php";
+
 
 $view = new stdClass();
 $view->pageTitle = "Home";
@@ -46,7 +48,11 @@ if (isset($_SESSION['user_id'])) {
 
 //get the api key to access async functions if needed
 $view->isUserLoggedIn = isset($_SESSION['user_id']);
-$view->apiKey = ApiKeyManager::getInstance()->obtainApiKey($_SERVER['REMOTE_ADDR']);
+//generate the api key in order to fetch data
+
+
+$apiKeyManager = ApiKeyManager::getInstance();
+$view->apiKey = $apiKeyManager->obtainApiKey($_SERVER['REMOTE_ADDR']);
 require_once "Views/index.phtml";
 ?>
 

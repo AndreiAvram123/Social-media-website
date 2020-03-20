@@ -39,7 +39,8 @@ class ApiKeyDatabase
     public function generateApiKeyForIPAddress($ip)
     {
         $apiKey = $this->generateApiKey($ip);
-        $query = "INSERT INTO api_keys VALUES (NULL,'$ip','$apiKey')";
+        $date = time();
+        $query = "INSERT INTO api_keys VALUES (NULL,'$ip','$apiKey','$date')";
         $this->executeQuery($query);
         return $apiKey;
     }
@@ -55,5 +56,15 @@ class ApiKeyDatabase
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         return $result;
+    }
+
+    public function getLastTimeApiKeyUsed($apiKey)
+    {
+        $query = "SELECT  last_request_time FROM api_keys WHERE api_key_value = :apiKey";
+        $result = $this->_dbHandler->prepare($query);
+        $result->bindValue(':apiKey', $apiKey);
+        $result->execute();
+        $row = $result->fetch();
+        return $row['last_request_time'];
     }
 }

@@ -8,16 +8,8 @@ $responseObject = new stdClass();
 
 
 if (isset($_GET['recentPosts'])) {
-
-    if (isset($_GET['lastPostID']) && InputValidator::isNumericParameterValid($_GET['lastPostID'])) {
-        $lastPostID = $_GET['lastPostID'];
-        $data = $dbHandler->getMorePosts($lastPostID);
-        echo json_encode($data);
-    } else {
-        $data = $dbHandler->getPosts(1);
-        echo json_encode($data);
-    }
-
+    $data = $dbHandler->getPosts(1);
+    echo json_encode($data);
 }
 
 
@@ -57,7 +49,7 @@ if (isset($_GET['postID'])) {
 
 if (isset($_GET['suggestionQuery'])) {
     $suggestionQuery = $_GET['suggestionQuery'];
-    $suggestions = $dbHandler->fetchSearchSuggestions($suggestionQuery,null,null);
+    $suggestions = $dbHandler->fetchSearchSuggestions($suggestionQuery, null, null);
     echo json_encode($suggestions);
 }
 if (isset($_REQUEST['uploadComment'])) {
@@ -116,8 +108,8 @@ if (isset($_REQUEST['uploadPost'])) {
     $dbHandler->uploadPost($json_obj->postAuthorID, $json_obj->postTitle
         , $json_obj->postContent, $json_obj->postCategory, $postDate, "images/posts/" . $filename);
 
-    echo json_encode($json_obj);
-
+    $lastPost = $dbHandler->fetchLastUserPost($json_obj->postAuthorID);
+    echo json_encode($lastPost);
 }
 
 if (isset($_REQUEST['savedPosts'])) {
