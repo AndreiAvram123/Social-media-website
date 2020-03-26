@@ -297,8 +297,6 @@ function uploadImage(receiverId) {
     }).then(function (data) {
         //prepare message
         let responseObject = JSON.parse(data);
-        responseObject.receiverId = receiverId;
-        responseObject.senderId = sessionUserId;
         chatWindow.addNewMessage(responseObject);
     })
 }
@@ -328,13 +326,7 @@ function sendMessage(receiverID) {
         }).then(function (response) {
             return response.text();
         }).then(function (data) {
-            //todo
-            //edit this
             let responseObject = JSON.parse(data);
-            responseObject.messageContent = message;
-            responseObject.receiverId = receiverID;
-            responseObject.senderId = sessionUserId;
-            responseObject.messageImage = null;
             chatWindow.addNewMessage(responseObject);
             shouldFetchNewMessages = true;
         });
@@ -373,7 +365,7 @@ function fetchNewMessages(receiverId) {
             return response.text();
         }).then(function (data) {
             let messageArray = JSON.parse(data);
-            chatWindow.addNewMessagesToContainer(messageArray)
+            chatWindow.addNewMessagesToContainer(messageArray);
             shouldFetchNewMessages = true;
         });
     }
