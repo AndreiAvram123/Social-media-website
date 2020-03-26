@@ -15,9 +15,8 @@ $requestAccepted = false;
  * if not ,do not process the request further
  */
 if (isset($_REQUEST['apiKey'])) {
-    $requestAccepted = $apiManager->isRequestAccepted($_REQUEST['apiKey'],$_SERVER['REMOTE_ADDR']);
+    $requestAccepted = $apiManager->isRequestAccepted($_REQUEST['apiKey'], $_SERVER['REMOTE_ADDR']);
 }
-
 
 
 if ($requestAccepted == true) {

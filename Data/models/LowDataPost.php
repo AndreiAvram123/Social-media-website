@@ -35,6 +35,16 @@ class LowDataPost implements JsonSerializable
         return $this->postID;
     }
 
+    /**
+     * @param mixed $postID
+     */
+    public function setPostID($postID)
+    {
+        $this->postID = $postID;
+    }
+
+
+
 
     public function jsonSerialize()
     {

@@ -140,13 +140,15 @@ class ChatWindow {
 
 
     addNewMessagesToContainer(messagesJson) {
-        messagesJson.forEach((message) => {
-            let messageView = this.messageFactory.createMessageElement(message);
-            this.messageContainer.appendChild(messageView);
-        });
+        if (messagesJson.length > 0) {
+            messagesJson.forEach((message) => {
+                let messageView = this.messageFactory.createMessageElement(message);
+                this.messageContainer.appendChild(messageView);
+            });
 
-        this.lastMessageID = messagesJson[messagesJson.length - 1].messageID;
-        chatWindow.scrollToLastFetchedMessage();
+            this.lastMessageID = messagesJson[messagesJson.length - 1].messageID;
+            chatWindow.scrollToLastFetchedMessage();
+        }
     }
 
     scrollToLastFetchedMessage() {
@@ -181,10 +183,6 @@ class ImageMessage {
             messageView.style.textAlign = "right";
         }
         this.messageView = messageView;
-    }
-
-    getView() {
-        return this.messageView;
     }
 
 }
@@ -330,6 +328,8 @@ function sendMessage(receiverID) {
         }).then(function (response) {
             return response.text();
         }).then(function (data) {
+            //todo
+            //edit this
             let responseObject = JSON.parse(data);
             responseObject.messageContent = message;
             responseObject.receiverId = receiverID;
@@ -373,9 +373,7 @@ function fetchNewMessages(receiverId) {
             return response.text();
         }).then(function (data) {
             let messageArray = JSON.parse(data);
-            if (messageArray.length > 0) {
-                chatWindow.addNewMessagesToContainer(messageArray)
-            }
+            chatWindow.addNewMessagesToContainer(messageArray)
             shouldFetchNewMessages = true;
         });
     }

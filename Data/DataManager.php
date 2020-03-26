@@ -5,7 +5,6 @@ require_once "Data/Post.php";
 require_once "Data/User.php";
 require_once "Data/models/LowDataPost.php";
 require_once "Data/FriendRequest.php";
-require_once "Data/SmallDataPost.php";
 require_once "utilities/Functions.php";
 
 /**
@@ -682,7 +681,9 @@ WHERE comment_post_id = '$postID'";
         $result->execute();
         $suggestions = [];
         while ($row = $result->fetch()) {
-            $suggestions[] = new LowDataPost($row);
+            $currentPost = new LowDataPost($row);
+            $suggestions[] =$currentPost;
+
         }
         return $suggestions;
 
