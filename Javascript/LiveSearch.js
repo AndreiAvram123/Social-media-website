@@ -80,7 +80,7 @@ function fetchFriendsSuggestions(event, query) {
         })
     }
 
-    if ((event.keyCode >= '65' && event.keyCode <= '90') || event.keyCode == 8) {
+    if ((event.keyCode >= '65' && event.keyCode <= '90') || event.keyCode === 8) {
         if (query.length > 1) {
             let url = "LiveSearchController.php?query=" + query + "&apiKey=" + apiKey;
             fetch(url).then(function (response) {

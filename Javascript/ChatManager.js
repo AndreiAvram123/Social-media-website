@@ -3,12 +3,15 @@ let timeIntervalCheck = 1500;
 let timeIntervalCheckTyping = 1500;
 let intervalCheck;
 let userIsTypingCheck;
+let idleCheck;
 let currentUserIsTypingCheck;
 let sessionUserId;
 let lastKeyPressedTime;
 let shouldFetchNewMessages = true;
 let chatWindow;
-
+let lastMouseMovedTime;
+//in milliseconds
+let timeBeforeIdleMode = 2000;
 
 class ChatWindow {
     constructor(username, receiverId) {
@@ -40,6 +43,9 @@ class ChatWindow {
         this.initializeDefaultParameters(receiverId);
         this.initializeViews(domElement);
         this.attachListeners(domElement, receiverId);
+        this.receiverID = receiverId;
+        this.asyncFunctionsRunning = false;
+
         document.body.append(this.chatWindow);
     }
 
@@ -63,6 +69,7 @@ class ChatWindow {
     }
 
     addOldMessagesToContainer(messages) {
+
         messages.forEach((message) => {
             let messageView = this.messageFactory.createMessageElement(message);
             if (this.messageContainer.childNodes.length > 0) {
@@ -98,6 +105,7 @@ class ChatWindow {
         imageSelector.addEventListener('change', event => {
             uploadImage(receiverId);
         });
+        this.attachScrollListener();
     }
 
     initializeViews(domElement) {
@@ -116,10 +124,12 @@ class ChatWindow {
 
 
     stopAsyncFunctions() {
+        this.asyncFunctionsRunning = false;
         clearInterval(intervalCheck);
         clearInterval(userIsTypingCheck);
         clearInterval(currentUserIsTypingCheck);
     }
+
 
     getMessageContainerTopOffset() {
         return this.messageContainer.scrollTop;
@@ -140,19 +150,27 @@ class ChatWindow {
 
 
     addNewMessagesToContainer(messagesJson) {
-        if (messagesJson.length > 0) {
-            messagesJson.forEach((message) => {
-                let messageView = this.messageFactory.createMessageElement(message);
-                this.messageContainer.appendChild(messageView);
-            });
+        messagesJson.forEach((message) => {
+            let messageView = this.messageFactory.createMessageElement(message);
+            this.messageContainer.appendChild(messageView);
+        });
 
-            this.lastMessageID = messagesJson[messagesJson.length - 1].messageID;
-            chatWindow.scrollToLastFetchedMessage();
-        }
+        this.lastMessageID = messagesJson[messagesJson.length - 1].messageID;
+        chatWindow.scrollToLastFetchedMessage();
+
     }
 
     scrollToLastFetchedMessage() {
         this.messageContainer.scrollTop = this.messageContainer.scrollHeight;
+    }
+
+    initializeMessagesCheckInterval() {
+        if (this.asyncFunctionsRunning === false) {
+            this.asyncFunctionsRunning = true;
+            intervalCheck = setInterval(fetchNewMessages, timeIntervalCheck, this.receiverID, this.messageContainer);
+            userIsTypingCheck = setInterval(checkUser2IsTyping, timeIntervalCheckTyping);
+            currentUserIsTypingCheck = setInterval(checkCurrentUserTyping, timeIntervalCheckTyping);
+        }
     }
 }
 
@@ -208,6 +226,7 @@ function removeChat(chat) {
     chatWindow.stopAsyncFunctions();
     document.body.removeChild(chat);
     chatWindow = undefined;
+
 }
 
 /**
@@ -224,6 +243,8 @@ function startChat(currentUserId, receiverId, username) {
         markCurrentUserAsTyping(false);
     }
 
+//todo
+    //change this
     window.onbeforeunload = resetDatabase;
     if (chatWindow === undefined) {
         sessionUserId = currentUserId;
@@ -244,30 +265,47 @@ function startChat(currentUserId, receiverId, username) {
     }
 }
 
-function initializeOtherAsyncFunctions(user2Id) {
+function attachIdleCheck() {
+    if (idleCheck === undefined) {
+        attachMouseListener();
+        idleCheck = setInterval(checkMouseLastMovedTime, 1000);
 
-    function getChatId() {
-        let url = "ChatController.php?requestName=fetchChatId&" + "apiKey=" + apiKey;
-        url += "&user1Id=" + sessionUserId;
-        url += "&user2Id=" + user2Id;
+        function attachMouseListener() {
+            document.body.onmousemove = (e) => {
+                lastMouseMovedTime = new Date().getTime();
+            }
+        }
 
-        fetch(url).then(function (response) {
-            return response.text();
-        }).then(data => {
-            chatWindow.chatId = data;
-        });
+        function checkMouseLastMovedTime() {
+            if (lastMouseMovedTime + timeBeforeIdleMode < new Date().getTime()) {
+                if (chatWindow !== undefined) {
+                    chatWindow.stopAsyncFunctions();
+                    console.log("stopping messaging system");
+                }
+            } else {
+                chatWindow.initializeMessagesCheckInterval();
+                console.log("resuming messaging system")
+            }
 
+        }
     }
 
-    getChatId();
+}
 
-    function initializeAsyncFunctions() {
-        intervalCheck = setInterval(fetchNewMessages, timeIntervalCheck, user2Id, this.messageContainer);
-        userIsTypingCheck = setInterval(checkUser2IsTyping, timeIntervalCheckTyping);
-        currentUserIsTypingCheck = setInterval(checkCurrentUserTyping, timeIntervalCheckTyping);
-    }
 
-    initializeAsyncFunctions();
+function getChatId(user2Id) {
+    let url = "ChatController.php?requestName=fetchChatId&" + "apiKey=" + apiKey;
+    url += "&user1Id=" + sessionUserId;
+    url += "&user2Id=" + user2Id;
+
+    fetch(url).then(function (response) {
+        return response.text();
+    }).then(data => {
+        chatWindow.chatId = data;
+        chatWindow.initializeMessagesCheckInterval();
+        attachIdleCheck();
+    });
+
 }
 
 
@@ -304,10 +342,6 @@ function uploadImage(receiverId) {
 /**
  * This function is used to send a message to the user with the specified receiverID
  *
- * we should cache the message to be inserted and wait until
- * the server has confirmed that the message arrived successfully
- * A little optimisation : the server will only give us back the message id
- * and date and not the whole message
  * @param receiverID
  */
 function sendMessage(receiverID) {
@@ -401,6 +435,8 @@ function checkCurrentUserTyping() {
 /**
  * This method is used in order to fetch old messages in a chat
  * Depending on the global variable currentlyDisplayedMessages
+ * It is efficient to only fetch old messages when the user wants to
+ *
  * @param receiverID
  */
 function fetchOldMessages(receiverID) {
@@ -408,19 +444,15 @@ function fetchOldMessages(receiverID) {
     url += "&currentUserId=" + sessionUserId;
     url += "&receiverId=" + receiverID;
     url += "&offset=" + chatWindow.currentlyDisplayedMessages;
+    chatWindow.fetchMessagesRequestSent = true;
     fetch(url).then(function (response) {
         return response.text();
     }).then(data => {
         let jsonArray = JSON.parse(data);
+        chatWindow.addOldMessagesToContainer(jsonArray);
         chatWindow.fetchMessagesRequestSent = false;
-        if (jsonArray.length > 0) {
-            chatWindow.addOldMessagesToContainer(jsonArray);
-            //if the fetchOldMessages function has been called
-            //the first time then chatWindowInitialized is false
-        }
-        if (intervalCheck === undefined) {
-            initializeOtherAsyncFunctions(receiverID);
-            chatWindow.attachScrollListener();
+        if (chatWindow.chatId === undefined) {
+            getChatId(receiverID);
         }
     });
 
