@@ -6,7 +6,7 @@
  */
 
 require_once "Data/DataManager.php";
-include_once "utilities/CommonFunctions.php";
+include_once "utilities/Functions.php";
 session_start();
 $view = new stdClass();
 $view->pageTitle = "OpenedPost";
@@ -30,7 +30,7 @@ if (isset($_GET["valuePostID"])) {
     //reset the post id set in the session
     $_SESSION["currentPostId"] = null;
     foreach ($dbHandler->getAllPostsIDs() as $postID) {
-        if ($postIDEncrypted === CommonFunctions::encodeWithSha512($postID)) {
+        if ($postIDEncrypted === Functions::encodeWithSha512($postID)) {
             //store the post id in the session
             $_SESSION["currentPostId"] = $postID;
         }

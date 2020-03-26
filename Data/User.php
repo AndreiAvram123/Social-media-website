@@ -5,7 +5,7 @@
  * the data from a user row in the database
  */
 
-class User
+class User implements JsonSerializable
 {
     private $userId;
     private $username;
@@ -27,6 +27,17 @@ class User
     }
 
 
+    public function jsonSerialize()
+    {
+        return
+            [
+                'userId' => $this->userId,
+                'username' => $this->username,
+                'profilePicture' => $this->profilePicture,
+            ];
+    }
+
+
     public function setLastMessage($lastMessage)
     {
         $this->lastMessage = $lastMessage;
@@ -37,7 +48,6 @@ class User
     {
         return $this->lastMessage;
     }
-
 
 
     public function isEmailVerified()

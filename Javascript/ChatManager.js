@@ -13,6 +13,7 @@ let chatWindow;
 class ChatWindow {
     constructor(username, receiverId) {
         //use a dom parser to convert html into a document element
+        this.scrollTopFetchOffset = 100;
         let domParser = new DOMParser();
         //the html element for a chat window
         let chatString = '<div class="message-window" >\n' +
@@ -64,7 +65,6 @@ class ChatWindow {
     addOldMessagesToContainer(messages) {
         messages.forEach((message) => {
             let messageView = this.messageFactory.createMessageElement(message);
-
             if (this.messageContainer.childNodes.length > 0) {
                 this.messageContainer.insertBefore(messageView, this.messageContainer.childNodes[0]);
             } else {
@@ -89,6 +89,7 @@ class ChatWindow {
      * @param domElement
      * @param receiverId
      */
+
     attachListeners(domElement, receiverId) {
         domElement.getElementsByTagName("i")[0].addEventListener('click', event => removeChat(this.chatWindow));
         let imageSelector = domElement.getElementsByName("files[]")[0];
@@ -124,9 +125,11 @@ class ChatWindow {
         return this.messageContainer.scrollTop;
     }
 
+    scrollTopFetchOffset;
+
     attachScrollListener() {
         this.messageContainer.addEventListener('scroll', event => {
-            if (this.fetchMessagesRequestSent !== true && this.getMessageContainerTopOffset() <= 100) {
+            if (this.fetchMessagesRequestSent !== true && this.getMessageContainerTopOffset() <= this.scrollTopFetchOffset) {
                 if (this.noMoreOldMessagesToFetch === false) {
                     this.fetchMessagesRequestSent = true;
                     fetchOldMessages(this.receiverID);
@@ -138,8 +141,10 @@ class ChatWindow {
 
     addNewMessagesToContainer(messagesJson) {
         messagesJson.forEach((message) => {
-            this.messageContainer.appendChild(message)
+            let messageView = this.messageFactory.createMessageElement(message);
+            this.messageContainer.appendChild(messageView);
         });
+
         this.lastMessageID = messagesJson[messagesJson.length - 1].messageID;
         chatWindow.scrollToLastFetchedMessage();
     }
@@ -244,7 +249,7 @@ function startChat(currentUserId, receiverId, username) {
 function initializeOtherAsyncFunctions(user2Id) {
 
     function getChatId() {
-        let url = "ChatController.php?requestName=fetchChatId";
+        let url = "ChatController.php?requestName=fetchChatId&" + "apiKey=" + apiKey;
         url += "&user1Id=" + sessionUserId;
         url += "&user2Id=" + user2Id;
 
@@ -279,7 +284,7 @@ function toggleElement(element) {
 
 //*********************************************AJAX FUNCTION *************************************************
 function uploadImage(receiverId) {
-    let url = "ChatController.php?requestName=UploadImage";
+    let url = "ChatController.php?requestName=UploadImage&" + "apiKey=" + apiKey;
     let formData = new FormData();
     const files = document.querySelector('[type=file]').files;
     formData.append('files[]', files[0]);
@@ -315,7 +320,7 @@ function sendMessage(receiverID) {
     if (message !== "") {
         shouldFetchNewMessages = false;
         let formData = new FormData();
-        let url = "ChatController.php?requestName=sendMessage";
+        let url = "ChatController.php?requestName=sendMessage&" + "apiKey=" + apiKey;
         formData.append("receiverId", receiverID);
         formData.append("currentUserId", sessionUserId);
         formData.append("messageContent", message);
@@ -340,7 +345,7 @@ function sendMessage(receiverID) {
 
 
 function checkUser2IsTyping() {
-    let url = "ChatController.php?requestName=checkUser2IsTyping";
+    let url = "ChatController.php?requestName=checkUser2IsTyping&" + "apiKey=" + apiKey;
     url += "&userId=" + sessionUserId;
     url += "&chatId=" + chatWindow.chatId;
     fetch(url).then(function (response) {
@@ -353,7 +358,7 @@ function checkUser2IsTyping() {
 }
 
 function fetchNewMessages(receiverId) {
-    let url = "ChatController.php?requestName=fetchNewMessages";
+    let url = "ChatController.php?requestName=fetchNewMessages&" + "apiKey=" + apiKey;
     let formData = new FormData();
     formData.append("lastMessageId", chatWindow.lastMessageID);
     formData.append("currentUserId", sessionUserId);
@@ -378,7 +383,7 @@ function fetchNewMessages(receiverId) {
 
 
 function markCurrentUserAsTyping(isTyping) {
-    let url = "ChatController.php?requestName=markTyping";
+    let url = "ChatController.php?requestName=markTyping&" + "apiKey=" + apiKey;
     let formData = new FormData();
     formData.append("userId", sessionUserId);
     formData.append("chatId", chatWindow.chatId);
@@ -409,7 +414,7 @@ function checkCurrentUserTyping() {
  * @param receiverID
  */
 function fetchOldMessages(receiverID) {
-    let url = "ChatController.php?requestName=fetchOldMessages";
+    let url = "ChatController.php?requestName=fetchOldMessages&" + "apiKey=" + apiKey;
     url += "&currentUserId=" + sessionUserId;
     url += "&receiverId=" + receiverID;
     url += "&offset=" + chatWindow.currentlyDisplayedMessages;
@@ -423,9 +428,10 @@ function fetchOldMessages(receiverID) {
             //if the fetchOldMessages function has been called
             //the first time then chatWindowInitialized is false
         }
-
-        initializeOtherAsyncFunctions(receiverID);
-        chatWindow.attachScrollListener();
+        if (intervalCheck === undefined) {
+            initializeOtherAsyncFunctions(receiverID);
+            chatWindow.attachScrollListener();
+        }
     });
 
 

@@ -31,10 +31,7 @@ if ($currentPost != null) {
                 if ($currentPost->getIsFavorite() === false) {
                     //if the user is logged in but the post is not added to favorite
                     ?>
-                    <form method="post" action="<?php echo $_SERVER['PHP_SELF'];
-                    //todo
-                    //wtf
-                    ?>">
+                    <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
                         <button type="submit" class="btn btn-primary btn" name="addToFavoriteButton">Add to watch list
                         </button>
                     </form>

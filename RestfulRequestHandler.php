@@ -1,14 +1,14 @@
 <?php
 require_once("Data/FriendsDatabase.php");
 require_once("Data/DataManager.php");
-require_once("utilities/CommonFunctions.php");
+require_once("utilities/Functions.php");
 
 $dbHandler = DataManager::getInstance();
 $responseObject = new stdClass();
 
 
 if (isset($_GET['page'])) {
-    $page = CommonFunctions::getSanitizedParameter($_GET['page']);
+    $page = Functions::sanitizeParameter($_GET['page']);
     if($page !== "" && is_numeric($page)) {
         $data = $dbHandler->getPosts($page);
         echo json_encode($data);

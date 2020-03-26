@@ -2,7 +2,7 @@
 require_once("Data/FriendsDatabase.php");
 require_once("Data/DataManager.php");
 require_once("Api/ApiKeyManager.php");
-include_once("utilities/CommonFunctions.php");
+include_once("utilities/Functions.php");
 
 $apiManager = ApiKeyManager::getInstance();
 
@@ -15,22 +15,15 @@ $requestAccepted = false;
  * if not ,do not process the request further
  */
 if (isset($_REQUEST['apiKey'])) {
-    //get the entered key
-    $apiKeyEntered = CommonFunctions::getSanitizedParameter($_REQUEST['apiKey']);
-    //get the api key from the database
-    $apiKeyDatabase = $apiManager->fetchApiKey($_SERVER['REMOTE_ADDR']);
-
-    if ($apiKeyDatabase !== null && $apiKeyEntered === $apiKeyDatabase) {
-        $requestAccepted = $apiManager->isRequestAccepted($apiKeyEntered);
-    }
+    $requestAccepted = $apiManager->isRequestAccepted($_REQUEST['apiKey'],$_SERVER['REMOTE_ADDR']);
 }
 
 
 
 if ($requestAccepted == true) {
-    $apiManager->setLastRequestTime(CommonFunctions::getSanitizedParameter($_REQUEST['apiKey']));
+    $apiManager->setLastRequestTime(Functions::sanitizeParameter($_REQUEST['apiKey']));
     if (isset($_REQUEST["query"])) {
-        $query = CommonFunctions::getSanitizedParameter($_REQUEST["query"]);
+        $query = Functions::sanitizeParameter($_REQUEST["query"]);
         $suggestions = [];
         if ($query !== "") {
             $friendDb = FriendsDatabase::getInstance();
@@ -41,7 +34,7 @@ if ($requestAccepted == true) {
 
 
     if (isset($_REQUEST["postsSearchQuery"])) {
-        $query = CommonFunctions::getSanitizedParameter($_REQUEST["postsSearchQuery"]);
+        $query = Functions::sanitizeParameter($_REQUEST["postsSearchQuery"]);
         $postCategory = null;
         $sortDate = null;
         if (isset($_REQUEST['sortDate'])) {
@@ -57,7 +50,7 @@ if ($requestAccepted == true) {
             $fetchedSuggestions = $dbManager->fetchSearchSuggestions($query, $sortDate, $postCategory);
             if (isset($_REQUEST['encrypted'])) {
                 for ($i = 0; $i < sizeof($fetchedSuggestions); $i++) {
-                    $fetchedSuggestions[$i]->setPostID(CommonFunctions::encodeWithSha512($fetchedSuggestions[$i]->getPostID()));
+                    $fetchedSuggestions[$i]->setPostID(Functions::encodeWithSha512($fetchedSuggestions[$i]->getPostID()));
                 }
             }
 

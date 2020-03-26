@@ -1,12 +1,9 @@
 <?php
 
-//todo
-//users now has an username field ...........
 require_once "Data/Database.php";
 require_once "Data/FriendRequest.php";
 require_once "Data/User.php";
 require_once "Data/Friend.php";
-require_once "Data/UserModelAsync.php";
 require_once "Data/Message.php";
 
 class FriendsDatabase
@@ -125,18 +122,6 @@ WHERE user_id IN
         $result->execute();
     }
 
-    public function getAllFriendRequestsIds()
-    {
-        $query = "SELECT request_id FROM friend_requests";
-        $result = $this->_dbHandler->prepare($query);
-        $result->execute();
-        $ids = [];
-        while ($row = $result->fetch()) {
-            $ids[] = $row["request_id"];
-        }
-        return $ids;
-    }
-
     /**
      * Use this method in order to accept a friend invitation
      * and persist the data in the database
@@ -188,7 +173,7 @@ WHERE user_id IN
         $result->execute();
         $users = [];
         while ($row = $result->fetch()) {
-            $users[] = new UserModelAsync($row);
+            $users[] = new User($row);
         }
         return $users;
     }

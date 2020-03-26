@@ -1,14 +1,13 @@
 <?php
 
-
-class Message
+class Message implements JsonSerializable
 {
-  public $messageId;
-  public $messageContent;
-  public $messageDate;
-  public $senderId;
-  public $receiverId;
-  public $messageImage;
+  private  $messageId;
+  private  $messageContent;
+  private  $messageDate;
+  private  $senderId;
+  private  $receiverId;
+  private  $messageImage;
 
   public function __construct($row)
   {
@@ -20,4 +19,20 @@ class Message
     $this->messageImage = $row["message_image"];
   }
 
+
+    /**
+     * @inheritDoc
+     */
+    public function jsonSerialize()
+    {
+        return
+            [
+                'messageId' => $this->messageId,
+                'messageContent' => $this->messageContent,
+                'messageDate' => $this->messageDate,
+                'senderId' => $this->senderId,
+                'receiverId' => $this->receiverId,
+                'messageImage' => $this->messageImage,
+            ];
+    }
 }

@@ -138,9 +138,9 @@ OR (user1_id = '$user2Id' AND user2_id='$user1Id')";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         $row = $result->fetch();
-        if($row["user_is_typing"] == 1){
+        if ($row["user_is_typing"] == 1) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
@@ -158,16 +158,16 @@ OR (user1_id = '$user2Id' AND user2_id='$user1Id')";
 
     }
 
-    public function fetchLastMessageID($user1Id, $user2Id)
+    public function fetchLastMessage($user1Id, $user2Id)
     {
-        $query = "SELECT  message_id FROM messages WHERE
+        $query = "SELECT  * FROM messages WHERE
         ((receiver_id = '$user1Id' AND sender_id = '$user2Id')
                               OR (receiver_id ='$user2Id' AND sender_id = '$user1Id'))
 ORDER BY message_id DESC LIMIT 1";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         $row = $result->fetch();
-        return $row['message_id'];
+        return new Message($row);
     }
 
 

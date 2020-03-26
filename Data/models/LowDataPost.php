@@ -1,9 +1,14 @@
 <?php
 
+/**
+ * Class LowDataPost
+ * A class that may be used for searching or low
+ * data usages
+ * It serializes less field comparing to the bigger one
+ * Post.php
+ */
 class LowDataPost implements JsonSerializable
 {
-    //todo
-    //get rid of this class
     private $postTitle;
     private $postID;
     private $postImage;
@@ -29,16 +34,6 @@ class LowDataPost implements JsonSerializable
     {
         return $this->postID;
     }
-
-    /**
-     * @param mixed $postID
-     */
-    public function setPostID($postID)
-    {
-        $this->postID = $postID;
-    }
-
-
 
 
     public function jsonSerialize()
