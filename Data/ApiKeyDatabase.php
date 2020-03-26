@@ -67,4 +67,14 @@ class ApiKeyDatabase
         $row = $result->fetch();
         return $row['last_request_time'];
     }
+
+    public function setLastRequestTime($apiKey,$currentTime)
+    {
+        $query = "UPDATE api_keys SET last_request_time = :lastRequestTime WHERE api_key_value = :apiKey";
+        $result = $this->_dbHandler->prepare($query);
+        $result->bindValue(':apiKey', $apiKey);
+        $result->bindValue(':lastRequestTime', $currentTime);
+        $result->execute();
+
+    }
 }

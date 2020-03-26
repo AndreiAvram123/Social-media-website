@@ -10,17 +10,27 @@ $apiManager = ApiKeyManager::getInstance();
 $responseObject = new stdClass();
 $requestAccepted = false;
 
+/**
+ * Check weather the request url contains an api key
+ * if not ,do not process the request further
+ */
 if (isset($_REQUEST['apiKey'])) {
-    $apiKey = $apiManager->fetchApiKey($_SERVER['REMOTE_ADDR']);
-    if ($apiKey !== null) {
-        $requestAccepted = $apiManager->isRequestAccepted($apiKey);
+    //get the entered key
+    $apiKeyEntered = CommonFunctions::getSanitizedParameter($_REQUEST['apiKey']);
+    //get the api key from the database
+    $apiKeyDatabase = $apiManager->fetchApiKey($_SERVER['REMOTE_ADDR']);
+
+    if ($apiKeyDatabase !== null && $apiKeyEntered === $apiKeyDatabase) {
+        $requestAccepted = $apiManager->isRequestAccepted($apiKeyEntered);
     }
 }
 
-if ($requestAccepted !== false) {
 
+
+if ($requestAccepted == true) {
+    $apiManager->setLastRequestTime(CommonFunctions::getSanitizedParameter($_REQUEST['apiKey']));
     if (isset($_REQUEST["query"])) {
-        $query = CommonFunctions::getSanitizedQuery($_REQUEST["query"]);
+        $query = CommonFunctions::getSanitizedParameter($_REQUEST["query"]);
         $suggestions = [];
         if ($query !== "") {
             $friendDb = FriendsDatabase::getInstance();
@@ -31,7 +41,7 @@ if ($requestAccepted !== false) {
 
 
     if (isset($_REQUEST["postsSearchQuery"])) {
-        $query = CommonFunctions::getSanitizedQuery($_REQUEST["postsSearchQuery"]);
+        $query = CommonFunctions::getSanitizedParameter($_REQUEST["postsSearchQuery"]);
         $postCategory = null;
         $sortDate = null;
         if (isset($_REQUEST['sortDate'])) {
@@ -57,7 +67,7 @@ if ($requestAccepted !== false) {
 
 
 } else {
-    $responseObject->errorMessage = "Api key not provided or invalid";
+    $responseObject->errorMessage = "Api key not provided or you tried too many requests in a given time";
     echo json_encode($responseObject);
 }
 ?>

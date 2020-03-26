@@ -1,15 +1,18 @@
 <?php
 require_once("Data/FriendsDatabase.php");
 require_once("Data/DataManager.php");
-require_once("utilities/InputValidator.php");
+require_once("utilities/CommonFunctions.php");
 
 $dbHandler = DataManager::getInstance();
 $responseObject = new stdClass();
 
 
-if (isset($_GET['recentPosts'])) {
-    $data = $dbHandler->getPosts(1);
-    echo json_encode($data);
+if (isset($_GET['page'])) {
+    $page = CommonFunctions::getSanitizedParameter($_GET['page']);
+    if($page !== "" && is_numeric($page)) {
+        $data = $dbHandler->getPosts($page);
+        echo json_encode($data);
+    }
 }
 
 
@@ -120,18 +123,14 @@ if (isset($_REQUEST['savedPosts'])) {
 }
 
 if (isset($_REQUEST['authenticateThirdPartyAccount'])) {
+
     if (isset($_REQUEST['email']) && $_REQUEST['email'] !== "") {
         //if the user exists use 1
         $fetchedUser = $dbHandler->getUserFromEmail($_REQUEST['email']);
         if ($fetchedUser != null) {
-            $responseObject->responseCode = 1;
             $responseObject->userID = $fetchedUser->getUserId();
             $responseObject->username = $fetchedUser->getUsername();
-        } else {
-            $responseObject->responseCode = 0;
         }
-    } else {
-        $responseObject->responseCode = -1;
     }
     echo json_encode($responseObject);
 

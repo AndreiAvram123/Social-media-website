@@ -6,7 +6,7 @@ class ApiKeyManager
 {
     private static $instance;
     private $apiKeyDb;
-    private $timeBetweenRequest = 300;
+    private $timeBetweenRequest = 0.3;
 
     //create singleton
     public static function getInstance()
@@ -32,6 +32,11 @@ class ApiKeyManager
     }
 
 
+    /**
+     * Function used to fetch the api key for a given ip address
+     * @param $ip
+     * @return |null
+     */
     public function fetchApiKey($ip)
     {
         return $this->apiKeyDb->fetchApiKeyForIPAddress($ip);
@@ -39,9 +44,15 @@ class ApiKeyManager
 
     public function isRequestAccepted($apiKey)
     {
-        $response = $this->apiKeyDb->getLastTimeApiKeyUsed($apiKey);
+        $response = (int)$this->apiKeyDb->getLastTimeApiKeyUsed($apiKey);
         $currentTime = time();
         return $response + $this->timeBetweenRequest < $currentTime;
+    }
+
+    public function setLastRequestTime($apiKey)
+    {
+        $this->apiKeyDb->setLastRequestTime($apiKey,time());
+
     }
 
 
