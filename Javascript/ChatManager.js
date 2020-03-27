@@ -7,7 +7,6 @@ let idleCheck;
 let currentUserIsTypingCheck;
 let sessionUserId;
 let lastKeyPressedTime;
-let shouldFetchNewMessages = true;
 let chatWindow;
 let lastMouseMovedTime;
 //in milliseconds
@@ -335,6 +334,7 @@ function uploadImage(receiverId) {
             //prepare message
             let responseObject = JSON.parse(data);
             chatWindow.addNewMessage(responseObject);
+            chatWindow.fetchMessagesRequestSent = false;
         })
 
     })
@@ -349,7 +349,7 @@ function sendMessage(receiverID) {
     let messageField = document.getElementById("messageField");
     let message = messageField.value.trim();
     if (message !== "") {
-        shouldFetchNewMessages = false;
+        chatWindow.fetchMessagesRequestSent = true;
         let formData = new FormData();
         let url = "ChatController.php?requestName=sendMessage&" + "apiKey=" + apiKey;
         formData.append("receiverId", receiverID);
@@ -363,7 +363,7 @@ function sendMessage(receiverID) {
         }).then(function (data) {
             let responseObject = JSON.parse(data);
             chatWindow.addNewMessage(responseObject);
-            shouldFetchNewMessages = true;
+            chatWindow.fetchMessagesRequestSent = false;
         });
 
         messageField.value = "";
@@ -393,8 +393,8 @@ function fetchNewMessages(receiverId) {
     formData.append("receiverId", receiverId);
 
 
-    if (shouldFetchNewMessages === true) {
-        shouldFetchNewMessages = false;
+    if (chatWindow.fetchMessagesRequestSent === false) {
+        chatWindow.fetchMessagesRequestSent = false;
         fetch(url, {
             method: 'POST',
             body: formData,
@@ -403,7 +403,7 @@ function fetchNewMessages(receiverId) {
         }).then(function (data) {
             let messageArray = JSON.parse(data);
             chatWindow.addNewMessagesToContainer(messageArray);
-            shouldFetchNewMessages = true;
+            chatWindow.fetchMessagesRequestSent = false;
         });
     }
 }
