@@ -53,16 +53,24 @@ if ($requestAccepted == true && isset($_REQUEST['requestName'])) {
     }
 
     if ($_REQUEST["requestName"] === "UploadImage") {
-        if (isset($_FILES)) {
-            $imagePath = $chatDatabase->uploadImageToServer($_FILES["files"]["name"][0], $_FILES["files"]["tmp_name"][0], "images/chatImages/");
-            $messageDate = time() * 1000;
-            $chatDatabase->insertImageMessage($imagePath,
-                $messageDate, $_REQUEST["currentUserId"], $_REQUEST["receiverId"]);
+        $base = $_REQUEST['imageData'];
+        // Get file name posted from Android App
+        $filename = md5($_REQUEST['imageName']) . ".jpeg";
+        $fileLocation  = 'images/chatImages/' . $filename;
+        $binary = base64_decode($base);
+            header('Content-Type: image/jpeg; charset=utf-8');
+        $file = fopen($fileLocation, 'wb');
+        fwrite($file, $binary);
+        fclose($file);
 
-            $lastMessage = $chatDatabase->fetchLastMessage($_REQUEST['currentUserId'], $_REQUEST['receiverId']);
+        $messageDate = time() * 1000;
+        $chatDatabase->insertImageMessage($fileLocation,
+            $messageDate, $_REQUEST["currentUserId"], $_REQUEST["receiverId"]);
 
-            echo json_encode($lastMessage);
-        }
+        $lastMessage = $chatDatabase->fetchLastMessage($_REQUEST['currentUserId'], $_REQUEST['receiverId']);
+
+        echo json_encode($lastMessage);
+
 
     }
 
