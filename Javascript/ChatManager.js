@@ -1,12 +1,7 @@
 //check the database every third of  a second
 let timeIntervalCheck = 1500;
 let timeIntervalCheckTyping = 1500;
-let intervalCheck;
-let userIsTypingCheck;
-let idleCheck;
-let currentUserIsTypingCheck;
 let sessionUserId;
-let lastKeyPressedTime;
 let chatWindow;
 let lastMouseMovedTime;
 //in milliseconds
@@ -15,7 +10,6 @@ let timeBeforeIdleMode = 2000;
 class ChatWindow {
     constructor(username, receiverId) {
         //use a dom parser to convert html into a document element
-        this.scrollTopFetchOffset = 200;
         let domParser = new DOMParser();
         //the html element for a chat window
         let chatString = '<div class="message-window" >\n' +
@@ -39,12 +33,11 @@ class ChatWindow {
             '</div>';
         let domElement = domParser.parseFromString(chatString, "text/html");
         this.messageFactory = new MessageFactory();
-        this.initializeDefaultParameters(receiverId);
+        this.initializeDefaultParameters();
         this.initializeViews(domElement);
         this.attachListeners(domElement, receiverId);
         this.receiverID = receiverId;
-        this.asyncFunctionsRunning = false;
-        this.lastMessageID = -1;
+
         document.body.append(this.chatWindow);
     }
 
@@ -59,6 +52,14 @@ class ChatWindow {
         this.currentlyDisplayedMessages = 0;
         this.fetchMessagesRequestSent = false;
         this.noMoreOldMessagesToFetch = false;
+        this.asyncFunctionsRunning = false;
+        this.lastMessageID = -1;
+        this.scrollTopFetchOffset = 200;
+        this.intervalCheck = undefined;
+        this.userIsTypingCheck = undefined;
+        this.idleCheck = undefined;
+        this.currentUserIsTypingCheck = undefined;
+        this.lastKeyPressedTime = new Date().getTime() - 3000;
     }
 
     addNewMessage(messageJson) {
@@ -97,13 +98,24 @@ class ChatWindow {
      */
 
     attachListeners(domElement, receiverId) {
-        domElement.getElementsByTagName("i")[0].addEventListener('click', event => removeChat(this.chatWindow));
+        domElement.getElementsByTagName("i")[0].addEventListener('click', () => removeChat(this.chatWindow));
         let imageSelector = domElement.getElementsByName("files[]")[0];
         let imageSelectIcon = domElement.getElementsByClassName("select-image-icon")[0];
-        imageSelectIcon.addEventListener('click', event => imageSelector.click());
-        imageSelector.addEventListener('change', event => {
+        imageSelectIcon.addEventListener('click', () => imageSelector.click());
+        imageSelector.addEventListener('change', () => {
             uploadImage(receiverId);
         });
+        domElement.getElementById("messageField").addEventListener('keyup', (event) => {
+            if (event.key === "Enter") {
+                sendMessage(receiverId);
+            } else {
+                if (event.key !== "Backspace") {
+                    chatWindow.lastKeyPressedTime = new Date().getTime();
+                }
+            }
+
+        });
+
         this.attachScrollListener();
     }
 
@@ -124,9 +136,9 @@ class ChatWindow {
 
     stopAsyncFunctions() {
         this.asyncFunctionsRunning = false;
-        clearInterval(intervalCheck);
-        clearInterval(userIsTypingCheck);
-        clearInterval(currentUserIsTypingCheck);
+        clearInterval(this.intervalCheck);
+        clearInterval(this.userIsTypingCheck);
+        clearInterval(this.currentUserIsTypingCheck);
     }
 
 
@@ -167,9 +179,9 @@ class ChatWindow {
     initializeMessagesCheckInterval() {
         if (this.asyncFunctionsRunning === false) {
             this.asyncFunctionsRunning = true;
-            intervalCheck = setInterval(fetchNewMessages, timeIntervalCheck, this.receiverID, this.messageContainer);
-            userIsTypingCheck = setInterval(checkUser2IsTyping, timeIntervalCheckTyping);
-            currentUserIsTypingCheck = setInterval(checkCurrentUserTyping, timeIntervalCheckTyping);
+            this.intervalCheck = setInterval(fetchNewMessages, timeIntervalCheck, this.receiverID, this.messageContainer);
+            this.userIsTypingCheck = setInterval(checkUser2IsTyping, timeIntervalCheckTyping);
+            this.currentUserIsTypingCheck = setInterval(checkCurrentUserTyping, timeIntervalCheckTyping);
         }
     }
 }
@@ -240,48 +252,34 @@ function startChat(currentUserId, receiverId, username) {
         markCurrentUserAsTyping(false);
     }
 
-//todo
-    //change this
     window.onbeforeunload = resetDatabase;
+
     if (chatWindow === undefined) {
         sessionUserId = currentUserId;
         chatWindow = new ChatWindow(username, receiverId);
-        lastKeyPressedTime = new Date().getTime() - 3000;
-        (document.getElementById("messageField")).addEventListener('keyup', (event) => {
-            if (event.key === "Enter") {
-                sendMessage(receiverId);
-            } else {
-                if (event.key !== "Backspace") {
-                    lastKeyPressedTime = new Date().getTime();
-                }
-            }
-
-
-        });
         fetchOldMessages(receiverId);
     }
 }
 
 function attachIdleCheck() {
-    if (idleCheck === undefined) {
+    if (chatWindow.idleCheck === undefined) {
         attachMouseListener();
-        idleCheck = setInterval(checkMouseLastMovedTime, 1000);
+        chatWindow.idleCheck = setInterval(checkMouseLastMovedTime, 1000);
 
         function attachMouseListener() {
-            document.body.onmousemove = (e) => {
+            document.body.onmousemove = () => {
                 lastMouseMovedTime = new Date().getTime();
             }
         }
 
         function checkMouseLastMovedTime() {
-            if (lastMouseMovedTime + timeBeforeIdleMode < new Date().getTime()) {
-                if (chatWindow !== undefined) {
+            if (chatWindow !== undefined) {
+                if (lastMouseMovedTime + timeBeforeIdleMode < new Date().getTime()) {
                     chatWindow.stopAsyncFunctions();
+                } else {
+                    chatWindow.initializeMessagesCheckInterval();
                 }
-            } else {
-                chatWindow.initializeMessagesCheckInterval();
             }
-
         }
     }
 
@@ -427,7 +425,7 @@ function markCurrentUserAsTyping(isTyping) {
 
 function checkCurrentUserTyping() {
     let currentTime = new Date().getTime();
-    if (lastKeyPressedTime + 2000 < currentTime) {
+    if (chatWindow.lastKeyPressedTime + 2000 < currentTime) {
         markCurrentUserAsTyping(false);
     } else {
         markCurrentUserAsTyping(true);
@@ -459,7 +457,7 @@ function fetchOldMessages(receiverID) {
 
         //the first time the function fetch old messages is called
         if (chatWindow.chatId === undefined) {
-            if(jsonArray.length>0){
+            if (jsonArray.length > 0) {
                 chatWindow.lastMessageID = jsonArray[0].messageId;
                 chatWindow.scrollToLastFetchedMessage();
             }
