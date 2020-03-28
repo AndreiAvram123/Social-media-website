@@ -33,7 +33,7 @@ if (isset($_POST["addPostButton"])) {
     $result = $validator->arePostDetailsValid($postTitle, $postContent, $postImage);
     if ($result === true) {
         $serverImageLocation = $databaseHandler->uploadImageToServer($postImage, $_FILES["fileToUpload"]["tmp_name"], "images/posts/");
-        $serverImageLocation = "http://sgb967.poseidon.salford.ac.uk/cms/" . $serverImageLocation;
+       // $serverImageLocation = "http://sgb967.poseidon.salford.ac.uk/cms/" . $serverImageLocation;
 
         $databaseHandler->uploadPost($_SESSION['user_id'],
             $postTitle, $postContent, $postCategoryName, $postDate, $serverImageLocation);

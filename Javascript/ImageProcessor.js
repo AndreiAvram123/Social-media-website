@@ -27,11 +27,11 @@ function resizeImage(file) {
                     const context = canvas.getContext("2d");
 
                     context.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-                    resolve(canvas.toDataURL("image/jpeg").split(",")[1]);
-
+                    resolve(canvas.toDataURL("image/jpeg").split(",")[1])
                 }
             }
         }
     )
 }
+
+

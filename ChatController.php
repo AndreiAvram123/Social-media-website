@@ -54,7 +54,6 @@ if ($requestAccepted == true && isset($_REQUEST['requestName'])) {
 
     if ($_REQUEST["requestName"] === "UploadImage") {
         $base = $_REQUEST['imageData'];
-        // Get file name posted from Android App
         $filename = md5($_REQUEST['imageName']) . ".jpeg";
         $fileLocation = 'images/chatImages/' . $filename;
 
@@ -65,7 +64,9 @@ if ($requestAccepted == true && isset($_REQUEST['requestName'])) {
         fclose($file);
 
         $messageDate = time() * 1000;
-        $fileLocation = "http://sgb967.poseidon.salford.ac.uk/cms/" . $fileLocation;
+
+        $fileLocation ="http://sgb967.poseidon.salford.ac.uk/cms/" . $fileLocation;
+
         $chatDatabase->insertImageMessage($fileLocation,
             $messageDate, $_REQUEST["currentUserId"], $_REQUEST["receiverId"]);
 
