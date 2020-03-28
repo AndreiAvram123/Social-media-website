@@ -16,7 +16,6 @@ if(isset($_GET['profileButton'])){
     //loop through the available users ids
     foreach ($dbManger ->getAllUsersId() as $userId){
         if($encryptedUserID === md5($userId)){
-
             $view->currentUser = $dbManger->getUserById($userId);
             $view->userPosts = $dbManger ->getUserPosts($userId);
         }

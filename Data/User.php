@@ -21,7 +21,6 @@ class User implements JsonSerializable
         $this->username = $db_row['username'];
         $this->email = $db_row['email'];
         $this->joinDate = $db_row['creation_date'];
-        $this->profilePicture = $db_row['profile_picture'];
         $this->isEmailVerified = $db_row['email_verified'];
 
     }
@@ -33,7 +32,6 @@ class User implements JsonSerializable
             [
                 'userId' => $this->userId,
                 'username' => $this->username,
-                'profilePicture' => $this->profilePicture,
             ];
     }
 

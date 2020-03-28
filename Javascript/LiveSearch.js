@@ -28,7 +28,7 @@ class FriendSuggestionItem {
     constructor(elementData) {
         let domParser = new DOMParser();
         let htmlString = '<div class="suggestion-friend-item clearfix">\n' +
-            '                        <img class="float-left" src="' + elementData.profilePicture + '"/>\n' +
+            '                        <img class="float-left" src="' + 'https://robohash.org/' + elementData.username.replace(/,/g, '-') + ' ?size=100x100&set=set4' + '"/>\n' +
             '  <form method="get" action="ProfilePage.php">\n' +
             '\n' +
             '            <button type="submit" class="link-button" name="profileButton">\n' +
@@ -51,11 +51,11 @@ class PostSuggestionItem {
 
 
         this.suggestionView = document.createElement("div");
-        if(showImages){
-          let image = document.createElement("img");
-          image.className = "postSuggestionImage";
-          image.src = suggestionJson.postImage;
-          this.suggestionView.append(image);
+        if (showImages) {
+            let image = document.createElement("img");
+            image.className = "postSuggestionImage";
+            image.src = suggestionJson.postImage;
+            this.suggestionView.append(image);
         }
 
         this.suggestionView.innerHTML += postTitle;
@@ -67,44 +67,6 @@ class PostSuggestionItem {
     }
 }
 
-
-function fetchFriendsSuggestions(event, query) {
-    let friendsSuggestionsContainer = document.getElementById("friends-suggestions-container");
-    let friendsList = document.getElementById("friend-container");
-
-    function closeFriendsSuggestionsContainer() {
-        friendsList.style.display = "block";
-        friendsSuggestionsContainer.style.display = "none";
-    }
-
-    function openFriendsSuggestionsContainer() {
-        friendsList.style.display = "none";
-        friendsSuggestionsContainer.style.display = "block";
-        friendsSuggestionsContainer.innerHTML = "";
-    }
-
-    function processResponse(jsonArray) {
-        openFriendsSuggestionsContainer();
-        jsonArray.forEach(element => {
-            friendsSuggestionsContainer.appendChild(suggestionFactory.createSuggestion("friend_suggestion", element));
-        })
-    }
-
-    if ((event.keyCode >= '65' && event.keyCode <= '90') || event.keyCode === 8) {
-        if (query.length > 1) {
-            abortCurrentRequest();
-            let url = "LiveSearchController.php?query=" + query + "&apiKey=" + apiKey;
-            fetch(url, {signal: signal}).then(function (response) {
-                return response.text();
-            }).then(data => {
-                processResponse(JSON.parse(data));
-            });
-
-        } else {
-            closeFriendsSuggestionsContainer();
-        }
-    }
-}
 
 function abortCurrentRequest() {
     abortController.abort();
@@ -120,7 +82,7 @@ function fetchPostSuggestions(query) {
         let category = document.getElementById("postCategorySelector").value;
 
 
-        let url = "LiveSearchController.php?postsSearchQuery=" + query + "&encrypted=true" +  "&apiKey=" + apiKey;
+        let url = "LiveSearchController.php?postsSearchQuery=" + query + "&encrypted=true" + "&apiKey=" + apiKey;
         if (sortDate !== "None") {
             url += "&sortDate=" + sortDate;
         }
@@ -154,6 +116,49 @@ function fetchPostSuggestions(query) {
 
 }
 
+function fetchFriendsSuggestions(event, query) {
+    let friendsSuggestionsContainer = document.getElementById("friends-suggestions-container");
+    let friendsList = document.getElementById("friend-container");
+
+    function closeFriendsSuggestionsContainer() {
+        friendsList.style.display = "block";
+        friendsSuggestionsContainer.style.display = "none";
+    }
+
+    function openFriendsSuggestionsContainer() {
+        friendsList.style.display = "none";
+        friendsSuggestionsContainer.style.display = "block";
+        friendsSuggestionsContainer.innerHTML = "";
+    }
+
+    function processResponse(jsonArray) {
+        openFriendsSuggestionsContainer();
+        jsonArray.forEach(element => {
+            friendsSuggestionsContainer.appendChild(suggestionFactory.createSuggestion("friend_suggestion", element));
+        })
+    }
+
+    if ((event.keyCode >= '65' && event.keyCode <= '90') || event.keyCode === 8) {
+        if (query.length > 1) {
+            abortCurrentRequest();
+            let url = "LiveSearchController.php?query=" + query + "&apiKey=" + apiKey;
+            fetch(url, {method: 'get' ,signal: signal}).then(function (response) {
+                return response.text();
+            }).then(data => {
+                processResponse(JSON.parse(data));
+            }).catch(err => {
+                if (err.name === "AbortError") {
+                    console.log("new search performed..");
+                }
+            });
+
+        } else {
+            closeFriendsSuggestionsContainer();
+        }
+    }
+}
+
+
 function performSearchByPostID(id) {
     window.location.href = "CurrentPost.php?valuePostID=" + id;
 }
@@ -176,3 +181,4 @@ function insertFetchedSuggestions(suggestionsJSONArray) {
         postsSuggestionContainer.innerHTML = "";
     }
 }
+

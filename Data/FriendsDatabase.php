@@ -168,7 +168,7 @@ WHERE user_id IN
      */
     public function getAllFriendsSuggestionsForQuery($searchQuery)
     {
-        $query = "SELECT user_id,username,profile_picture FROM users WHERE username LIKE :query LIMIT 8";
+        $query = "SELECT user_id,username FROM users WHERE username LIKE :query LIMIT 8";
         $result = $this->_dbHandler->prepare($query);
         $result->bindValue(':query', $searchQuery . "%");
         $result->execute();
