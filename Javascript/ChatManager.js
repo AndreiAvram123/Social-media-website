@@ -5,7 +5,8 @@ let sessionUserId;
 let chatWindow;
 let lastMouseMovedTime;
 //in milliseconds
-let timeBeforeIdleMode = 2000;
+let timeBeforeIdleMode = 20000;
+
 
 class ChatWindow {
     constructor(username, receiverId) {
@@ -14,7 +15,7 @@ class ChatWindow {
         //the html element for a chat window
         let chatString = '<div class="message-window" >\n' +
             '<i class="fas fa-times float-right"></i>' +
-            '    <div class="message-header" onclick="toggleElement(document.getElementById(' + '\'' + 'message-window-body' + '\')' + ')">' +
+            '    <div class="message-header" onclick="toggleChatWindow(document.getElementById(' + '\'' + 'message-window-body' + '\')' + ')">' +
             '        <p class="text-center" style="color: white">' + username + '</p>\n' +
             '    </div>\n' +
             '    <div id="message-window-body">\n' +
@@ -37,7 +38,6 @@ class ChatWindow {
         this.initializeViews(domElement);
         this.attachListeners(domElement, receiverId);
         this.receiverID = receiverId;
-
         document.body.append(this.chatWindow);
     }
 
@@ -105,7 +105,8 @@ class ChatWindow {
         imageSelector.addEventListener('change', () => {
             uploadImage(receiverId);
         });
-        domElement.getElementById("messageField").addEventListener('keyup', (event) => {
+        this.messageField = domElement.getElementById("messageField");
+        this.messageField.addEventListener('keyup', (event) => {
             if (event.key === "Enter") {
                 sendMessage(receiverId);
             } else {
@@ -115,6 +116,9 @@ class ChatWindow {
             }
 
         });
+        this.messageField.onfocus = () => {
+            this.hideNotification();
+        };
 
         this.attachScrollListener();
     }
@@ -123,6 +127,7 @@ class ChatWindow {
         this.chatWindow = domElement.documentElement;
         this.userIsTypingHint = domElement.getElementById("user-is-typing-hint");
         this.messageContainer = domElement.getElementsByClassName("message-container")[0];
+        this.chatHeader = domElement.getElementsByClassName("message-header")[0];
     }
 
     displayUserTypingHint(isTyping) {
@@ -167,12 +172,24 @@ class ChatWindow {
                 this.messageContainer.appendChild(messageView);
             });
 
-            this.lastMessageID = messagesJson[messagesJson.length - 1].messageID;
+            this.lastMessageID = messagesJson[messagesJson.length - 1].messageId;
             chatWindow.scrollToLastFetchedMessage();
+            playNotificationSound();
+            this.showNotification();
         }
     }
 
+    showNotification() {
+        if(document.activeElement !== chatWindow.messageField)
+            this.chatHeader.style.background = "#000000";
+    }
+
+    hideNotification() {
+        this.chatHeader.style.background = "#007BFF";
+    }
+
     scrollToLastFetchedMessage() {
+
         this.messageContainer.scrollTop = this.messageContainer.scrollHeight;
     }
 
@@ -194,7 +211,7 @@ class MessageFactory {
 
     createMessageElement(messageJson) {
         if (messageJson.messageImage !== null) {
-            let imageMessage = new ImageMessage(messageJson);
+            let imageMessage = new ImageMessageView(messageJson);
             return imageMessage.messageView;
         } else {
             let textMessage = new TextMessage(messageJson);
@@ -204,7 +221,7 @@ class MessageFactory {
 }
 
 
-class ImageMessage {
+class ImageMessageView {
     constructor(messageJson) {
         let messageHtml = '<div><img src="' + messageJson.messageImage + '"class="message-image"></div>';
         let domParser = new DOMParser();
@@ -306,8 +323,19 @@ function getChatId(user2Id) {
 function toggleElement(element) {
     if (element.style.display !== "none") {
         element.style.display = "none";
+
     } else {
         element.style.display = "block";
+    }
+}
+
+
+function toggleChatWindow(chatBody) {
+    if (chatBody.style.display !== "none") {
+        chatBody.style.display = "none";
+    } else {
+        chatBody.style.display = "block";
+        chatWindow.hideNotification();
     }
 }
 
@@ -468,9 +496,11 @@ function fetchOldMessages(receiverID) {
 }
 
 
-
-
-
+function playNotificationSound() {
+    if (!document.hasFocus()) {
+        document.getElementById("notificationAudio").play()
+    }
+}
 
 
 

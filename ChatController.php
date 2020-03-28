@@ -56,22 +56,21 @@ if ($requestAccepted == true && isset($_REQUEST['requestName'])) {
         $base = $_REQUEST['imageData'];
         // Get file name posted from Android App
         $filename = md5($_REQUEST['imageName']) . ".jpeg";
-        $fileLocation  = 'images/chatImages/' . $filename;
+        $fileLocation = 'images/chatImages/' . $filename;
         $binary = base64_decode($base);
-            header('Content-Type: image/jpeg; charset=utf-8');
+        header('Content-Type: image/jpeg; charset=utf-8');
         $file = fopen($fileLocation, 'wb');
         fwrite($file, $binary);
         fclose($file);
 
         $messageDate = time() * 1000;
+        $fileLocation = "http://sgb967.poseidon.salford.ac.uk/cms/" . $fileLocation;
         $chatDatabase->insertImageMessage($fileLocation,
             $messageDate, $_REQUEST["currentUserId"], $_REQUEST["receiverId"]);
 
         $lastMessage = $chatDatabase->fetchLastMessage($_REQUEST['currentUserId'], $_REQUEST['receiverId']);
 
         echo json_encode($lastMessage);
-
-
     }
 
     if ($_REQUEST["requestName"] === "fetchChatId") {
