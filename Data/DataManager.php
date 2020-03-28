@@ -183,6 +183,7 @@ VALUES (NULL,?,?,?,?,?)";
      */
     public function uploadImageToServer($target_file, $tempName, $target_dir)
     {
+
         $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
         //once you encrypt the image, the algorithm will also encrypt
         //the file extension. That's why I need to add it as well
@@ -190,7 +191,6 @@ VALUES (NULL,?,?,?,?,?)";
         move_uploaded_file($tempName, $targetLocation);
         return $targetLocation;
     }
-
 
     /**
      * This method is used to return all the IDs of
@@ -678,9 +678,14 @@ WHERE comment_post_id = '$postID'";
 
         $result->execute();
         $suggestions = [];
+
         while ($row = $result->fetch()) {
             $currentPost = new LowDataPost($row);
-            $suggestions[] =$currentPost;
+            $imageLocation = $currentPost->getPostImage();
+            $position = strpos($imageLocation, ".",50);
+            $resizedImageLocation = substr_replace($imageLocation, "_resized", $position, 0);
+            $currentPost->setPostImage($resizedImageLocation);
+            $suggestions[] = $currentPost;
 
         }
         return $suggestions;
@@ -710,5 +715,14 @@ ORDER BY comment_id DESC LIMIT 1";
         return new Post($row);
     }
 
+    public function uploadResizedImageToServer($originalImageLocation, $tmp_name)
+    {
+        // Create a new Imagick object
+        $imagick = new Imagick(
+            $tmp_name);
 
+// Resize the image
+        $imagick->resizeImage(70, 40, Imagick::FILTER_LANCZOS, 1);
+        $imagick->writeImage("test.jpeg");
+    }
 }

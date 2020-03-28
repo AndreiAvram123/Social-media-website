@@ -15,6 +15,7 @@ class LowDataPost implements JsonSerializable
 
     public function __construct($db_row)
     {
+
         $this->postID = $db_row['post_id'];
         $this->postTitle = $db_row['post_title'];
         $this->postImage = $db_row['post_image'];
@@ -43,7 +44,13 @@ class LowDataPost implements JsonSerializable
         $this->postID = $postID;
     }
 
-
+    /**
+     * @param mixed $postImage
+     */
+    public function setPostImage($postImage)
+    {
+        $this->postImage = $postImage;
+    }
 
 
     public function jsonSerialize()

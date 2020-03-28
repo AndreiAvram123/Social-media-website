@@ -57,6 +57,7 @@ if ($requestAccepted == true && isset($_REQUEST['requestName'])) {
         // Get file name posted from Android App
         $filename = md5($_REQUEST['imageName']) . ".jpeg";
         $fileLocation = 'images/chatImages/' . $filename;
+
         $binary = base64_decode($base);
         header('Content-Type: image/jpeg; charset=utf-8');
         $file = fopen($fileLocation, 'wb');

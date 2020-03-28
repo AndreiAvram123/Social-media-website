@@ -47,11 +47,19 @@ class PostSuggestionItem {
     constructor(suggestionJson) {
         let postTitle = suggestionJson.postTitle;
         let postID = suggestionJson.postID;
-        /*check if the item starts with the same letters as the text field value:*/
-        /*create a DIV element for each matching element:*/
-        this.suggestionView = document.createElement("DIV");
-        //make the matching letters bold
+        let showImages = document.getElementById("showImagesCheckbox").checked;
+
+
+        this.suggestionView = document.createElement("div");
+        if(showImages){
+          let image = document.createElement("img");
+          image.className = "postSuggestionImage";
+          image.src = suggestionJson.postImage;
+          this.suggestionView.append(image);
+        }
+
         this.suggestionView.innerHTML += postTitle;
+
         /*execute a function when someone clicks on the item value (DIV element):*/
         this.suggestionView.addEventListener("click", function (e) {
             performSearchByPostID(postID);
@@ -110,20 +118,22 @@ function fetchPostSuggestions(query) {
         //get the filters from the filter modal and display suggestions accordingly
         let sortDate = document.getElementById("postOrder").value;
         let category = document.getElementById("postCategorySelector").value;
-        let url = "LiveSearchController.php?postsSearchQuery=" + query + "&encrypted=true" + "&apiKey=" + apiKey;
+
+
+        let url = "LiveSearchController.php?postsSearchQuery=" + query + "&encrypted=true" +  "&apiKey=" + apiKey;
         if (sortDate !== "None") {
             url += "&sortDate=" + sortDate;
         }
         if (category !== "All") {
             url += "&category=" + category;
         }
+
         return url;
     }
 
     if (query.length > 1) {
         //cancel the last call
         abortCurrentRequest();
-        console.log("fetching new suggestions");
         let url = getPostSuggestionsUrl(query);
         fetch(url, {
             method: 'get',
@@ -131,7 +141,6 @@ function fetchPostSuggestions(query) {
         }).then(function (response) {
             return response.text();
         }).then(data => {
-            console.log(data);
             let jsonArray = JSON.parse(data);
             insertFetchedSuggestions(jsonArray);
         }).catch(err => {
@@ -157,6 +166,7 @@ function insertFetchedSuggestions(suggestionsJSONArray) {
     searchField.parentNode.appendChild(postsSuggestionContainer);
     //insert all available suggestions
     suggestionsJSONArray.forEach(suggestion => {
+
         postsSuggestionContainer.appendChild(suggestionFactory.createSuggestion("post_suggestion", suggestion));
     });
 

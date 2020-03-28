@@ -21,6 +21,7 @@ if (isset($_REQUEST['apiKey'])) {
 
 
 if ($requestAccepted == true) {
+
     if (isset($_REQUEST["query"])) {
         $query = Functions::sanitizeParameter($_REQUEST["query"]);
         $suggestions = [];

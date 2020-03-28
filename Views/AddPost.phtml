@@ -21,7 +21,7 @@ if (isset($view->warningMessage)) {
                     <label for="postTitle">Title</label>
                     <div class="input-group ">
                         <input type="text" name="postTitle" id="postTitle" class="form-control"
-                               aria-describedby="inputGroup-sizing-default">
+                               aria-describedby="inputGroup-sizing-default"
                     </div>
                 </div>
 
@@ -44,12 +44,14 @@ if (isset($view->warningMessage)) {
                     <label>Post picture</label>
                     <div class="custom-file mt-2">
                         <input type="file" name="fileToUpload" id="fileToUpload">
+                        <input type="hidden" name="resizedImage"/>
                     </div>
                 </div>
                 <?php
                 include "Views/commonLayouts/GoogleCaptcha.html";
                 ?>
-                <button type="submit" name="addPostButton" class="btn btn-primary mt-3 submitButton" disabled>Add post</button>
+                <button type="submit" name="addPostButton" class="btn btn-primary mt-3 submitButton" disabled>Add post
+                </button>
             </form>
         </div>
 
@@ -59,6 +61,7 @@ if (isset($view->warningMessage)) {
 
 </div>
 <script>
+
     var robotTestPassed = false;
 
     function enableButton() {

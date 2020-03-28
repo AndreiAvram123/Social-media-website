@@ -17,12 +17,14 @@ if (isset($_POST['registerButton'])) {
     $image = $_FILES["profilePicture"]["name"];
     $result = SessionManager::getInstance()->createUser($username, $email, $password, $image, $creationDate);
     UserAccountManager::getInstance()->sendEmailVerification($email);
+
+
     if ($result === true) {
         $view->warningMessage = "You successfully created your account ! Go to login page now.";
     } else {
         $view->errorMessage = $result;
-
     }
+
 }
 include "Views/Register.phtml";
 ?>
