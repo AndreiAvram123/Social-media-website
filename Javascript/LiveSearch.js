@@ -1,5 +1,7 @@
 let postsSuggestionContainer;
 initializePostSuggestionsContainer();
+let abortController = new AbortController();
+let signal = abortController.signal;
 
 class SuggestionFactory {
     createSuggestion(type, jsonData) {
@@ -82,8 +84,9 @@ function fetchFriendsSuggestions(event, query) {
 
     if ((event.keyCode >= '65' && event.keyCode <= '90') || event.keyCode === 8) {
         if (query.length > 1) {
+            abortCurrentRequest();
             let url = "LiveSearchController.php?query=" + query + "&apiKey=" + apiKey;
-            fetch(url).then(function (response) {
+            fetch(url, {signal: signal}).then(function (response) {
                 return response.text();
             }).then(data => {
                 processResponse(JSON.parse(data));
@@ -93,6 +96,12 @@ function fetchFriendsSuggestions(event, query) {
             closeFriendsSuggestionsContainer();
         }
     }
+}
+
+function abortCurrentRequest() {
+    abortController.abort();
+    abortController = new AbortController();
+    signal = abortController.signal;
 }
 
 function fetchPostSuggestions(query) {
@@ -112,16 +121,28 @@ function fetchPostSuggestions(query) {
     }
 
     if (query.length > 1) {
+        //cancel the last call
+        abortCurrentRequest();
+        console.log("fetching new suggestions");
         let url = getPostSuggestionsUrl(query);
-        fetch(url).then(function (response) {
+        fetch(url, {
+            method: 'get',
+            signal: signal,
+        }).then(function (response) {
             return response.text();
         }).then(data => {
-            let jsonObject = JSON.parse(data);
-            insertFetchedSuggestions(jsonObject);
+            console.log(data);
+            let jsonArray = JSON.parse(data);
+            insertFetchedSuggestions(jsonArray);
+        }).catch(err => {
+            if (err.name === "AbortError") {
+                console.log("new search performed..");
+            }
         });
     } else {
         postsSuggestionContainer.innerHTML = "";
     }
+
 }
 
 function performSearchByPostID(id) {
@@ -137,7 +158,6 @@ function insertFetchedSuggestions(suggestionsJSONArray) {
     //insert all available suggestions
     suggestionsJSONArray.forEach(suggestion => {
         postsSuggestionContainer.appendChild(suggestionFactory.createSuggestion("post_suggestion", suggestion));
-
     });
 
 

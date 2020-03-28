@@ -71,7 +71,13 @@
 
 <div class="container mt-3 mb-3">
     <?php
-      include_once "Modals/ConfimationModal.phtml";
+    include_once "Modals/ConfimationModal.phtml";
+    if (isset($view->apiKey)) {
+        ?>
+        <script>var apiKey = '<?php echo $view->apiKey ?>'</script>
+        <?php
+
+    }
     ?>
 
     <!--Include JQuery in order for bootstrap to properly work

@@ -332,7 +332,7 @@ WHERE comment_post_id = '$postID'";
         }
         //define what to search for
         $query = $query . "(post_title LIKE :searchQueryTitle 
-         OR post_content LIKE :searchQueryContent OR 
+         OR 
          post_author_id IN (SELECT user_id FROM users WHERE username LIKE :searchQueryAuthor))";
 
         //sort
@@ -352,9 +352,7 @@ WHERE comment_post_id = '$postID'";
 
 
         $result = $this->_dbHandler->prepare($query);
-        //use parameterized query to avoid sql injection
         $result->bindValue(':searchQueryTitle', '%' . $searchQuery . '%');
-        $result->bindValue(':searchQueryContent', '%' . $searchQuery . '%');
         $result->bindValue(':searchQueryAuthor', '%' . $searchQuery . '%');
         $result->execute();
         $posts = [];

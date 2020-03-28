@@ -8,7 +8,6 @@ class ApiKeyManager
 {
     private static $instance;
     private $apiKeyDb;
-    private $timeBetweenRequest = 0.3;
 
     //create singleton
     public static function getInstance()
@@ -59,11 +58,6 @@ class ApiKeyManager
 
     }
 
-    public function setLastRequestTime($apiKey)
-    {
-        $this->apiKeyDb->setLastRequestTime($apiKey, time());
-
-    }
 
     /**
      * @param $apiKey
@@ -71,9 +65,23 @@ class ApiKeyManager
      */
     public function isTimeBetweenRequestsValid($apiKey): bool
     {
-        $lastTimeRequest = (int)$this->apiKeyDb->getLastTimeApiKeyUsed($apiKey);
+        $row = $this->apiKeyDb->getLastRequestTimeAndNumber($apiKey);
+        $lastSecondAPiKeyUsed = $row['last_request_time'];
+        $numberOfRequests = $row['api_key_used_current_second'];
+         //check weather the client has pushed another request in the same second
         $currentTime = time();
-        return $lastTimeRequest + $this->timeBetweenRequest < $currentTime;
+        if($lastSecondAPiKeyUsed === $currentTime) {
+            if ($numberOfRequests >= 6) {
+                return false;
+            } else {
+                $this->apiKeyDb->incrementApiKeyUsedInLastSecond($apiKey);
+                return true;
+            }
+        }else{
+            $this->apiKeyDb->setLastSecondApiKeyUsed($apiKey,$currentTime);
+            return true;
+        }
+
     }
 
 

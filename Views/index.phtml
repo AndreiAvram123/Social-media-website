@@ -1,13 +1,6 @@
 <?php
 include "Views/pageElements/Header.phtml";
 include "Views/commonLayouts/SearchForm.phtml";
-if (isset($view->apiKey)) {
-
-    ?>
-    <script>var apiKey = '<?php echo $view->apiKey ?>'</script>
-    <?php
-
-}
 ?>
 
 
@@ -33,12 +26,13 @@ if (isset($view->apiKey)) {
             </div>
             <div id="friends-list-body">
                 <div class="mt-3 mb-3">
-                    <input class="form-control mr-sm-2" autocomplete="off" type="search"
+                    <input class="form-control mr-sm-2" autocomplete="off"
                            placeholder="Search for new people"
                            name="search-text"
                            aria-label="Search"
                            id="friends-search-field"
                            onkeyup="fetchFriendsSuggestions(event, this.value)"
+                           onclose="console.log('lala bend')"
                     >
                 </div>
                 <?php
@@ -104,8 +98,8 @@ if ($view->isUserLoggedIn) {
     <source src="sounds/test_notification.mp3" type="audio/mpeg">
 </audio>
 </div>
-<script src="Javascript/LiveSearch.js"></script>
-<script src="Javascript/ImageProcessor.js"></script>
+<script src='Javascript/ChatManager.js'></script>
+
 </body>
 </html>
 

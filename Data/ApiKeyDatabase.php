@@ -24,7 +24,7 @@ class ApiKeyDatabase
         $this->_dbHandler = $this->_dbInstance->getDatabaseConnection();
     }
 
-    public function fetchApiKeyForIPAddress($ip):string
+    public function fetchApiKeyForIPAddress($ip): string
     {
         $query = "SELECT api_key_value FROM api_keys WHERE ip_address_client = '$ip'";
         $result = $this->executeQuery($query);
@@ -58,23 +58,31 @@ class ApiKeyDatabase
         return $result;
     }
 
-    public function getLastTimeApiKeyUsed($apiKey)
+    public function getLastRequestTimeAndNumber($apiKey)
     {
-        $query = "SELECT  last_request_time FROM api_keys WHERE api_key_value = :apiKey";
+        $query = "SELECT  last_request_time, api_key_used_current_second FROM api_keys WHERE api_key_value = :apiKey";
         $result = $this->_dbHandler->prepare($query);
         $result->bindValue(':apiKey', $apiKey);
         $result->execute();
-        $row = $result->fetch();
-        return $row['last_request_time'];
+        return $result->fetch();
     }
 
-    public function setLastRequestTime($apiKey,$currentTime)
+    public function setLastSecondApiKeyUsed($apiKey, $currentTime)
     {
-        $query = "UPDATE api_keys SET last_request_time = :lastRequestTime WHERE api_key_value = :apiKey";
+        $query = "UPDATE api_keys SET last_request_time = :lastRequestTime, api_key_used_current_second = 0 WHERE api_key_value = :apiKey";
         $result = $this->_dbHandler->prepare($query);
         $result->bindValue(':apiKey', $apiKey);
         $result->bindValue(':lastRequestTime', $currentTime);
         $result->execute();
+
+    }
+
+    public function incrementApiKeyUsedInLastSecond($apiKey)
+    {
+        $query = "UPDATE api_keys SET last_request_time = :time, api_key_used_current_second = api_key_used_current_second +1
+WHERE api_key_value = :apiKey";
+        $result = $this->_dbHandler->prepare($query);
+        $result->bindValue(':apiKey', $apiKey);
 
     }
 }

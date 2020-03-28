@@ -16,11 +16,11 @@ $requestAccepted = false;
  */
 if (isset($_REQUEST['apiKey'])) {
     $requestAccepted = $apiManager->isRequestAccepted($_REQUEST['apiKey'], $_SERVER['REMOTE_ADDR']);
+
 }
 
 
 if ($requestAccepted == true) {
-    $apiManager->setLastRequestTime(Functions::sanitizeParameter($_REQUEST['apiKey']));
     if (isset($_REQUEST["query"])) {
         $query = Functions::sanitizeParameter($_REQUEST["query"]);
         $suggestions = [];

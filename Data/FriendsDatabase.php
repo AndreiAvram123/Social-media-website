@@ -163,13 +163,14 @@ WHERE user_id IN
      * for a given query
      * The query returns only the id, username and profile picture in order to optimize
      * the speed
-     * @param $query
+     * @param $searchQuery
      * @return array
      */
-    public function getAllFriendsSuggestionsForQuery($query)
+    public function getAllFriendsSuggestionsForQuery($searchQuery)
     {
-        $query = "SELECT user_id,username,profile_picture FROM users WHERE username LIKE '$query%'";
+        $query = "SELECT user_id,username,profile_picture FROM users WHERE username LIKE :query LIMIT 8";
         $result = $this->_dbHandler->prepare($query);
+        $result->bindValue(':query', $searchQuery . "%");
         $result->execute();
         $users = [];
         while ($row = $result->fetch()) {
