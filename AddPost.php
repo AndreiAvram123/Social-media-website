@@ -1,48 +1,52 @@
 <?php
-/**
- * This is the controller for the AddPost action
- */
-session_start();
+
 require_once "Data/DataManager.php";
 require_once "Data/Validator.php";
 require_once "utilities/Functions.php";
+require_once("Api/ApiKeyManager.php");
 
-//create a view and add data to it
-$view = new stdClass();
-$view->pageTitle = "AddPost";
 $dbManager = DataManager::getInstance();
 $validator = new Validator();
-$view->categories = $dbManager->getAllCategories();
 
-//handle added post action
-if (isset($_POST["addPostButton"])) {
-    $databaseHandler = DataManager::getInstance();
-    //get all the necessary data from the view
-    $postTitle = htmlentities($_POST["postTitle"]);
-    $postCategoryName = htmlentities($_POST["postCategory"]);
-    $postContent = htmlentities($_POST["postContent"]);
-    $postDate = date('Y-m-d H:i:s');
-    $postImage = $_FILES["fileToUpload"]["name"];
+$responseObject = new stdClass();
+$requestAccepted = false;
 
-
-
-
-    //check if the captcha code is valid or not
-    //returns true if valid
-    //else returns error message
-    $result = $validator->arePostDetailsValid($postTitle, $postContent, $postImage);
-    if ($result === true) {
-        $serverImageLocation = $databaseHandler->uploadImageToServer($postImage, $_FILES["fileToUpload"]["tmp_name"], "images/posts/");
-       // $serverImageLocation = "http://sgb967.poseidon.salford.ac.uk/cms/" . $serverImageLocation;
-
-        $databaseHandler->uploadPost($_SESSION['user_id'],
-            $postTitle, $postContent, $postCategoryName, $postDate, $serverImageLocation);
-        $view->warningMessage = "You successfully added your post :). Go to main page to check it.";
-    } else {
-        $view->warningMessage = $result;
-    }
-
+if (isset($_REQUEST['apiKey'])) {
+    $apiManager = ApiKeyManager::getInstance();
+    $requestAccepted = $apiManager->isRequestAccepted($_REQUEST['apiKey'], $_SERVER['REMOTE_ADDR']);
 }
 
-include "Views/AddPost.phtml";
+
+if ($requestAccepted == true) {
+        $base = $_REQUEST['imageData'];
+        $filename = md5($_REQUEST['imageName']) . ".jpeg";
+        $fileLocation = 'images/posts/' . $filename;
+        $binary = base64_decode($base);
+        header('Content-Type: image/jpeg; charset=utf-8');
+        $file = fopen($fileLocation, 'wb');
+        fwrite($file, $binary);
+        fclose($file);
+
+        $postTitle = $_REQUEST["postTitle"];
+        $postCategoryName = Functions::sanitizeParameter($_REQUEST["postCategory"]);
+        $postContent = Functions::sanitizeParameter($_REQUEST["postContent"]);
+        $postDate = date('Y-m-d H:i:s');
+
+        $result = $validator->arePostDetailsValid($postTitle, $postContent);
+        if ($result === true) {
+
+            $serverImageLocation = "http://sgb967.poseidon.salford.ac.uk/cms/" . $fileLocation;
+            $dbManager->uploadPost($_REQUEST['userID'],
+                $postTitle, $postContent, $postCategoryName, $postDate, $fileLocation);
+            $postUploaded = $dbManager->fetchLastUserPost($_REQUEST['userID']);
+            echo json_encode($postUploaded);
+        } else {
+            $responseObject->warningMessage = $result;
+            echo json_encode($responseObject);
+        }
+
+} else {
+    $responseObject->errorMessage = "Api key not provided or you tried too many requests in a given time";
+    echo json_encode($responseObject);
+}
 ?>

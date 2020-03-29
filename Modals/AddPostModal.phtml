@@ -1,0 +1,64 @@
+<div class="modal fade" id="addPostModal" tabindex="-1" role="dialog" aria-labelledby="addPostModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addPostModalLabel">What do you want to include in your post?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="mt-3">
+                    <label for="postTitle">Title</label>
+                    <div class="input-group ">
+                        <input type="text"  id="postTitle" class="form-control"
+                               aria-describedby="inputGroup-sizing-default"
+                    </div>
+                </div>
+
+                <div class="form-group mt-3">
+                    <label for="postCategorySelector">Select Category</label>
+                    <select class="form-control"  id="postCategorySelector">
+                        <?php
+                        foreach ($view->categories as $category) {
+                            echo '<option>' . $category . '</option>';
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="postContent">Enter some text</label>
+                    <textarea id="postContent" class="form-control text-area"></textarea>
+                </div>
+
+                <div class="mt-3 form-group">
+                    <label>Post picture</label>
+                    <div class="custom-file mt-2">
+                        <input type="file"  id="fileToUpload"
+
+                    </div>
+                </div>
+                <?php
+                include "Views/commonLayouts/GoogleCaptcha.html";
+                ?>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary submitButton"  disabled onclick="submitPost(<?php echo $_SESSION['user_id'] ?>)">Submit post</button>
+                <script>
+
+                    var robotTestPassed = false;
+
+                    function enableButton() {
+                        robotTestPassed = true;
+                        document.getElementsByClassName("submitButton")[0].disabled = false;
+                    }</script>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+

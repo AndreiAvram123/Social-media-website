@@ -708,21 +708,11 @@ ORDER BY comment_id DESC LIMIT 1";
 
     public function fetchLastUserPost($postAuthorID)
     {
-        $query = "SELECT * FROM forum_posts WHERE post_author_id = '$postAuthorID' ORDER BY post_id DESC LIMIT 1";
+        $query = "SELECT * FROM forum_posts INNER JOIN users ON user_id = post_author_id WHERE post_author_id = '$postAuthorID' ORDER BY post_id DESC LIMIT 1";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         $row = $result->fetch();
         return new Post($row);
     }
 
-    public function uploadResizedImageToServer($originalImageLocation, $tmp_name)
-    {
-        // Create a new Imagick object
-        $imagick = new Imagick(
-            $tmp_name);
-
-// Resize the image
-        $imagick->resizeImage(70, 40, Imagick::FILTER_LANCZOS, 1);
-        $imagick->writeImage("test.jpeg");
-    }
 }

@@ -349,7 +349,7 @@ function uploadImage(receiverId) {
     formData.append("receiverId", receiverId);
     formData.append("currentUserId", sessionUserId);
     formData.append("imageName", file.name);
-    resizeImage(file).then(imageData => {
+    resizeImage(file,250,200).then(imageData => {
         formData.append('imageData', imageData);
         fetch(url, {
             method: 'POST',

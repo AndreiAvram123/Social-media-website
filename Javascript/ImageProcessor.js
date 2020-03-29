@@ -1,12 +1,9 @@
 let canvas = document.createElement("canvas");
 
-function resizeImage(file) {
+function resizeImage(file,newWidth,newHeight) {
 
     return new Promise((resolve, reject) => {
 
-            if (!file.type.match(/image.*/)) {
-                reject("file not an image")
-            }
 
             let fileReader = new FileReader();
             fileReader.addEventListener('load', () => {
@@ -22,8 +19,8 @@ function resizeImage(file) {
                 const img = new Image();
                 img.src = imageData;
                 img.onload = () => {
-                    canvas.width = 250;
-                    canvas.height = 200;
+                    canvas.width = newWidth;
+                    canvas.height = newHeight;
                     const context = canvas.getContext("2d");
 
                     context.drawImage(img, 0, 0, canvas.width, canvas.height);
