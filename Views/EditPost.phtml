@@ -6,12 +6,13 @@ if (isset($view->warningMessage)) {
     include "Modals/WarningModal.phtml";
     echo "<script>$('#warningModal').modal('show')</script>";
 }
-if($currentPost!==null) {
+if ($currentPost !== null) {
     ?>
     <div class="row mt-4">
         <div class="col">
             <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>" enctype="multipart/form-data">
-                <input type="hidden" name="postID" value="<?php echo md5($currentPost->getPostID()) ?>">
+                <input type="hidden" name="postID"
+                       value="<?php echo Functions::encodeWithSha512($currentPost->getPostID()) ?>">
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
                         <span class="input-group-text">Title</span>

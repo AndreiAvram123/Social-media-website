@@ -1,7 +1,3 @@
-
-
-
-
 function submitPost(userID) {
 
     let postTitle = document.getElementById("postTitle").value;
@@ -28,15 +24,16 @@ function submitPost(userID) {
     function pushRequest() {
         return new Promise((resolve, reject) => {
             let url = "AddPost.php?" + "apiKey=" + apiKey;
-
             let formData = new FormData();
             formData.append("postTitle", postTitle);
             formData.append("postCategory", postCategory);
             formData.append("postContent", postContent);
             formData.append("imageName", file.name);
             formData.append("userID", userID);
-            resizeImage(file,600,500).then((imageData) => {
-                formData.append("imageData", imageData);
+            Promise.all([resizeImage(file, 600, 500),
+                resizeImage(file, 70, 40)]).then((images) => {
+                formData.append("imageData", images[0]);
+                formData.append("imageResizedData", images[1]);
                 fetch(url, {
                     method: 'POST',
                     body: formData,
@@ -51,13 +48,11 @@ function submitPost(userID) {
                     }
                 })
 
-            })
+            });
 
 
         });
 
 
     }
-
-
 }

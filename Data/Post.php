@@ -90,4 +90,5 @@ class Post extends LowDataPost implements JsonSerializable
         $this->isFavorite = $isFavorite;
     }
 
+
 }

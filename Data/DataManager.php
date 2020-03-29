@@ -61,20 +61,9 @@ class DataManager
         $result->execute();
         $posts = [];
         while ($row = $result->fetch()) {
-            $posts[] = new Post($row);
-        }
-        return $posts;
-    }
-
-    public function getMorePosts($lastPostID)
-    {
-        $query = "SELECT forum_posts.post_id, post_author_id, post_title, post_content, post_category_name, post_date, post_image, username
- FROM forum_posts INNER JOIN users ON users.user_id = forum_posts.post_author_id  WHERE '$lastPostID' < forum_posts.post_id
- ORDER BY post_date DESC LIMIT $this->postPerPage";
-        $result = $this->_dbHandler->prepare($query);
-        $result->execute();
-        $posts = [];
-        while ($row = $result->fetch()) {
+            if ($row['post_image'] == null) {
+                $row['post_image'] = "https://i.picsum.photos/id/".rand(0,150)."/500/400.jpg";
+            }
             $posts[] = new Post($row);
         }
         return $posts;
@@ -226,6 +215,9 @@ VALUES (NULL,?,?,?,?,?)";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         $row = $result->fetch();
+        if ($row['post_image'] == null) {
+            $row['post_image'] = "https://i.picsum.photos/id/".rand(0,150)."/1000/700.jpg";
+        }
         return new Post($row);
     }
 
@@ -682,7 +674,8 @@ WHERE comment_post_id = '$postID'";
         while ($row = $result->fetch()) {
             $currentPost = new LowDataPost($row);
             $imageLocation = $currentPost->getPostImage();
-            $position = strpos($imageLocation, ".",50);
+
+            $position = strpos($imageLocation, ".", 50);
             $resizedImageLocation = substr_replace($imageLocation, "_resized", $position, 0);
             $currentPost->setPostImage($resizedImageLocation);
             $suggestions[] = $currentPost;

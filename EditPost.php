@@ -1,16 +1,16 @@
 <?php
-/**
- * This file is the controller used to handle the EditPost action
- */
 session_start();
 require_once "Data/DataManager.php";
 require_once "Data/Validator.php";
+require_once "utilities/Functions.php";
+
 //put the details in the view class
 $view = new stdClass();
 $view->pageTitle = "Edit post";
 $dataManager = DataManager::getInstance();
 $view->categories = $dataManager->getAllCategories();
 $currentPostID = null;
+
 
 //handle the situation when an user presses save changes button
 if (isset($_POST['saveChangesButton'])) {
@@ -20,7 +20,7 @@ if (isset($_POST['saveChangesButton'])) {
     $post = null;
     //get the post id
     foreach ($dataManager->getAllPostsIDs() as $postID) {
-        if (md5($postID) === $encryptedPostID) {
+        if (Functions::encodeWithSha512($postID) === $encryptedPostID) {
             $currentPostID = $postID;
             $post = $dataManager->getPostById($postID);
         }
@@ -30,6 +30,7 @@ if (isset($_POST['saveChangesButton'])) {
     $valid = true;
 
     $title = htmlentities($_POST['postTitle']);
+
     if ($title !== $post->getPostTitle()) {
         $valid = $validator->isPostTitleValid($title);
         if ($valid === true) {
@@ -55,31 +56,27 @@ if (isset($_POST['saveChangesButton'])) {
     }
     if ($valid === true) {
         $postImage = $_FILES["fileToUpload"]["name"];
-        if(!empty($postImage)){
-
+        if (!empty($postImage)) {
             //check if the user selected an image
-            if($postImage ===null) {
-                $valid = $validator->isImageValid($_FILES["fileToUpload"]["name"]);
-                if ($valid === true) {
-                    $imageLocation = $dataManager->uploadImageToServer($_FILES["fileToUpload"]["name"],$_FILES["fileToUpload"]["tmp"],"images/posts");
-                    $dataManager->changePostImage($post->getPostID(), $imageLocation);
-                }
+            $valid = $validator->isImageValid($_FILES["fileToUpload"]["name"]);
+            if ($valid === true) {
+                $imageLocation = $dataManager->uploadImageToServer($postImage, $_FILES["fileToUpload"]["tmp_name"], "images/posts/");
+                //     $imageLocation = $_SERVER['DOCUMENT_ROOT'] . $imageLocation;
+                $dataManager->changePostImage($post->getPostID(), $imageLocation);
             }
         }
 
 
     }
-    if($valid===true){
-        //redirect user and do not execute any more code
-        echo '<meta http-equiv="refresh" content="0; url=MyPosts.php">';
-    }else{
-        $view->warningMessage = $valid;;
+    if ($valid === false) {
+        $view->warningMessage = $valid;
     }
 
 }
-if(isset($_POST['cancelChangesButton'])){
+if (isset($_POST['cancelChangesButton'])) {
     //redirect the user in case none of the changes should take effect
-    echo '<meta http-equiv="refresh" content="0; url=MyPosts.php">';
+//    echo '<meta http-equiv="refresh" content="0; url=MyPosts.php">';
+    $view->currentPost = $dataManager->getPostById($postID);
 }
 
 //this happens when the user presses the edit button
@@ -87,7 +84,7 @@ if (isset($_GET['valuePostID'])) {
     $encryptedPostID = $_GET['valuePostID'];
 //get the post id
     foreach ($dataManager->getAllPostsIDs() as $postID) {
-        if (md5($postID) === $encryptedPostID) {
+        if (Functions::encodeWithSha512($postID) === $encryptedPostID) {
             $currentPostID = $postID;
         }
     }
@@ -100,10 +97,7 @@ if ($currentPostID != null) {
     //the $currentPostID will only be null if the
     //use changed values in the inspector
     $view->currentPost = null;
-    $view->warningMessage =   $view->warningMessage= "!!!Any attempt to hack the website could lead to you being banned";
+    $view->warningMessage = $view->warningMessage = "!!!Any attempt to hack the website could lead to you being banned";
 }
-
 include_once "Views/EditPost.phtml";
-
-
 ?>

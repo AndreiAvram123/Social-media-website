@@ -18,32 +18,42 @@ if (isset($_REQUEST['apiKey'])) {
 
 
 if ($requestAccepted == true) {
-        $base = $_REQUEST['imageData'];
-        $filename = md5($_REQUEST['imageName']) . ".jpeg";
-        $fileLocation = 'images/posts/' . $filename;
-        $binary = base64_decode($base);
-        header('Content-Type: image/jpeg; charset=utf-8');
-        $file = fopen($fileLocation, 'wb');
-        fwrite($file, $binary);
-        fclose($file);
+    $base = $_REQUEST['imageData'];
+    $filename = md5($_REQUEST['imageName']) . ".jpeg";
+    $fileLocation = 'images/posts/' . $filename;
+    $binary = base64_decode($base);
+    header('Content-Type: image/jpeg; charset=utf-8');
+    $file = fopen($fileLocation, 'wb');
+    fwrite($file, $binary);
+    fclose($file);
 
-        $postTitle = $_REQUEST["postTitle"];
-        $postCategoryName = Functions::sanitizeParameter($_REQUEST["postCategory"]);
-        $postContent = Functions::sanitizeParameter($_REQUEST["postContent"]);
-        $postDate = date('Y-m-d H:i:s');
 
-        $result = $validator->arePostDetailsValid($postTitle, $postContent);
-        if ($result === true) {
+    $resizedBase = $_REQUEST['imageResizedData'];
+    $resizedFilename = md5($_REQUEST['imageName']) . "_resized" . ".jpeg";
+    $resizedFileLocation = 'images/posts/' . $resizedFilename;
+    $binary = base64_decode($resizedBase);
+    header('Content-Type: image/jpeg; charset=utf-8');
+    $file = fopen($resizedFileLocation, 'wb');
+    fwrite($file, $binary);
+    fclose($file);
 
-            $serverImageLocation = "http://sgb967.poseidon.salford.ac.uk/cms/" . $fileLocation;
-            $dbManager->uploadPost($_REQUEST['userID'],
-                $postTitle, $postContent, $postCategoryName, $postDate, $fileLocation);
-            $postUploaded = $dbManager->fetchLastUserPost($_REQUEST['userID']);
-            echo json_encode($postUploaded);
-        } else {
-            $responseObject->warningMessage = $result;
-            echo json_encode($responseObject);
-        }
+    $postTitle = $_REQUEST["postTitle"];
+    $postCategoryName = Functions::sanitizeParameter($_REQUEST["postCategory"]);
+    $postContent = Functions::sanitizeParameter($_REQUEST["postContent"]);
+    $postDate = date('Y-m-d H:i:s');
+
+    $result = $validator->arePostDetailsValid($postTitle, $postContent);
+    if ($result === true) {
+
+        $serverImageLocation = "http://sgb967.poseidon.salford.ac.uk/cms/" . $fileLocation;
+        $dbManager->uploadPost($_REQUEST['userID'],
+            $postTitle, $postContent, $postCategoryName, $postDate, $serverImageLocation);
+        $postUploaded = $dbManager->fetchLastUserPost($_REQUEST['userID']);
+        echo json_encode($postUploaded);
+    } else {
+        $responseObject->warningMessage = $result;
+        echo json_encode($responseObject);
+    }
 
 } else {
     $responseObject->errorMessage = "Api key not provided or you tried too many requests in a given time";
