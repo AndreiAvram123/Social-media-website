@@ -85,7 +85,7 @@ class ChatWindow {
     }
 
     notifyNewMessageAdded(lastMessageID) {
-        this.lastMessageID = lastMessageID;
+        chatWindow.lastMessageID = lastMessageID;
         chatWindow.scrollToLastFetchedMessage();
     }
 
@@ -119,6 +119,7 @@ class ChatWindow {
         this.messageField.onfocus = () => {
             this.hideNotification();
         };
+        domElement.getElementsByClassName("message-window")[0].onclick = () => this.hideNotification();
 
         this.attachScrollListener();
     }
@@ -180,8 +181,8 @@ class ChatWindow {
     }
 
     showNotification() {
-        if(document.activeElement !== chatWindow.messageField)
-            this.chatHeader.style.background = "#000000";
+        if (document.activeElement !== chatWindow.messageField)
+            this.chatHeader.style.background = "#AD8235";
     }
 
     hideNotification() {
@@ -349,7 +350,7 @@ function uploadImage(receiverId) {
     formData.append("receiverId", receiverId);
     formData.append("currentUserId", sessionUserId);
     formData.append("imageName", file.name);
-    resizeImage(file,250,200).then(imageData => {
+    resizeImage(file, 250, 200).then(imageData => {
         formData.append('imageData', imageData);
         fetch(url, {
             method: 'POST',
@@ -361,6 +362,7 @@ function uploadImage(receiverId) {
             let responseObject = JSON.parse(data);
             chatWindow.addNewMessage(responseObject);
             chatWindow.fetchMessagesRequestSent = false;
+            console.log(responseObject);
         })
 
     })
@@ -411,6 +413,7 @@ function checkUser2IsTyping() {
 }
 
 function fetchNewMessages(receiverId) {
+    console.log("fetching new messages");
     let url = "ChatController.php?requestName=fetchNewMessages&" + "apiKey=" + apiKey;
     let formData = new FormData();
 

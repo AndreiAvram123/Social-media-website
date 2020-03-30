@@ -406,6 +406,9 @@ WHERE comment_post_id = '$postID'";
         $result->execute();
         $posts = [];
         while ($row = $result->fetch()) {
+            if ($row['post_image'] == null) {
+                $row['post_image'] = "https://i.picsum.photos/id/" . rand(0, 150) . "/500/400.jpg";
+            }
             $post = new Post($row);
             $post->setAddedToWatchList(true);
             $posts[] = $post;

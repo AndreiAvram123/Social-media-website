@@ -86,8 +86,8 @@ class ChatDatabase
 
     public function createChatLiveFunctions($charId, $user1Id, $user2Id)
     {
-        $query = "INSERT INTO chat_live_functions VALUES ('$charId','$user1Id',false)";
-        $secondQuery = "INSERT INTO chat_live_functions VALUES ('$charId','$user2Id',false)";
+        $query = "INSERT INTO chat_live_functions VALUES ('$charId','$user1Id',false,false)";
+        $secondQuery = "INSERT INTO chat_live_functions VALUES ('$charId','$user2Id',false,false)";
         $this->executeQuery($query);
         $this->executeQuery($secondQuery);
     }

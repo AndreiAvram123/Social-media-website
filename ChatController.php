@@ -76,7 +76,7 @@ if ($requestAccepted == true && isset($_REQUEST['requestName'])) {
     if ($_REQUEST["requestName"] === "fetchChatId") {
         $user1Id = Functions::sanitizeParameter($_REQUEST["user1Id"]);
         $user2Id = Functions::sanitizeParameter($_REQUEST["user2Id"]);
-        $chatId = Functions::sanitizeParameter($chatDatabase->fetchChatId($user1Id, $user2Id));
+        $chatId = $chatDatabase->fetchChatId($user1Id, $user2Id);
 
         if ($chatId == null) {
             $chatDatabase->createChat($user1Id, $user2Id);
