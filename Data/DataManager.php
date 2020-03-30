@@ -62,7 +62,7 @@ class DataManager
         $posts = [];
         while ($row = $result->fetch()) {
             if ($row['post_image'] == null) {
-                $row['post_image'] = "https://i.picsum.photos/id/".rand(0,150)."/500/400.jpg";
+                $row['post_image'] = "https://i.picsum.photos/id/" . rand(0, 150) . "/500/400.jpg";
             }
             $posts[] = new Post($row);
         }
@@ -216,7 +216,7 @@ VALUES (NULL,?,?,?,?,?)";
         $result->execute();
         $row = $result->fetch();
         if ($row['post_image'] == null) {
-            $row['post_image'] = "https://i.picsum.photos/id/".rand(0,150)."/1000/700.jpg";
+            $row['post_image'] = "https://i.picsum.photos/id/" . rand(0, 150) . "/1000/700.jpg";
         }
         return new Post($row);
     }
@@ -672,14 +672,14 @@ WHERE comment_post_id = '$postID'";
         $suggestions = [];
 
         while ($row = $result->fetch()) {
-            $currentPost = new LowDataPost($row);
-            $imageLocation = $currentPost->getPostImage();
+            if ($row['post_image'] == null) {
+                $row['post_image'] = "https://i.picsum.photos/id/" . rand(0, 150) . "/70/40.jpg";
+            } else {
+                $position = strpos($row['post_image'], ".", 50);
+                $row['post_image'] = substr_replace($row['post_image'], "_resized", $position, 0);
+            }
 
-            $position = strpos($imageLocation, ".", 50);
-            $resizedImageLocation = substr_replace($imageLocation, "_resized", $position, 0);
-            $currentPost->setPostImage($resizedImageLocation);
-            $suggestions[] = $currentPost;
-
+            $suggestions[] = new LowDataPost($row);
         }
         return $suggestions;
 

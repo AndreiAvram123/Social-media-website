@@ -7,6 +7,7 @@
  * It serializes less field comparing to the bigger one
  * Post.php
  */
+include_once "utilities/Functions.php";
 class LowDataPost implements JsonSerializable
 {
     private $postTitle;
@@ -16,7 +17,7 @@ class LowDataPost implements JsonSerializable
     public function __construct($db_row)
     {
 
-        $this->postID = $db_row['post_id'];
+        $this->postID = Functions::encodeWithSha512($db_row['post_id']);
         $this->postTitle = $db_row['post_title'];
         $this->postImage = $db_row['post_image'];
     }
@@ -34,22 +35,6 @@ class LowDataPost implements JsonSerializable
     public function getPostID()
     {
         return $this->postID;
-    }
-
-    /**
-     * @param mixed $postID
-     */
-    public function setPostID($postID)
-    {
-        $this->postID = $postID;
-    }
-
-    /**
-     * @param mixed $postImage
-     */
-    public function setPostImage($postImage)
-    {
-        $this->postImage = $postImage;
     }
 
 

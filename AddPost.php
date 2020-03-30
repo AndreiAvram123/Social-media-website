@@ -45,9 +45,8 @@ if ($requestAccepted == true) {
     $result = $validator->arePostDetailsValid($postTitle, $postContent);
     if ($result === true) {
 
-        $serverImageLocation = "http://sgb967.poseidon.salford.ac.uk/cms/" . $fileLocation;
         $dbManager->uploadPost($_REQUEST['userID'],
-            $postTitle, $postContent, $postCategoryName, $postDate, $serverImageLocation);
+            $postTitle, $postContent, $postCategoryName, $postDate, $fileLocation);
         $postUploaded = $dbManager->fetchLastUserPost($_REQUEST['userID']);
         echo json_encode($postUploaded);
     } else {

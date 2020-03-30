@@ -23,11 +23,10 @@ if (isset($_REQUEST['apiKey'])) {
 if ($requestAccepted == true) {
 
     if (isset($_REQUEST["query"])) {
-        $query = Functions::sanitizeParameter($_REQUEST["query"]);
         $suggestions = [];
-        if ($query !== "") {
+        if (Functions::isParameterValid($_REQUEST["query"]) ) {
             $friendDb = FriendsDatabase::getInstance();
-            $suggestions = $friendDb->getAllFriendsSuggestionsForQuery($query);
+            $suggestions = $friendDb->getAllFriendsSuggestionsForQuery($_REQUEST["query"]);
         }
         echo json_encode($suggestions);
     }
@@ -48,11 +47,6 @@ if ($requestAccepted == true) {
         if ($query !== "") {
             $dbManager = DataManager::getInstance();
             $fetchedSuggestions = $dbManager->fetchSearchSuggestions($query, $sortDate, $postCategory);
-            if (isset($_REQUEST['encrypted'])) {
-                for ($i = 0; $i < sizeof($fetchedSuggestions); $i++) {
-                    $fetchedSuggestions[$i]->setPostID(Functions::encodeWithSha512($fetchedSuggestions[$i]->getPostID()));
-                }
-            }
 
         }
         echo json_encode($fetchedSuggestions);

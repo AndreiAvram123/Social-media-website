@@ -4,6 +4,7 @@
  * Class used to create objects that contain
  * the data from a user row in the database
  */
+include_once "utilities/Functions.php";
 
 class User implements JsonSerializable
 {

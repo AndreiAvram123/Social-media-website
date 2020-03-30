@@ -1,6 +1,6 @@
 <?php
 require_once "Data/models/LowDataPost.php";
-
+include_once "utilities/Functions.php";
 /**
  * This class is used to create Post object
  * that contain the data from a Post row in the
@@ -24,7 +24,7 @@ class Post extends LowDataPost implements JsonSerializable
         $this->postDate = $db_row['post_date'];
         $this->postContent = substr($db_row['post_content'], 0, 700);
         $this->postCategoryName = $db_row['post_category_name'];
-        $this->authorID = $db_row['post_author_id'];
+        $this->authorID = Functions::encodeWithSha512($db_row['post_author_id']);
         $this->authorName = $db_row['username'];
         $this->isFavorite = FALSE;
     }

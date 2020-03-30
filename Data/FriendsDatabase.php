@@ -174,6 +174,7 @@ WHERE user_id IN
         $result->execute();
         $users = [];
         while ($row = $result->fetch()) {
+            $row['user_id'] = Functions::encodeWithSha512($row['user_id']);
             $users[] = new User($row);
         }
         return $users;

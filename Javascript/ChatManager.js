@@ -29,7 +29,7 @@ class ChatWindow {
             '            <button onclick="sendMessage(' + '\'' + receiverId + '\'' + ')"><i\n' +
             '                    class="far fa-paper-plane"></i></button>\n' +
             '        </div>\n' +
-            ' <input type="file"  name="files[]"  style="display: none"' +
+            ' <input type="file"  name="chatImage"  style="display: none"' +
             '    </div>\n' +
             '</div>';
         let domElement = domParser.parseFromString(chatString, "text/html");
@@ -99,7 +99,7 @@ class ChatWindow {
 
     attachListeners(domElement, receiverId) {
         domElement.getElementsByTagName("i")[0].addEventListener('click', () => removeChat(this.chatWindow));
-        let imageSelector = domElement.getElementsByName("files[]")[0];
+        let imageSelector = domElement.getElementsByName("chatImage")[0];
         let imageSelectIcon = domElement.getElementsByClassName("select-image-icon")[0];
         imageSelectIcon.addEventListener('click', () => imageSelector.click());
         imageSelector.addEventListener('change', () => {
@@ -172,7 +172,7 @@ class ChatWindow {
                 this.messageContainer.appendChild(messageView);
             });
 
-            this.lastMessageID = messagesJson[messagesJson.length - 1].messageId;
+            chatWindow.lastMessageID = messagesJson[messagesJson.length - 1].messageId;
             chatWindow.scrollToLastFetchedMessage();
             playNotificationSound();
             this.showNotification();
@@ -345,7 +345,7 @@ function uploadImage(receiverId) {
     chatWindow.fetchMessagesRequestSent = true;
     let url = "ChatController.php?requestName=UploadImage&" + "apiKey=" + apiKey;
     let formData = new FormData();
-    const file = document.querySelector('[type=file]').files[0];
+    const file = document.getElementsByName("chatImage")[0].files[0];
     formData.append("receiverId", receiverId);
     formData.append("currentUserId", sessionUserId);
     formData.append("imageName", file.name);
@@ -418,9 +418,8 @@ function fetchNewMessages(receiverId) {
     formData.append("currentUserId", sessionUserId);
     formData.append("receiverId", receiverId);
 
-
     if (chatWindow.fetchMessagesRequestSent === false) {
-        chatWindow.fetchMessagesRequestSent = false;
+        chatWindow.fetchMessagesRequestSent = true;
         fetch(url, {
             method: 'POST',
             body: formData,

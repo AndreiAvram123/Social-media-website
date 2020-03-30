@@ -7,14 +7,14 @@ $post = $view->post;
         <?php
         //if the user is logged in and the post belongs to him
         //let him him edit the post no matter where in the forum
-        if (isset($_SESSION['user_id']) && $_SESSION['user_id'] === $post->getAuthorID()) {
+        if (isset($_SESSION['user_id']) && Functions::encodeWithSha512($_SESSION['user_id']) === $post->getAuthorID()) {
             ?>
             <form method="get" action="EditPost.php" class="float-right">
                 <button class="icon-button" type="submit"><i class="edit-icon"></i></button>
                 <input type="hidden" name="valuePostID" value="<?php
                 //it is better for security if we encrypt the post id, so
                 // users cannot change it in the inspector
-               echo Functions::encodeWithSha512($post->getPostID()) ?>">
+               echo $post->getPostID() ?>">
             </form>
             <?php
         }
@@ -27,7 +27,7 @@ $post = $view->post;
 
             <button type="submit" class="link-button" name="profileButton">Author
                 : <?php echo $post->getAuthorName() ?></button>
-            <input type="hidden" name="authorIDValue" value="<?php echo md5($post->getAuthorID()) ?>">
+            <input type="hidden" name="authorIDValue" value="<?php echo $post->getAuthorID() ?>">
 
         </form>
         <?php
@@ -57,7 +57,7 @@ $post = $view->post;
             <input type="hidden" name="valuePostID" value="<?php
             //it is better for security if we encrypt the post id, so
             // users cannot change it in the inspector
-            echo Functions::encodeWithSha512($post->getPostID())?>">
+            echo $post->getPostID()?>">
         </form>
         <?php
         //only show the remove from favorite button if the post is added to favorites
@@ -72,15 +72,13 @@ $post = $view->post;
             -->
             <form method="post">
                 <button type="submit" class="btn btn-danger mt-3" name="removeButton">Remove</button>
-                <input type="hidden" name="removeValue" value="<?php echo md5($post->getPostID()) ?>">
+                <input type="hidden" name="removeValue" value="<?php echo $post->getPostID() ?>">
             </form>
 
             <?php
         }
         ?>
     </div>
-
-
 </div>
 
 

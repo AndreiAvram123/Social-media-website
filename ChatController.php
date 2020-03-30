@@ -65,8 +65,6 @@ if ($requestAccepted == true && isset($_REQUEST['requestName'])) {
 
         $messageDate = time() * 1000;
 
-        $fileLocation ="http://sgb967.poseidon.salford.ac.uk/cms/" . $fileLocation;
-
         $chatDatabase->insertImageMessage($fileLocation,
             $messageDate, $_REQUEST["currentUserId"], $_REQUEST["receiverId"]);
 
