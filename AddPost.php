@@ -44,18 +44,15 @@ if ($requestAccepted == true) {
 
     $result = $validator->arePostDetailsValid($postTitle, $postContent);
     if ($result === true) {
-
         $dbManager->uploadPost($_REQUEST['userID'],
             $postTitle, $postContent, $postCategoryName, $postDate, $fileLocation);
-        $postUploaded = $dbManager->fetchLastUserPost($_REQUEST['userID']);
-        echo json_encode($postUploaded);
     } else {
         $responseObject->warningMessage = $result;
-        echo json_encode($responseObject);
     }
+
 
 } else {
     $responseObject->errorMessage = "Api key not provided or you tried too many requests in a given time";
-    echo json_encode($responseObject);
 }
+echo json_encode($responseObject);
 ?>

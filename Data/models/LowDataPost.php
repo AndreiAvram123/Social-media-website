@@ -17,7 +17,7 @@ class LowDataPost implements JsonSerializable
     public function __construct($db_row)
     {
 
-        $this->postID = Functions::encodeWithSha512($db_row['post_id']);
+        $this->postID = $db_row['post_id'];
         $this->postTitle = $db_row['post_title'];
         $this->postImage = $db_row['post_image'];
     }

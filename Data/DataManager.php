@@ -674,13 +674,8 @@ WHERE comment_post_id = '$postID'";
         $suggestions = [];
 
         while ($row = $result->fetch()) {
-            if ($row['post_image'] == null) {
-                $row['post_image'] = "https://i.picsum.photos/id/" . rand(0, 150) . "/70/40.jpg";
-            } else {
-                $position = strpos($row['post_image'], ".");
-                $row['post_image'] = substr_replace($row['post_image'], "_resized", $position, 0);
-            }
-
+            $this->getSmallPostImage($row);
+            $this->encryptPostID($row);
             $suggestions[] = new LowDataPost($row);
         }
         return $suggestions;
@@ -708,6 +703,24 @@ ORDER BY comment_id DESC LIMIT 1";
         $result->execute();
         $row = $result->fetch();
         return new Post($row);
+    }
+
+    /**
+     * @param $row
+     */
+    public function getSmallPostImage(&$row)
+    {
+        if ($row['post_image'] == null) {
+            $row['post_image'] = "https://i.picsum.photos/id/" . rand(0, 150) . "/70/40.jpg";
+        } else {
+            $position = strpos($row['post_image'], ".");
+            $row['post_image'] = substr_replace($row['post_image'], "_resized", $position, 0);
+        }
+    }
+
+    private function encryptPostID(&$row)
+    {
+        $row['post_id'] = Functions::encodeWithSha512($row['post_id']);
     }
 
 }

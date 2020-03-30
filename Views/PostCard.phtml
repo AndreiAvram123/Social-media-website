@@ -14,7 +14,7 @@ $post = $view->post;
                 <input type="hidden" name="valuePostID" value="<?php
                 //it is better for security if we encrypt the post id, so
                 // users cannot change it in the inspector
-               echo $post->getPostID() ?>">
+                echo  Functions::encodeWithSha512($post->getPostID()) ?>">
             </form>
             <?php
         }
@@ -57,7 +57,7 @@ $post = $view->post;
             <input type="hidden" name="valuePostID" value="<?php
             //it is better for security if we encrypt the post id, so
             // users cannot change it in the inspector
-            echo $post->getPostID()?>">
+            echo Functions::encodeWithSha512($post->getPostID()) ?>">
         </form>
         <?php
         //only show the remove from favorite button if the post is added to favorites
@@ -72,7 +72,8 @@ $post = $view->post;
             -->
             <form method="post">
                 <button type="submit" class="btn btn-danger mt-3" name="removeButton">Remove</button>
-                <input type="hidden" name="removeValue" value="<?php echo $post->getPostID() ?>">
+                <input type="hidden" name="removeValue"
+                       value="<?php echo Functions::encodeWithSha512($post->getPostID()) ?>">
             </form>
 
             <?php
