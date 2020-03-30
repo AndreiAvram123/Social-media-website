@@ -79,25 +79,20 @@ class SessionManager
      * @param $creationDate
      * @return bool|string
      */
-    public function createUser($username, $email, $password, $image, $creationDate)
+    public function createUser($username, $email, $password, $creationDate)
     {
         $databaseHandler = DataManager::getInstance();
-        $check = $this->checkRegisterCredentials($username, $email, $password, $image);
+        $check = $this->checkRegisterCredentials($username, $email, $password);
         if ($check === true) {
-            $imageLocation = null;
-            if (!empty($image)) {
-                $imageLocation = $databaseHandler->uploadImageToServer($image, $_FILES["profilePicture"]["tmp_name"], "images/users/");
-                $imageLocation = $_SERVER['DOCUMENT_ROOT'] . $imageLocation;
-            }
             //the user will have a default image is he does not choose one
-            $databaseHandler->createUser($username, $email, $password, $creationDate, $imageLocation);
+            $databaseHandler->createUser($username, $email, $password, $creationDate);
             return true;
         } else {
             return $check;
         }
     }
 
-    private function checkRegisterCredentials($username, $email, $password, $image)
+    private function checkRegisterCredentials($username, $email, $password)
     {
         if (empty($username)) {
             return "You have not entered an email";
@@ -123,9 +118,6 @@ class SessionManager
         }
         if ($this->_dbManager->emailExists($email)) {
             return "Email already used";
-        }
-        if (!empty($image)) {
-            return $this->_validator->isProfileImageValid($image);
         }
         return true;
 

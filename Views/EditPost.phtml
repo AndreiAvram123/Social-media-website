@@ -12,7 +12,7 @@ if ($currentPost !== null) {
         <div class="col">
             <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>" enctype="multipart/form-data">
                 <input type="hidden" name="postID"
-                       value="<?php echo$currentPost->getPostID() ?>">
+                       value="<?php echo $currentPost->getPostID() ?>">
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
                         <span class="input-group-text">Title</span>
@@ -23,12 +23,7 @@ if ($currentPost !== null) {
                 </div>
                 <div>
                     <img src="<?php echo $currentPost->getPostImage() ?>" class="card-img-top">
-                    <div class="mt-5">
-                        <label>Select another picture</label>
-                        <div class="custom-file mt-2">
-                            <input type="file" name="fileToUpload" id="fileToUpload">
-                        </div>
-                    </div>
+
                 </div>
                 <div class="input-group mt-4">
                     <div class="input-group-prepend">
@@ -58,9 +53,9 @@ if ($currentPost !== null) {
                 <div class="mt-5 mb-4">
                     <button type="submit" name="saveChangesButton" class="btn btn-success btn-block">Save changes
                     </button>
-                    <button type="submit" name="cancelChangesButton" class="btn btn-danger btn-block">Cancel</button>
                 </div>
             </form>
+            <button type="button"  class="btn btn-danger btn-block" onclick="window.history.back()">Cancel</button>
         </div>
 
 

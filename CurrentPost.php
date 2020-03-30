@@ -64,11 +64,11 @@ if ($currentPostID == null) {
 
     //handle the new comment
     if (isset($_POST['postReviewButton'])) {
-        //filter malicious code
-        $comment_text = htmlentities($_POST['comment_text']);
-        if (!empty($comment_text)) {
+
+        $comment_text = Functions::sanitizeParameter($_POST['comment_text']);
+        if ($comment_text!=="") {
             $comment_user_id = $_SESSION['user_id'];
-            $comment_post_id = htmlentities($_SESSION['currentPostId']);
+            $comment_post_id = $currentPostID;
             $comment_date = date('Y-m-d H:i:s');
             $dbHandler->uploadComment($comment_user_id,
                 $comment_post_id, $comment_text, $comment_date);

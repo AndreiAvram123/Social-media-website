@@ -35,7 +35,7 @@ if (isset($_POST['saveChangesButton'])) {
         $valid = $validator->isPostTitleValid($title);
         if ($valid === true) {
             //execute query to change title
-            $dataManager->changePostTitle($post->getPostID(), $title);
+            $dataManager->changePostTitle($currentPostID, $title);
         }
     }
     //don't continue if the other details are not valid
@@ -44,40 +44,23 @@ if (isset($_POST['saveChangesButton'])) {
         if ($content !== $post->getPostContent()) {
             $valid = $validator->isPostContentValid($content);
             if ($valid === true) {
-                $dataManager->changePostContent($post->getPostID(), $content);
+                $dataManager->changePostContent($currentPostID, $content);
             }
         }
     }
     if ($valid === true) {
         $category = $_POST['postCategory'];
         if ($category !== $post->getCategoryName()) {
-            $dataManager->changePostCategory($post->getPostID(), $category);
+            $dataManager->changePostCategory($currentPostID, $category);
         }
     }
-    if ($valid === true) {
-        $postImage = $_FILES["fileToUpload"]["name"];
-        if (!empty($postImage)) {
-            //check if the user selected an image
-            $valid = $validator->isImageValid($_FILES["fileToUpload"]["name"]);
-            if ($valid === true) {
-                $imageLocation = $dataManager->uploadImageToServer($postImage, $_FILES["fileToUpload"]["tmp_name"], "images/posts/");
-                //     $imageLocation = $_SERVER['DOCUMENT_ROOT'] . $imageLocation;
-                $dataManager->changePostImage($post->getPostID(), $imageLocation);
-            }
-        }
 
-
-    }
     if ($valid === false) {
         $view->warningMessage = $valid;
     }
 
 }
-if (isset($_POST['cancelChangesButton'])) {
-    //redirect the user in case none of the changes should take effect
-//    echo '<meta http-equiv="refresh" content="0; url=MyPosts.php">';
-    $view->currentPost = $dataManager->getPostById($postID);
-}
+
 
 //this happens when the user presses the edit button
 if (isset($_GET['valuePostID'])) {
@@ -90,7 +73,6 @@ if (isset($_GET['valuePostID'])) {
     }
 }
 
-
 if ($currentPostID != null) {
     $view->currentPost = $dataManager->getPostById($currentPostID);
 } else {
@@ -99,5 +81,6 @@ if ($currentPostID != null) {
     $view->currentPost = null;
     $view->warningMessage = $view->warningMessage = "!!!Any attempt to hack the website could lead to you being banned";
 }
+
 include_once "Views/EditPost.phtml";
 ?>

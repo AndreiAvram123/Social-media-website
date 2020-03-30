@@ -144,18 +144,17 @@ class DataManager
      * @param $creationDate
      * @param $imageLocation
      */
-    public function createUser($username, $email, $password, $creationDate, $imageLocation)
+    public function createUser($username, $email, $password, $creationDate)
     {
         $encryptedPassword = md5($password);
-        $query = "INSERT INTO users (user_id,username, email, password, creation_date,profile_picture)
-VALUES (NULL,?,?,?,?,?)";
+        $query = "INSERT INTO users (user_id,username, email, password, creation_date)
+VALUES (NULL,?,?,?,?)";
 
         $result = $this->_dbHandler->prepare($query);
         $result->bindParam(1, $username);
         $result->bindParam(2, $email);
         $result->bindParam(3, $encryptedPassword);
         $result->bindParam(4, $creationDate);
-        $result->bindParam(5, $imageLocation);
         $result->execute();
 
     }
@@ -250,7 +249,7 @@ VALUES (NULL,?,?,?,?,?)";
      */
     public function getCommentsForPost($postID)
     {
-        $query = "SELECT comment_id, comment_user_id, comment_post_id, comment_text, comment_date, user_id, username, email, password, creation_date, profile_picture ,username
+        $query = "SELECT comment_id, comment_user_id, comment_post_id, comment_text, comment_date, user_id, username, email, password, creation_date,username
 FROM comments  INNER JOIN users ON users.user_id = comments.comment_user_id
 WHERE comment_post_id = '$postID'";
         $result = $this->_dbHandler->prepare($query);
@@ -675,7 +674,7 @@ WHERE comment_post_id = '$postID'";
             if ($row['post_image'] == null) {
                 $row['post_image'] = "https://i.picsum.photos/id/" . rand(0, 150) . "/70/40.jpg";
             } else {
-                $position = strpos($row['post_image'], ".", 50);
+                $position = strpos($row['post_image'], ".");
                 $row['post_image'] = substr_replace($row['post_image'], "_resized", $position, 0);
             }
 

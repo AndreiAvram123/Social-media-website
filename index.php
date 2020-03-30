@@ -6,7 +6,6 @@ require_once "Data/FriendsDatabase.php";
 require_once("Api/ApiKeyManager.php");
 require_once "utilities/Functions.php";
 
-
 $view = new stdClass();
 $view->pageTitle = "Home";
 $dbHandle = DataManager::getInstance();
