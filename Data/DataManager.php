@@ -3,9 +3,11 @@ require_once "Data/Database.php";
 require_once "Data/Comment.php";
 require_once "Data/Post.php";
 require_once "Data/User.php";
+require_once "Data/NullSafeUser.php";
 require_once "Data/models/LowDataPost.php";
 require_once "Data/FriendRequest.php";
 require_once "utilities/Functions.php";
+
 
 /**
  * This class is used to handle
@@ -83,8 +85,7 @@ class DataManager
         $result->bindValue(':email', $email);
         $result->execute();
         $row = $result->fetch();
-        $password = $row['password'];
-        return $password;
+        return $row['password'];
     }
 
     /**
@@ -293,7 +294,7 @@ WHERE comment_post_id = '$postID'";
         if ($row != false) {
             return new User($row);
         } else {
-            return null;
+            return new NullSafeUser();
         }
     }
 
@@ -368,6 +369,7 @@ WHERE comment_post_id = '$postID'";
         $result->bindValue(':user_id', $user_id);
         $result->execute();
 
+
     }
 
     /**
@@ -376,7 +378,7 @@ WHERE comment_post_id = '$postID'";
      * @param $user_id
      * @return bool
      */
-    public function isPostAddedToWatchList($post_id, $user_id)
+    public function isPostAddedToFavorites($post_id, $user_id)
     {
         $query = "SELECT * from favorite_posts WHERE user_id = '$user_id' AND post_id = '$post_id'";
         $result = $this->_dbHandler->prepare($query);
@@ -680,7 +682,6 @@ WHERE comment_post_id = '$postID'";
         }
         return $suggestions;
 
-
     }
 
 
@@ -721,6 +722,21 @@ ORDER BY comment_id DESC LIMIT 1";
     private function encryptPostID(&$row)
     {
         $row['post_id'] = Functions::encodeWithSha512($row['post_id']);
+    }
+
+    public function fetchSearchSuggestionsMobile($searchQuery)
+    {
+        $query = "SELECT post_id,post_title,post_image FROM forum_posts WHERE post_title LIKE :searchQuery LIMIT 10";
+        $result = $this->_dbHandler->prepare($query);
+        $result->bindValue(':searchQuery', $searchQuery . '%');
+        $result->execute();
+        $suggestions = [];
+        while ($row = $result->fetch()) {
+            $this->getSmallPostImage($row);
+            $suggestions[] = new LowDataPost($row);
+        }
+        return $suggestions;
+
     }
 
 }

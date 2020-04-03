@@ -27,7 +27,7 @@ $post = $view->post;
 
             <button type="submit" class="link-button" name="profileButton">Author
                 : <?php echo $post->getAuthorName() ?></button>
-            <input type="hidden" name="authorIDValue" value="<?php echo $post->getAuthorID() ?>">
+            <input type="hidden" name="authorIDValue" value="<?php echo Functions::encodeWithSha512($post->getAuthorID()) ?>">
 
         </form>
         <?php

@@ -53,7 +53,7 @@ if ($currentPostID == null) {
     if (isset($_SESSION['user_id'])) {
         if ($_SESSION['user_id'] !== $view->currentPost->getAuthorID()) {
             $view->postBelongsToUser = false;
-            $addedToWatchList = $dbHandler->isPostAddedToWatchList($currentPostID, $_SESSION['user_id']);
+            $addedToWatchList = $dbHandler->isPostAddedToFavorites($currentPostID, $_SESSION['user_id']);
             $view->currentPost->setAddedToWatchList($addedToWatchList);
         } else {
             $view->postBelongsToUser = true;

@@ -18,7 +18,7 @@ class LowDataPost implements JsonSerializable
     {
 
         $this->postID = $db_row['post_id'];
-        $this->postTitle = $db_row['post_title'];
+        $this->postTitle = utf8_encode($db_row['post_title']);
         $this->postImage = $db_row['post_image'];
     }
 

@@ -6,10 +6,32 @@ require_once("utilities/Functions.php");
 $dbHandler = DataManager::getInstance();
 $responseObject = new stdClass();
 
+if(isset($_REQUEST['postQuery'])){
+    $fetchedData = $dbHandler->fetchSearchSuggestionsMobile($_REQUEST['postQuery']);
+   echo json_encode($fetchedData);
+}
+
+
+if (isset($_REQUEST['addPostToFavorites'])) {
+    $postID = $_REQUEST['postID'];
+    $userID = $_REQUEST['userID'];
+    if ($postID != null && $userID != null) {
+        $dbHandler->addPostToFavorite($postID, $userID);
+    }
+}
+
+if (isset($_REQUEST['removePostFromFavorites'])) {
+    $postID = $_REQUEST['postID'];
+    $userID = $_REQUEST['userID'];
+    if ($postID != null && $userID != null) {
+        $dbHandler->removePostFromFavorites($postID, $userID);
+    }
+}
+
 
 if (isset($_GET['page'])) {
     $page = Functions::sanitizeParameter($_GET['page']);
-    if($page !== "" && is_numeric($page)) {
+    if ($page !== "" && is_numeric($page)) {
         $data = $dbHandler->getPosts($page);
         echo json_encode($data);
     }
@@ -45,16 +67,15 @@ if (isset($_GET['postID'])) {
         if (isset($_GET['comments'])) {
             echo json_encode($dbHandler->getCommentsForPost($postID));
         } else {
-            echo json_encode($dbHandler->getPostById($postID));
+            $fetchedPost = $dbHandler->getPostById($postID);
+            if (isset($_GET['userID']) && $_GET['userID'] !== "") {
+                $fetchedPost->setAddedToWatchList($dbHandler->isPostAddedToFavorites($postID, $_GET['userID']));
+            }
+            echo json_encode($fetchedPost);
         }
     }
 }
 
-if (isset($_GET['suggestionQuery'])) {
-    $suggestionQuery = $_GET['suggestionQuery'];
-    $suggestions = $dbHandler->fetchSearchSuggestions($suggestionQuery, null, null);
-    echo json_encode($suggestions);
-}
 if (isset($_REQUEST['uploadComment'])) {
     $commentUserID = null;
     $commentDate = date('Y-m-d H:i:s');
@@ -115,7 +136,7 @@ if (isset($_REQUEST['uploadPost'])) {
     echo json_encode($lastPost);
 }
 
-if (isset($_REQUEST['savedPosts'])) {
+if (isset($_REQUEST['favoritePosts'])) {
     if (isset($_REQUEST['userID']) && $_REQUEST['userID'] !== "") {
         $favoritePosts = $dbHandler->getWatchList($_REQUEST['userID']);
         echo json_encode($favoritePosts);
@@ -127,22 +148,11 @@ if (isset($_REQUEST['authenticateThirdPartyAccount'])) {
     if (isset($_REQUEST['email']) && $_REQUEST['email'] !== "") {
         //if the user exists use 1
         $fetchedUser = $dbHandler->getUserFromEmail($_REQUEST['email']);
-        if ($fetchedUser != null) {
-            $responseObject->userID = $fetchedUser->getUserId();
-            $responseObject->username = $fetchedUser->getUsername();
-        }
     }
-    echo json_encode($responseObject);
+    echo json_encode($fetchedUser);
 
 }
 
-if (isset($_REQUEST['addPostToFavorite'])) {
-    $postID = $_REQUEST['postID'];
-    $userID = $_REQUEST['userID'];
-    if ($postID != null && $userID != null) {
-        $dbHandler->addPostToFavorite($postID, $userID);
-    }
-}
 
 if (isset($_REQUEST['createThirdPartyAccount'])) {
     $jsonObject = decodePostData();

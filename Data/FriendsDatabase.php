@@ -3,7 +3,6 @@
 require_once "Data/Database.php";
 require_once "Data/FriendRequest.php";
 require_once "Data/User.php";
-require_once "Data/Friend.php";
 require_once "Data/Message.php";
 
 class FriendsDatabase
@@ -14,7 +13,6 @@ class FriendsDatabase
     //create a singleton pattern for this as well
     private static $friendsDatabase;
     //define how may posts should be displayed on page
-    private $postPerPage = 10;
 
     //method used to create a singleton pattern
     public static function getInstance()
@@ -82,7 +80,7 @@ WHERE user_id IN
         $result->execute();
         $friends = [];
         while ($row = $result->fetch()) {
-            $friend = new Friend($row);
+            $friend = new User($row);
             $friend->setLastMessage($this->fetchLastMessage($user_id, $friend->getUserId()));
             $friends[] = $friend;
         }
