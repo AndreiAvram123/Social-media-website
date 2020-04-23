@@ -18,6 +18,11 @@ if (isset($_REQUEST['apiKey'])) {
 
 if ($requestAccepted == true && isset($_REQUEST['requestName'])) {
 
+    if($_REQUEST['requestName'] == "markMessagesAsSeen"){
+        $chatDatabase->markMessagesAsSeen($_REQUEST['lastMessageId'],$_REQUEST['currentUserId'],$_REQUEST['receiverId']);
+    }
+
+
     if ($_REQUEST["requestName"] == "sendMessage") {
 
         if (isset($_REQUEST['messageContent']) &&

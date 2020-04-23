@@ -47,7 +47,7 @@ class ChatDatabase
 
     public function insertNewMessage($messageContent, $date, $sender_id, $receiver_id)
     {
-        $query = "INSERT INTO messages VALUES (NULL,'$messageContent','$date', '$sender_id','$receiver_id',NULL)";
+        $query = "INSERT INTO messages VALUES (NULL,'$messageContent','$date', '$sender_id','$receiver_id',NULL,false)";
 
         $this->executeQuery($query);
 
@@ -55,7 +55,7 @@ class ChatDatabase
 
     public function insertImageMessage($imagePath, $date, $sender_id, $receiver_id)
     {
-        $query = "INSERT INTO messages VALUES (NULL,NULL,'$date', '$sender_id','$receiver_id','$imagePath')";
+        $query = "INSERT INTO messages VALUES (NULL,NULL,'$date', '$sender_id','$receiver_id','$imagePath',false)";
         $this->executeQuery($query);
     }
 
@@ -155,6 +155,16 @@ ORDER BY message_id DESC LIMIT 1";
         $result->execute();
         $row = $result->fetch();
         return new Message($row);
+    }
+
+    public function markMessagesAsSeen($lastMessageID,$currentUserID,$receiverID)
+    {
+        $query = "UPDATE messages SET message_seen = TRUE WHERE message_id <= :lastMessageID AND  
+                             receiver_id = '$currentUserID' AND sender_id = '$receiverID'";
+
+        $result = $this->_dbHandler->prepare($query);
+        $result->bindValue(':lastMessageID', $lastMessageID);
+        $result->execute();
     }
 
 

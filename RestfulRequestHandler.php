@@ -143,7 +143,7 @@ if (isset($_REQUEST['favoritePosts'])) {
     }
 }
 
-if (isset($_REQUEST['authenticateThirdPartyAccount'])) {
+if (isset($_REQUEST['authenticateWithGoogle'])) {
 
     if (isset($_REQUEST['email']) && $_REQUEST['email'] !== "") {
         //if the user exists use 1

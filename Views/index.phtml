@@ -37,14 +37,14 @@ include "Views/commonLayouts/SearchForm.phtml";
                 <?php
                 if (isset($view->friends)) {
                     ?>
-                    <div id="friend-container">
+                    <div id="friend-container"  >
                         <?php
-                        foreach ($view->friends as $friend) {
+                        for($i=0;$i<sizeof($view->friends);$i++) {
+                            $friend = $view->friends[$i];
                             ?>
-                            <div>
+                            <div style="background:<?php if($view->newMessages[$i] == true ){echo 'aliceblue';} ?> " id ="friend_container_<?php echo $friend->getUserId()?>">
                                 <button class="link-button"
-                                        onclick="startChat('<?php echo $_SESSION['user_id'] ?>',
-                                                '<?php echo $friend->getUserId() ?>','<?php echo $friend->getUsername() ?>')"><?php echo $friend->getUsername() ?>
+                                        onclick="startChat('<?php echo $_SESSION['user_id'] ?>','<?php echo $friend->getUserId() ?>','<?php echo $friend->getUsername() ?>')"><?php echo $friend->getUsername() ?>
                                 </button>
                             </div>
                             <?php
@@ -71,7 +71,8 @@ include "Views/commonLayouts/SearchForm.phtml";
 if ($view->isUserLoggedIn) {
 
     ?>
-        <div data-toggle="modal" data-target="#addPostModal" class="float-button-left"><i class="fa fa-plus add-button"></i></div>
+    <div data-toggle="modal" data-target="#addPostModal" class="float-button-left"><i class="fa fa-plus add-button"></i>
+    </div>
     <?php
 }
 ?>
@@ -98,9 +99,11 @@ if ($view->isUserLoggedIn) {
 </div>
 <script src='Javascript/ChatManager.js'></script>
 <?php
-include_once "Modals/AddPostModal.phtml";
+if (isset($_SESSION['user_id'])) {
+    include_once "Modals/AddPostModal.phtml";
+}
 ?>
-<script src = "Javascript/AddPost.js"></script>
+<script src="Javascript/AddPost.js"></script>
 </body>
 </html>
 

@@ -193,4 +193,17 @@ WHERE user_id IN
         }
     }
 
+    public function hasNewMessageWith($currentUserID, $user2ID)
+    {
+       $query = "SELECT COUNT(message_seen) AS 'unseen_messages' FROM messages WHERE message_seen = FALSE AND sender_id= :senderID AND receiver_id= :receiverID;";
+        $result = $this->_dbHandler->prepare($query);
+        $result->bindValue(':senderID', $user2ID);
+        $result->bindValue(':receiverID', $currentUserID);
+        $result->execute();
+        $row = $result->fetch();
+        return $row['unseen_messages'] > 0;
+
+
+    }
+
 }

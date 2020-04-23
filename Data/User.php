@@ -27,16 +27,18 @@ class User implements JsonSerializable
     }
 
 
-     public function jsonSerialize()
-{
+    public function jsonSerialize()
+    {
 
-    return
-        [
-            'userID' => $this->getUserId(),
-            'username' => $this->getUsername(),
-            'lastMessage' =>$this->getLastMessage(),
-        ];
-}
+        return
+            [
+
+                'userID' => $this->getUserId(),
+                'username' => $this->getUsername(),
+                'lastMessage' => $this->getLastMessage(),
+                'email' => $this->email,
+            ];
+    }
 
     public function setLastMessage($lastMessage)
     {
@@ -57,6 +59,38 @@ class User implements JsonSerializable
     public function getUsername()
     {
         return $this->username;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getProfilePicture()
+    {
+        return $this->profilePicture;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getJoinDate()
+    {
+        return $this->joinDate;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function IsEmailVerified()
+    {
+        return $this->isEmailVerified;
     }
 
 }
