@@ -16,6 +16,10 @@
     left: 0;
     right: 0;
 }
+.error-field {
+    border-width: 5px !important;
+    border-color: red !important;
+}
 
 .autocomplete-items div {
     padding: 10px;

@@ -41,14 +41,15 @@
                 <?php
                 include "Views/commonLayouts/GoogleCaptcha.html";
                 ?>
+                <div class="alert alert-danger mt-3" role="alert" id ="errorAddPost" style="visibility: hidden">
+
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-primary submitButton"  disabled onclick="submitPost(<?php echo $_SESSION['user_id'] ?>)">Submit post</button>
                 <script>
-
-                    var robotTestPassed = false;
-
+                    let robotTestPassed = false;
                     function enableButton() {
                         robotTestPassed = true;
                         document.getElementsByClassName("submitButton")[0].disabled = false;
