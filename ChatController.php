@@ -19,9 +19,8 @@ if (isset($_REQUEST['apiKey'])) {
 if ($requestAccepted == true && isset($_REQUEST['requestName'])) {
 
     if($_REQUEST['requestName'] == "markMessagesAsSeen"){
-        $chatDatabase->markMessagesAsSeen($_REQUEST['lastMessageId'],$_REQUEST['currentUserId'],$_REQUEST['receiverId']);
+        $chatDatabase->markMessagesAsSeen($_REQUEST['currentUserId'],$_REQUEST['receiverId']);
     }
-
 
     if ($_REQUEST["requestName"] == "sendMessage") {
 
@@ -39,7 +38,7 @@ if ($requestAccepted == true && isset($_REQUEST['requestName'])) {
         }
     }
 
-// GET REQUESTS
+     // GET REQUESTS
     if ($_REQUEST["requestName"] === "fetchOldMessages") {
         $receiverId = Functions::sanitizeParameter($_REQUEST["receiverId"]);
         $currentUserId = Functions::sanitizeParameter($_REQUEST["currentUserId"]);
@@ -94,11 +93,16 @@ if ($requestAccepted == true && isset($_REQUEST['requestName'])) {
     if ($_REQUEST["requestName"] === "markTyping") {
         $chatDatabase->setUserIsTyping($_REQUEST["chatId"], $_REQUEST["userId"], $_REQUEST["isTyping"]);
     }
+
     if ($_REQUEST["requestName"] === "checkUser2IsTyping") {
         $responseObject->userIsTyping = $chatDatabase->checkUserIsTyping($_REQUEST["chatId"], $_REQUEST["userId"]);
         echo json_encode($responseObject);
     }
 
+    if($_REQUEST["requestName"] === "checkHasNewMessages"){
+      $userIDs = $chatDatabase->getUsersIDsForUnseenMessages($_REQUEST['currentUserId']);
+      echo json_encode($userIDs);
+    }
 } else {
     $responseObject->errorMessage = "Api key invalid or you tried too many requests within a period of time";
     echo json_encode($responseObject);

@@ -157,14 +157,27 @@ ORDER BY message_id DESC LIMIT 1";
         return new Message($row);
     }
 
-    public function markMessagesAsSeen($lastMessageID,$currentUserID,$receiverID)
+    public function markMessagesAsSeen($currentUserID, $senderID)
     {
-        $query = "UPDATE messages SET message_seen = TRUE WHERE message_id <= :lastMessageID AND  
-                             receiver_id = '$currentUserID' AND sender_id = '$receiverID'";
-
+        $query = "UPDATE messages SET message_seen = TRUE WHERE 
+                             receiver_id = :currentUserID AND sender_id = :senderID";
         $result = $this->_dbHandler->prepare($query);
-        $result->bindValue(':lastMessageID', $lastMessageID);
+        $result->bindValue(':currentUserID', $currentUserID);
+        $result->bindValue(':senderID', $senderID);
         $result->execute();
+    }
+
+    public function getUsersIDsForUnseenMessages($currentUserId)
+    {
+        $query = "SELECT DISTINCT sender_id FROM messages WHERE receiver_id = :currentUserID AND message_seen = FALSE";
+        $result = $this->_dbHandler->prepare($query);
+        $result->bindValue(':currentUserID', $currentUserId);
+        $result->execute();
+        $ids = [];
+        while ($row = $result->fetch()) {
+            $ids[] = $row['sender_id'];
+        }
+        return $ids;
     }
 
 

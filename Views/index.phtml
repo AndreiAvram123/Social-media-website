@@ -37,14 +37,13 @@ include "Views/commonLayouts/SearchForm.phtml";
                 <?php
                 if (isset($view->friends)) {
                     ?>
-                    <div id="friend-container"  >
+                    <div id="friend-container">
                         <?php
-                        for($i=0;$i<sizeof($view->friends);$i++) {
-                            $friend = $view->friends[$i];
+                        foreach ($view->friends as $friend) {
                             ?>
-                            <div style="background:<?php if($view->newMessages[$i] == true ){echo 'aliceblue';} ?> " id ="friend_container_<?php echo $friend->getUserId()?>">
+                            <div id="friend_container_<?php echo $friend->getUserId() ?>">
                                 <button class="link-button"
-                                        onclick="startChat('<?php echo $_SESSION['user_id'] ?>','<?php echo $friend->getUserId() ?>','<?php echo $friend->getUsername() ?>')"><?php echo $friend->getUsername() ?>
+                                        onclick="startChat('<?php echo $friend->getUserId() ?>','<?php echo $friend->getUsername() ?>')"><?php echo $friend->getUsername() ?>
                                 </button>
                             </div>
                             <?php
@@ -98,6 +97,13 @@ if ($view->isUserLoggedIn) {
 </audio>
 </div>
 <script src='Javascript/ChatManager.js'></script>
+<script> sessionUserId = '<?php
+        if (isset($_SESSION['user_id'])) {
+            echo $_SESSION['user_id'];
+        }?>'
+    setIntervalNewMessages();
+    checkHasUnreadMessages();
+</script>
 <?php
 if (isset($_SESSION['user_id'])) {
     include_once "Modals/AddPostModal.phtml";
