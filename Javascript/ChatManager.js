@@ -1,6 +1,6 @@
 //check the database every third of  a second
 let timeIntervalCheckMessageCheck = 1500;
-let timeIntervalCheckTyping = 3000;
+let timeIntervalCheckTyping = 2000;
 let sessionUserId;
 let chatWindow;
 let lastMouseMovedTime;
@@ -181,23 +181,24 @@ class ChatWindow {
             if (!document.hasFocus()) {
                 playNotificationSound();
             }
-            this.showNotification();
+            this.showNotificationInChat();
             chatWindow.scrollToLastFetchedMessage();
         }
 
     }
 
-    showNotification() {
-        if (document.activeElement !== chatWindow.messageField)
-            this.chatHeader.style.background = "#AD8235";
+    showNotificationInChat() {
+        if (document.activeElement !== chatWindow.messageField) {
+            this.chatHeader.style.background = "#ffb465";
+        }
     }
+
 
     hideNotification() {
         this.chatHeader.style.background = "#007BFF";
     }
 
     scrollToLastFetchedMessage() {
-
         this.messageContainer.scrollTop = this.messageContainer.scrollHeight;
     }
 
@@ -283,6 +284,7 @@ function startChat(receiverId, username) {
         chatWindow = new ChatWindow(username, receiverId);
         fetchOldMessages();
         chatWindow.requestFocusOnTextArea();
+        setTimeout(chatWindow.scrollToLastFetchedMessage(), 1000);
     }
 }
 
@@ -550,7 +552,10 @@ function checkHasUnreadMessages() {
     }).then(data => {
         let jsonData = JSON.parse(data);
         for (let i = 0; i < jsonData.length; i++) {
-            document.getElementById("friend_container_" + jsonData[i]).style.background = "#AD8235";
+            let userID = jsonData[i];
+            if (chatWindow === undefined || chatWindow.receiverID !== userID) {
+                document.getElementById("friend_container_" + userID).style.background = "#ffb465";
+            }
         }
     });
 }

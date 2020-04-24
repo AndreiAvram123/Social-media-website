@@ -24,7 +24,7 @@ class ApiKeyDatabase
         $this->_dbHandler = $this->_dbInstance->getDatabaseConnection();
     }
 
-    public function fetchApiKeyForIPAddress($ip): string
+    public function fetchApiKeyForIPAddress($ip)
     {
         $query = "SELECT api_key_value FROM api_keys WHERE ip_address_client = '$ip'";
         $result = $this->executeQuery($query);

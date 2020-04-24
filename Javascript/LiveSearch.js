@@ -33,7 +33,7 @@ class FriendSuggestionItem {
             '\n' +
             '            <button type="submit" class="link-button" name="profileButton">\n' +
             '               ' + elementData.username + '</button>\n' +
-            '            <input type="hidden" name="authorIDValue" value="' + elementData.userId + '">\n' +
+            '            <input type="hidden" name="authorIDValue" value="' + elementData.userID + '">\n' +
             '\n' +
             '        </form>\n' +
             '                    </div>';

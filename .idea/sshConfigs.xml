@@ -3,7 +3,7 @@
   <component name="SshConfigs">
     <configs>
       <sshConfig authType="PASSWORD" host="poseidon.salford.ac.uk" id="d5c1b720-4551-4f20-ac8c-93274a436435" port="22" customName="poseidon" nameFormat="CUSTOM" username="sgb967" />
-      <sshConfig authType="PASSWORD" host="poseidon.salford.ac.uk" id="63d6a222-24cd-4e02-87bb-93a70eb312a3" port="22" customName="poseidon" nameFormat="CUSTOM" username="sgb967" />
+      <sshConfig authType="PASSWORD" host="poseidon.salford.ac.uk" id="78437f29-5237-4414-81b8-8731a2415731" port="22" customName="poseidon" nameFormat="CUSTOM" username="sgb967" />
     </configs>
   </component>
 </project>

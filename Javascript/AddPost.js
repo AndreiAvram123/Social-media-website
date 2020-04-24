@@ -69,7 +69,7 @@ function submitPost(userID) {
                     return response.text();
                 }).then(function (data) {
                     let jsonData = JSON.parse(data);
-                    if (jsonData.hasOwnProperty("warningMessage")) {
+                    if (jsonData.hasOwnProperty("errorMessage")) {
                         reject(jsonData);
                     } else {
                         resolve();
@@ -77,8 +77,6 @@ function submitPost(userID) {
                 })
 
             });
-
-
         });
 
 

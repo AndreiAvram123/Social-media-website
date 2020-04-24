@@ -1,7 +1,13 @@
 <?php
+/**
+ * ************** Class only used for the android version of the website ************************
+ */
+
 require_once("Data/FriendsDatabase.php");
 require_once("Data/DataManager.php");
 require_once("utilities/Functions.php");
+
+
 
 $dbHandler = DataManager::getInstance();
 $responseObject = new stdClass();
@@ -45,7 +51,6 @@ if (isset($_GET['friends'])) {
     }
     if ($userID == null) {
         $responseObject->message = "User id cannot be empty";
-        $responseObject->errorMessageID = Constants::$errorMessageURLNotValid;
         echo json_encode($responseObject);
     } else {
         $dbFriends = FriendsDatabase::getInstance();
@@ -114,7 +119,6 @@ if (isset($_REQUEST['uploadComment'])) {
 
 if (isset($_REQUEST['uploadPost'])) {
     $json_str = file_get_contents('php://input');
-# Get as an object
     $json_obj = json_decode($json_str);
     //upload image
     $base = $json_obj->image;
@@ -164,7 +168,7 @@ if (isset($_REQUEST['createThirdPartyAccount'])) {
     if ($accountID != null && $email != null && $username != null && $profilePictureURL != null) {
         //generate random password
         $randomPassword = generateRandomPassword();
-        $dbHandler->createUser($username, $email, $randomPassword, $date, $profilePictureURL);
+        $dbHandler->createUser($username, $email, $randomPassword, $date);
         $responseObject->responseCode = 2;
         $fetchedUser = $dbHandler->getUserFromEmail($email);
         sendEmailWithPassword($email, $randomPassword);
@@ -195,7 +199,6 @@ if (isset($_REQUEST['myPosts'])) {
 function decodePostData()
 {
     $json_str = file_get_contents('php://input');
-# Get as an object
     return json_decode($json_str);
 }
 

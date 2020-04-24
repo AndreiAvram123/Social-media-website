@@ -47,9 +47,8 @@ if ($requestAccepted == true) {
         $dbManager->uploadPost($_REQUEST['userID'],
             $postTitle, $postContent, $postCategoryName, $postDate, $fileLocation);
     } else {
-        $responseObject->warningMessage = $result;
+        $responseObject->errorMessage = $result;
     }
-
 
 } else {
     $responseObject->errorMessage = "Api key not provided or you tried too many requests in a given time";

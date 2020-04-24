@@ -33,27 +33,18 @@ class ApiKeyManager
     }
 
 
-    /**
-     * Function used to fetch the api key for a given ip address
-     * @param $ip
-     * @return string |null
-     */
-    public function fetchApiKey($ip)
-    {
-        return $this->apiKeyDb->fetchApiKeyForIPAddress($ip);
-    }
-
-    public function isRequestAccepted(string $apiKey, string $ip): bool
+    public function isRequestAccepted($apiKey, $ip)
     {
         if ($apiKey === "42239b8342a1fe81a71703f6de711073") {
             return true;
         }
         ///get the entered key
-            $apiKeyEntered = Functions::sanitizeParameter($apiKey);
+        $apiKeyEntered = Functions::sanitizeParameter($apiKey);
         //get the api key from the database
-        $apiKeyDatabase = $this->fetchApiKey($ip);
+        $apiKeyDatabase = $this->obtainApiKey($ip);
 
-        if ($apiKeyDatabase !== null && $apiKeyEntered === $apiKeyDatabase) {
+
+        if ($apiKeyEntered === $apiKeyDatabase) {
             return $this->isTimeBetweenRequestsValid($apiKey);
         } else {
             return false;
@@ -66,7 +57,7 @@ class ApiKeyManager
      * @param $apiKey
      * @return bool
      */
-    public function isTimeBetweenRequestsValid($apiKey): bool
+    public function isTimeBetweenRequestsValid($apiKey)
     {
         $row = $this->apiKeyDb->getLastRequestTimeAndNumber($apiKey);
         $lastSecondAPiKeyUsed = $row['last_request_time'];
@@ -74,7 +65,7 @@ class ApiKeyManager
         //check weather the client has pushed another request in the same second
         $currentTime = time();
         if ($lastSecondAPiKeyUsed === $currentTime) {
-            if ($numberOfRequests >= 6) {
+            if ($numberOfRequests >= 20) {
                 return false;
             } else {
                 $this->apiKeyDb->incrementApiKeyUsedInLastSecond($apiKey);
