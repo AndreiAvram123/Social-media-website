@@ -3,10 +3,11 @@ require_once "Data/Database.php";
 require_once "Data/Comment.php";
 require_once "Data/Post.php";
 require_once "Data/User.php";
+require_once "Data/NullSafeUser.php";
 require_once "Data/models/LowDataPost.php";
 require_once "Data/FriendRequest.php";
-require_once "Data/SmallDataPost.php";
-require_once "utilities/CommonFunctions.php";
+require_once "utilities/Functions.php";
+
 
 /**
  * This class is used to handle
@@ -62,20 +63,9 @@ class DataManager
         $result->execute();
         $posts = [];
         while ($row = $result->fetch()) {
-            $posts[] = new Post($row);
-        }
-        return $posts;
-    }
-
-    public function getMorePosts($lastPostID)
-    {
-        $query = "SELECT forum_posts.post_id, post_author_id, post_title, post_content, post_category_name, post_date, post_image, username
- FROM forum_posts INNER JOIN users ON users.user_id = forum_posts.post_author_id  WHERE '$lastPostID' < forum_posts.post_id
- ORDER BY post_date DESC LIMIT $this->postPerPage";
-        $result = $this->_dbHandler->prepare($query);
-        $result->execute();
-        $posts = [];
-        while ($row = $result->fetch()) {
+            if ($row['post_image'] == null) {
+                $row['post_image'] = "https://i.picsum.photos/id/" . rand(0, 150) . "/500/400.jpg";
+            }
             $posts[] = new Post($row);
         }
         return $posts;
@@ -95,8 +85,7 @@ class DataManager
         $result->bindValue(':email', $email);
         $result->execute();
         $row = $result->fetch();
-        $password = $row['password'];
-        return $password;
+        return $row['password'];
     }
 
     /**
@@ -156,18 +145,17 @@ class DataManager
      * @param $creationDate
      * @param $imageLocation
      */
-    public function createUser($username, $email, $password, $creationDate, $imageLocation)
+    public function createUser($username, $email, $password, $creationDate)
     {
         $encryptedPassword = md5($password);
-        $query = "INSERT INTO users (user_id,username, email, password, creation_date,profile_picture)
-VALUES (NULL,?,?,?,?,?)";
+        $query = "INSERT INTO users (user_id,username, email, password, creation_date)
+VALUES (NULL,?,?,?,?)";
 
         $result = $this->_dbHandler->prepare($query);
         $result->bindParam(1, $username);
         $result->bindParam(2, $email);
         $result->bindParam(3, $encryptedPassword);
         $result->bindParam(4, $creationDate);
-        $result->bindParam(5, $imageLocation);
         $result->execute();
 
     }
@@ -184,6 +172,7 @@ VALUES (NULL,?,?,?,?,?)";
      */
     public function uploadImageToServer($target_file, $tempName, $target_dir)
     {
+
         $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
         //once you encrypt the image, the algorithm will also encrypt
         //the file extension. That's why I need to add it as well
@@ -191,7 +180,6 @@ VALUES (NULL,?,?,?,?,?)";
         move_uploaded_file($tempName, $targetLocation);
         return $targetLocation;
     }
-
 
     /**
      * This method is used to return all the IDs of
@@ -227,6 +215,9 @@ VALUES (NULL,?,?,?,?,?)";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         $row = $result->fetch();
+        if ($row['post_image'] == null) {
+            $row['post_image'] = "https://i.picsum.photos/id/" . rand(0, 150) . "/1000/700.jpg";
+        }
         return new Post($row);
     }
 
@@ -259,7 +250,7 @@ VALUES (NULL,?,?,?,?,?)";
      */
     public function getCommentsForPost($postID)
     {
-        $query = "SELECT comment_id, comment_user_id, comment_post_id, comment_text, comment_date, user_id, username, email, password, creation_date, profile_picture ,username
+        $query = "SELECT comment_id, comment_user_id, comment_post_id, comment_text, comment_date, user_id, username, email, password, creation_date,username
 FROM comments  INNER JOIN users ON users.user_id = comments.comment_user_id
 WHERE comment_post_id = '$postID'";
         $result = $this->_dbHandler->prepare($query);
@@ -303,7 +294,7 @@ WHERE comment_post_id = '$postID'";
         if ($row != false) {
             return new User($row);
         } else {
-            return null;
+            return new NullSafeUser();
         }
     }
 
@@ -333,7 +324,7 @@ WHERE comment_post_id = '$postID'";
         }
         //define what to search for
         $query = $query . "(post_title LIKE :searchQueryTitle 
-         OR post_content LIKE :searchQueryContent OR 
+         OR 
          post_author_id IN (SELECT user_id FROM users WHERE username LIKE :searchQueryAuthor))";
 
         //sort
@@ -353,9 +344,8 @@ WHERE comment_post_id = '$postID'";
 
 
         $result = $this->_dbHandler->prepare($query);
-        //use parameterized query to avoid sql injection
         $result->bindValue(':searchQueryTitle', '%' . $searchQuery . '%');
-        $result->bindValue(':searchQueryContent', '%' . $searchQuery . '%');
+
         $result->bindValue(':searchQueryAuthor', '%' . $searchQuery . '%');
         $result->execute();
         $posts = [];
@@ -380,6 +370,7 @@ WHERE comment_post_id = '$postID'";
         $result->bindValue(':user_id', $user_id);
         $result->execute();
 
+
     }
 
     /**
@@ -388,7 +379,7 @@ WHERE comment_post_id = '$postID'";
      * @param $user_id
      * @return bool
      */
-    public function isPostAddedToWatchList($post_id, $user_id)
+    public function isPostAddedToFavorites($post_id, $user_id)
     {
         $query = "SELECT * from favorite_posts WHERE user_id = '$user_id' AND post_id = '$post_id'";
         $result = $this->_dbHandler->prepare($query);
@@ -418,6 +409,9 @@ WHERE comment_post_id = '$postID'";
         $result->execute();
         $posts = [];
         while ($row = $result->fetch()) {
+            if ($row['post_image'] == null) {
+                $row['post_image'] = "https://i.picsum.photos/id/" . rand(0, 150) . "/500/400.jpg";
+            }
             $post = new Post($row);
             $post->setAddedToWatchList(true);
             $posts[] = $post;
@@ -663,7 +657,7 @@ WHERE comment_post_id = '$postID'";
 
     public function fetchSearchSuggestions($searchQuery, $sortDate, $category)
     {
-        $query = "SELECT post_id,post_title,post_image FROM forum_posts WHERE post_title LIKE ':searchQuery' ";
+        $query = "SELECT post_id,post_title,post_image FROM forum_posts WHERE post_title LIKE :searchQuery";
 
         if ($category !== null) {
             $query .= "AND post_category_name = '$category'";
@@ -681,11 +675,13 @@ WHERE comment_post_id = '$postID'";
 
         $result->execute();
         $suggestions = [];
+
         while ($row = $result->fetch()) {
+            $this->getSmallPostImage($row);
+            $this->encryptPostID($row);
             $suggestions[] = new LowDataPost($row);
         }
         return $suggestions;
-
 
     }
 
@@ -702,5 +698,46 @@ ORDER BY comment_id DESC LIMIT 1";
         return new Comment($row);
     }
 
+    public function fetchLastUserPost($postAuthorID)
+    {
+        $query = "SELECT * FROM forum_posts INNER JOIN users ON user_id = post_author_id WHERE post_author_id = '$postAuthorID' ORDER BY post_id DESC LIMIT 1";
+        $result = $this->_dbHandler->prepare($query);
+        $result->execute();
+        $row = $result->fetch();
+        return new Post($row);
+    }
+
+    /**
+     * @param $row
+     */
+    public function getSmallPostImage(&$row)
+    {
+        if ($row['post_image'] == null) {
+            $row['post_image'] = "https://i.picsum.photos/id/" . rand(0, 150) . "/70/40.jpg";
+        } else {
+            $position = strpos($row['post_image'], ".");
+            $row['post_image'] = substr_replace($row['post_image'], "_resized", $position, 0);
+        }
+    }
+
+    private function encryptPostID(&$row)
+    {
+        $row['post_id'] = Functions::encodeWithSha512($row['post_id']);
+    }
+
+    public function fetchSearchSuggestionsMobile($searchQuery)
+    {
+        $query = "SELECT post_id,post_title,post_image FROM forum_posts WHERE post_title LIKE :searchQuery LIMIT 10";
+        $result = $this->_dbHandler->prepare($query);
+        $result->bindValue(':searchQuery', $searchQuery . '%');
+        $result->execute();
+        $suggestions = [];
+        while ($row = $result->fetch()) {
+            $this->getSmallPostImage($row);
+            $suggestions[] = new LowDataPost($row);
+        }
+        return $suggestions;
+
+    }
 
 }

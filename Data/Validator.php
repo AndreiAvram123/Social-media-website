@@ -4,7 +4,7 @@
 class Validator
 {
 
-    public function arePostDetailsValid($postTitle, $postContent, $postImage)
+    public function arePostDetailsValid($postTitle, $postContent)
     {
         $check = $this->isPostTitleValid($postTitle);
         if ($check !== true) {
@@ -14,7 +14,7 @@ class Validator
         if ($check !== true) {
             return $check;
         }
-        return $this->isImageValid($postImage);
+        return true;
     }
 
     public function isPostTitleValid($postTitle)
@@ -57,6 +57,7 @@ class Validator
         return true;
 
     }
+
     /**
      * Check if the login details are
      * in a valid format
@@ -69,7 +70,7 @@ class Validator
         if (empty($email)) {
             return "You have not entered an email";
         }
-        if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return "Your email is not valid";
         }
         if (empty($password)) {
@@ -77,6 +78,7 @@ class Validator
         }
         return true;
     }
+
     /**
      * Check if the image selected by the user is valid
      * and return true if it is valid or

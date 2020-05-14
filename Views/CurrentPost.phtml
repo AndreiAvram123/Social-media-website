@@ -18,10 +18,10 @@ if ($currentPost != null) {
     <div class="row mt-4">
         <div class="col">
             <h1 class="text-center title-post"> <?php echo $currentPost->getPostTitle() ?></h1>
-            <h3 class="text-center">Category : <?php echo $currentPost-> getCategoryName()?></h3>
+            <h3 class="text-center">Category : <?php echo $currentPost->getCategoryName() ?></h3>
             <img src="<?php if (isset($_SESSION['user_id'])) {
                 echo $currentPost->getPostImage();
-            }else{
+            } else {
                 echo "images/posts/image_not_logged_in.png";
             } ?>" class="img-fluid mx-auto d-block">
             <p class="post-text mt-5"> <?php echo $currentPost->getPostContent(); ?> </p>
@@ -31,7 +31,7 @@ if ($currentPost != null) {
                 if ($currentPost->getIsFavorite() === false) {
                     //if the user is logged in but the post is not added to favorite
                     ?>
-                    <form  method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+                    <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
                         <button type="submit" class="btn btn-primary btn" name="addToFavoriteButton">Add to watch list
                         </button>
                     </form>
@@ -57,9 +57,9 @@ if ($currentPost != null) {
                     <span><?php echo $comment->getAuthor() ?></span>
                     <p><?php echo $comment->getCommentText(); ?></p>
                     <div>
-                    <span class="float-right"><?php echo $comment->getCommentDate() ?></span>
+                        <span class="float-right"><?php echo $comment->getCommentDate() ?></span>
                     </div>
-                        <?php
+                    <?php
                     //allow the user to remove a comment directly from the post
                     //but check if the user of the comment is the user logged in
                     if (isset($_SESSION['user_id']) && $comment->getCommentUserID() === $_SESSION['user_id']) {

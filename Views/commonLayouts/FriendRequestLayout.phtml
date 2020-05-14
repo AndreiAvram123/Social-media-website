@@ -5,7 +5,7 @@ $friendRequest = $view->friendRequest;
 <div class="container-item">
     <h2>SENDER IS <?php echo $friendRequest->getSenderId() ?> </h2>
     <h2>Receiver IS <?php echo $friendRequest->getReceiverId() ?> </h2>
-    <input type="hidden" name = "senderId" value = "<?php echo md5($friendRequest->getSenderId())?>">
+    <input type="hidden" name = "senderId" value = "<?php echo Functions::encodeWithSha512($friendRequest->getSenderId())?>">
     <button type="submit" class="btn btn-primary" name = "acceptFriendButton">Accept</button>
     <button type="submit" class="btn btn-danger" name = "rejectFriendButton">Reject</button>
 </div>

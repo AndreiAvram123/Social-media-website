@@ -1,6 +1,13 @@
 <?php
-include_once "utilities/CommonFunctions.php";
 
+/**
+ * Class LowDataPost
+ * A class that may be used for searching or low
+ * data usages
+ * It serializes less field comparing to the bigger one
+ * Post.php
+ */
+include_once "utilities/Functions.php";
 class LowDataPost implements JsonSerializable
 {
     private $postTitle;
@@ -9,8 +16,9 @@ class LowDataPost implements JsonSerializable
 
     public function __construct($db_row)
     {
-        $this->postID = CommonFunctions::encodeWithSha512($db_row['post_id']);
-        $this->postTitle = $db_row['post_title'];
+
+        $this->postID = $db_row['post_id'];
+        $this->postTitle = utf8_encode($db_row['post_title']);
         $this->postImage = $db_row['post_image'];
     }
 

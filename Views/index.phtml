@@ -1,8 +1,8 @@
 <?php
 include "Views/pageElements/Header.phtml";
 include "Views/commonLayouts/SearchForm.phtml";
-?>
 
+?>
 
 <div class="row mt-5" xmlns="http://www.w3.org/1999/html">
 
@@ -26,7 +26,7 @@ include "Views/commonLayouts/SearchForm.phtml";
             </div>
             <div id="friends-list-body">
                 <div class="mt-3 mb-3">
-                    <input class="form-control mr-sm-2" autocomplete="off" type="search"
+                    <input class="form-control mr-sm-2" autocomplete="off"
                            placeholder="Search for new people"
                            name="search-text"
                            aria-label="Search"
@@ -41,10 +41,9 @@ include "Views/commonLayouts/SearchForm.phtml";
                         <?php
                         foreach ($view->friends as $friend) {
                             ?>
-                            <div>
+                            <div id="friend_container_<?php echo $friend->getUserId() ?>">
                                 <button class="link-button"
-                                        onclick="startChat('<?php echo $_SESSION['user_id'] ?>',
-                                                '<?php echo $friend->getUserId() ?>','<?php echo $friend->getUsername() ?>')"><?php echo $friend->getUsername() ?>
+                                        onclick="startChat('<?php echo $friend->getUserId() ?>','<?php echo $friend->getUsername() ?>')"><?php echo $friend->getUsername() ?>
                                 </button>
                             </div>
                             <?php
@@ -69,10 +68,10 @@ include "Views/commonLayouts/SearchForm.phtml";
 
 //only show the add post button if the user is logged in
 if ($view->isUserLoggedIn) {
+
     ?>
-    <a href="AddPost.php">
-        <div class="float-button-left"><i class="fa fa-plus add-button"></i></div>
-    </a>
+    <div data-toggle="modal" data-target="#addPostModal" class="float-button-left"><i class="fa fa-plus add-button"></i>
+    </div>
     <?php
 }
 ?>
@@ -93,12 +92,24 @@ if ($view->isUserLoggedIn) {
     </div>
 </form>
 
-
 <audio id="notificationAudio">
-    <source src="sounds/notification_tone.mp3" type="audio/mpeg">
+    <source src="sounds/test_notification.mp3" type="audio/mpeg">
 </audio>
 </div>
-<script src="Javascript/LiveSearch.js"></script>
+
+<?php
+if (isset($_SESSION['user_id'])) {
+    ?>
+    <script src='Javascript/ChatManager.js'></script>
+    <script> sessionUserId = '<?php echo $_SESSION['user_id'];?>'
+        setIntervalNewMessages();
+        checkHasUnreadMessages();
+    </script>
+    <?php
+    include_once "Modals/AddPostModal.phtml";
+}
+?>
+<script src="Javascript/AddPost.js"></script>
 </body>
 </html>
 

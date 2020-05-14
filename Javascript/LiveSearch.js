@@ -1,6 +1,20 @@
 let postsSuggestionContainer;
-
 initializePostSuggestionsContainer();
+let abortController = new AbortController();
+let signal = abortController.signal;
+
+class SuggestionFactory {
+    createSuggestion(type, jsonData) {
+        switch (type) {
+            case "post_suggestion":
+                return new PostSuggestionItem(jsonData).suggestionView;
+            case "friend_suggestion":
+                return new FriendSuggestionItem(jsonData).suggestionView;
+        }
+    }
+}
+
+const suggestionFactory = new SuggestionFactory();
 
 
 function initializePostSuggestionsContainer() {
@@ -9,29 +23,95 @@ function initializePostSuggestionsContainer() {
     postsSuggestionContainer.setAttribute("class", "autocomplete-items");
 }
 
+
 class FriendSuggestionItem {
     constructor(elementData) {
         let domParser = new DOMParser();
         let htmlString = '<div class="suggestion-friend-item clearfix">\n' +
-            '                        <img class="float-left" src="' + elementData.profilePicture + '"/>\n' +
+            '                        <img class="float-left" src="' + 'https://robohash.org/' + elementData.username.replace(/,/g, '-') + ' ?size=100x100&set=set4' + '"/>\n' +
             '  <form method="get" action="ProfilePage.php">\n' +
             '\n' +
             '            <button type="submit" class="link-button" name="profileButton">\n' +
             '               ' + elementData.username + '</button>\n' +
-            '            <input type="hidden" name="authorIDValue" value="' + elementData.userId + '">\n' +
+            '            <input type="hidden" name="authorIDValue" value="' + elementData.userID + '">\n' +
             '\n' +
             '        </form>\n' +
             '                    </div>';
-        this.elementBody = domParser.parseFromString(htmlString, "text/html");
+        this.suggestionView = domParser.parseFromString(htmlString, "text/html").getElementsByClassName("suggestion-friend-item clearfix")[0];
 
     }
 
-    /**
-     * Return the view associated with this object
-     * @returns {Element}
-     */
-    getView() {
-        return this.elementBody.getElementsByClassName("suggestion-friend-item clearfix")[0];
+}
+
+class PostSuggestionItem {
+    constructor(suggestionJson) {
+        let postTitle = suggestionJson.postTitle;
+        let postID = suggestionJson.postID;
+        let showImages = document.getElementById("showImagesCheckbox").checked;
+
+
+        this.suggestionView = document.createElement("div");
+        if (showImages) {
+            let image = document.createElement("img");
+            image.className = "postSuggestionImage";
+            image.src = suggestionJson.postImage;
+            this.suggestionView.append(image);
+        }
+
+        this.suggestionView.innerHTML += postTitle;
+
+        /*execute a function when someone clicks on the item value (DIV element):*/
+        this.suggestionView.addEventListener("click", function (e) {
+            performSearchByPostID(postID);
+        });
+    }
+}
+
+
+function abortCurrentRequest() {
+    abortController.abort();
+    abortController = new AbortController();
+    signal = abortController.signal;
+}
+
+function fetchPostSuggestions(query) {
+
+    function getPostSuggestionsUrl() {
+        //get the filters from the filter modal and display suggestions accordingly
+        let sortDate = document.getElementById("postOrder").value;
+        let category = document.getElementById("postCategorySelector").value;
+
+
+        let url = "LiveSearchController.php?postsSearchQuery=" + query + "&encrypted=true" + "&apiKey=" + apiKey;
+        if (sortDate !== "None") {
+            url += "&sortDate=" + sortDate;
+        }
+        if (category !== "All") {
+            url += "&category=" + category;
+        }
+
+        return url;
+    }
+
+    if (query.length > 1) {
+        //cancel the last call
+        abortCurrentRequest();
+        let url = getPostSuggestionsUrl(query);
+        fetch(url, {
+            method: 'get',
+            signal: signal,
+        }).then(function (response) {
+            return response.text();
+        }).then(data => {
+            let jsonArray = JSON.parse(data);
+            insertFetchedSuggestions(jsonArray);
+        }).catch(err => {
+            if (err.name === "AbortError") {
+                console.log("new search performed..");
+            }
+        });
+    } else {
+        postsSuggestionContainer.innerHTML = "";
     }
 
 }
@@ -54,18 +134,22 @@ function fetchFriendsSuggestions(event, query) {
     function processResponse(jsonArray) {
         openFriendsSuggestionsContainer();
         jsonArray.forEach(element => {
-            let suggestionItem = new FriendSuggestionItem(element);
-            friendsSuggestionsContainer.appendChild(suggestionItem.getView());
+            friendsSuggestionsContainer.appendChild(suggestionFactory.createSuggestion("friend_suggestion", element));
         })
     }
 
-    if ((event.keyCode >= '65' && event.keyCode <= '90') || event.keyCode == 8) {
+    if ((event.keyCode >= '65' && event.keyCode <= '90') || event.keyCode === 8) {
         if (query.length > 1) {
+            abortCurrentRequest();
             let url = "LiveSearchController.php?query=" + query + "&apiKey=" + apiKey;
-            fetch(url).then(function (response) {
+            fetch(url, {method: 'get' ,signal: signal}).then(function (response) {
                 return response.text();
             }).then(data => {
                 processResponse(JSON.parse(data));
+            }).catch(err => {
+                if (err.name === "AbortError") {
+                    console.log("new search performed..");
+                }
             });
 
         } else {
@@ -74,67 +158,21 @@ function fetchFriendsSuggestions(event, query) {
     }
 }
 
-function fetchPostSuggestions(query) {
-
-    function getPostSuggestionsUrl() {
-        //get the filters from the filter modal and display suggestions accordingly
-        let sortDate = document.getElementById("postOrder").value;
-        let category = document.getElementById("postCategorySelector").value;
-        let url = "LiveSearchController.php?postsSearchQuery=" + query + "&apiKey=" + apiKey;
-        if (sortDate !== "None") {
-            url += "&sortDate=" + sortDate;
-        }
-        if (category !== "All") {
-            url += "&category=" + category;
-        }
-        return url;
-    }
-
-    if (query.length > 1) {
-        let url = getPostSuggestionsUrl(query);
-        fetch(url).then(function (response) {
-            return response.text();
-        }).then(data => {
-            let jsonObject = JSON.parse(data);
-            insertFetchedSuggestions(jsonObject);
-        });
-    } else {
-        postsSuggestionContainer.innerHTML = "";
-    }
-}
 
 function performSearchByPostID(id) {
     window.location.href = "CurrentPost.php?valuePostID=" + id;
 }
 
 function insertFetchedSuggestions(suggestionsJSONArray) {
-    let currentFocus;
-    /*execute a function when someone writes in the text field:*/
     let searchField = document.getElementById("search-posts-field");
-    let suggestedItem, i, val = searchField.value;
-    /*close any already open lists of autocompleted values*/
     clearSuggestionsList();
-    if (!val) {
-        return false;
-    }
 
     //insert the suggestions postsSuggestionContainer as a child in the search field
     searchField.parentNode.appendChild(postsSuggestionContainer);
     //insert all available suggestions
     suggestionsJSONArray.forEach(suggestion => {
-        let postTitle = suggestion.postTitle;
-        let postID = suggestion.postID;
-        /*check if the item starts with the same letters as the text field value:*/
-        /*create a DIV element for each matching element:*/
-        suggestedItem = document.createElement("DIV");
-        //make the matching letters bold
-        suggestedItem.innerHTML += postTitle;
-        /*execute a function when someone clicks on the item value (DIV element):*/
-        suggestedItem.addEventListener("click", function (e) {
-            performSearchByPostID(postID);
-        });
-        postsSuggestionContainer.appendChild(suggestedItem);
 
+        postsSuggestionContainer.appendChild(suggestionFactory.createSuggestion("post_suggestion", suggestion));
     });
 
 
@@ -143,3 +181,4 @@ function insertFetchedSuggestions(suggestionsJSONArray) {
         postsSuggestionContainer.innerHTML = "";
     }
 }
+

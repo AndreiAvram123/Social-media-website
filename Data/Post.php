@@ -1,5 +1,6 @@
 <?php
 require_once "Data/models/LowDataPost.php";
+include_once "utilities/Functions.php";
 
 /**
  * This class is used to create Post object
@@ -21,9 +22,8 @@ class Post extends LowDataPost implements JsonSerializable
     {
 
         parent::__construct($db_row);
-
         $this->postDate = $db_row['post_date'];
-        $this->postContent = substr($db_row['post_content'], 0, 700);
+        $this->postContent = utf8_encode(substr($db_row['post_content'], 0, 700));
         $this->postCategoryName = $db_row['post_category_name'];
         $this->authorID = $db_row['post_author_id'];
         $this->authorName = $db_row['username'];
@@ -41,10 +41,11 @@ class Post extends LowDataPost implements JsonSerializable
                 'postDate' => $this->getPostDate(),
                 'postAuthor' => $this->getAuthorName(),
                 'postCategory' => $this->getCategoryName(),
-                'postContent' => $this->getPostContent()
+                'postContent' => $this->getPostContent(),
+                'postAuthorID'=>$this ->authorID,
+                'isFavorite' =>$this->isFavorite,
             ];
     }
-
 
 
     public function getAuthorID()
@@ -65,8 +66,6 @@ class Post extends LowDataPost implements JsonSerializable
     }
 
 
-
-
     public function getPostDate()
     {
         return $this->postDate;
@@ -79,7 +78,6 @@ class Post extends LowDataPost implements JsonSerializable
     }
 
 
-
     public function getIsFavorite()
     {
         return $this->isFavorite;
@@ -90,5 +88,6 @@ class Post extends LowDataPost implements JsonSerializable
     {
         $this->isFavorite = $isFavorite;
     }
+
 
 }

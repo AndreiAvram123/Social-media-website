@@ -2,11 +2,13 @@
 include "Views/pageElements/Header.phtml";
 include "Views/commonLayouts/SearchForm.phtml";
 $results = $view->searchResults;
+?>
+<h2 class="text-center mt-3">Number of results : <?php echo sizeof($results) ?></h2>
+<?php
 
 foreach ($results as $post) {
     $view->post = $post;
     ?>
-    <h2 class="text-center mt-3">Number of results : <?php echo sizeof($results) ?></h2>
     <div class="row">
         <div class="col">
             <?php include "Views/PostCard.phtml"; ?>

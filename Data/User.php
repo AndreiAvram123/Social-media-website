@@ -4,14 +4,15 @@
  * Class used to create objects that contain
  * the data from a user row in the database
  */
+include_once "utilities/Functions.php";
 
-class User
+class User implements JsonSerializable
 {
-    private $userId;
-    private $username;
-    private $email;
+    protected $userId;
+    protected $username;
+    protected $email;
+    protected $profilePicture;
     private $joinDate;
-    private $profilePicture;
     private $isEmailVerified;
     private $lastMessage;
 
@@ -21,28 +22,32 @@ class User
         $this->username = $db_row['username'];
         $this->email = $db_row['email'];
         $this->joinDate = $db_row['creation_date'];
-        $this->profilePicture = $db_row['profile_picture'];
         $this->isEmailVerified = $db_row['email_verified'];
 
     }
 
+
+    public function jsonSerialize()
+    {
+
+        return
+            [
+
+                'userID' => $this->getUserId(),
+                'username' => $this->getUsername(),
+                'lastMessage' => $this->getLastMessage(),
+                'email' => $this->email,
+            ];
+    }
 
     public function setLastMessage($lastMessage)
     {
         $this->lastMessage = $lastMessage;
     }
 
-
     public function getLastMessage()
     {
         return $this->lastMessage;
-    }
-
-
-
-    public function isEmailVerified()
-    {
-        return $this->isEmailVerified;
     }
 
 
@@ -51,28 +56,41 @@ class User
         return $this->userId;
     }
 
-    public function getProfilePicture()
-    {
-        return $this->profilePicture;
-    }
-
-
     public function getUsername()
     {
         return $this->username;
     }
 
-
-    public function getJoinDate()
-    {
-        return $this->joinDate;
-    }
-
-
+    /**
+     * @return mixed
+     */
     public function getEmail()
     {
         return $this->email;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getProfilePicture()
+    {
+        return $this->profilePicture;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getJoinDate()
+    {
+        return $this->joinDate;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function IsEmailVerified()
+    {
+        return $this->isEmailVerified;
+    }
 
 }

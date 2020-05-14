@@ -64,7 +64,6 @@
                 Sign out
             </button>
             <?php
-
         }
         ?>
     </nav>
@@ -72,21 +71,20 @@
 
 <div class="container mt-3 mb-3">
     <?php
-    //the confirmation modal is mainly used to ask the user
-    //for confirmation for certain actions such as signing out
     include_once "Modals/ConfimationModal.phtml";
     if (isset($view->apiKey)) {
-
         ?>
         <script>var apiKey = '<?php echo $view->apiKey ?>'</script>
         <?php
 
     }
     ?>
+
     <!--Include JQuery in order for bootstrap to properly work
        Getting the files from cache via link is more efficient than actually
        storing them on the server
     -->
+    <script src="Javascript/ImageProcessor.js"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"

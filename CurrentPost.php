@@ -6,7 +6,7 @@
  */
 
 require_once "Data/DataManager.php";
-include_once "utilities/CommonFunctions.php";
+include_once "utilities/Functions.php";
 session_start();
 $view = new stdClass();
 $view->pageTitle = "OpenedPost";
@@ -30,7 +30,7 @@ if (isset($_GET["valuePostID"])) {
     //reset the post id set in the session
     $_SESSION["currentPostId"] = null;
     foreach ($dbHandler->getAllPostsIDs() as $postID) {
-        if ($postIDEncrypted === CommonFunctions::encodeWithSha512($postID)) {
+        if ($postIDEncrypted === Functions::encodeWithSha512($postID)) {
             //store the post id in the session
             $_SESSION["currentPostId"] = $postID;
         }
@@ -53,7 +53,7 @@ if ($currentPostID == null) {
     if (isset($_SESSION['user_id'])) {
         if ($_SESSION['user_id'] !== $view->currentPost->getAuthorID()) {
             $view->postBelongsToUser = false;
-            $addedToWatchList = $dbHandler->isPostAddedToWatchList($currentPostID, $_SESSION['user_id']);
+            $addedToWatchList = $dbHandler->isPostAddedToFavorites($currentPostID, $_SESSION['user_id']);
             $view->currentPost->setAddedToWatchList($addedToWatchList);
         } else {
             $view->postBelongsToUser = true;
@@ -64,11 +64,11 @@ if ($currentPostID == null) {
 
     //handle the new comment
     if (isset($_POST['postReviewButton'])) {
-        //filter malicious code
-        $comment_text = htmlentities($_POST['comment_text']);
-        if (!empty($comment_text)) {
+
+        $comment_text = Functions::sanitizeParameter($_POST['comment_text']);
+        if ($comment_text!=="") {
             $comment_user_id = $_SESSION['user_id'];
-            $comment_post_id = htmlentities($_SESSION['currentPostId']);
+            $comment_post_id = $currentPostID;
             $comment_date = date('Y-m-d H:i:s');
             $dbHandler->uploadComment($comment_user_id,
                 $comment_post_id, $comment_text, $comment_date);

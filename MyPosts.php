@@ -1,10 +1,8 @@
 <?php
-/**
- * This file is the controller that handles the situation when the user
- * enters the MyPosts page
- */
+
 session_start();
 require_once "Data/DataManager.php";
+require_once "utilities/Functions.php";
 //create the view and put data in it
 $view = new stdClass();
 $view->pageTitle = "My posts";
@@ -22,7 +20,7 @@ if(isset($_POST['removeButton'])){
     $encryptedPostId = $_POST['removeValue'];
     //loop through the available posts ids and check which post should be removed
     foreach($postIDs as $postId){
-        if($encryptedPostId === md5($postId)){
+        if($encryptedPostId === Functions::encodeWithSha512($postId)){
             $dbHandler ->removePost($postId);
         }
     }

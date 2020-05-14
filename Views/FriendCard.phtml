@@ -7,7 +7,7 @@ $friend = $view->friend;
         <h2><?php echo $friend->getUsername() ?></h2>
         <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>" class="mt-5">
             <button type="submit" name="unfriendButton" class="btn btn-danger">Unfriend</button>
-            <input type="hidden" name="userIdValue" value="<?php echo $friend->getUserId() ?>">
+            <input type="hidden" name="userIdValue" value="<?php echo Functions::encodeWithSha512($friend->getUserId()) ?>">
         </form>
     </div>
 </div>

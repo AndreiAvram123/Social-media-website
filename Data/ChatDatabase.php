@@ -45,22 +45,9 @@ class ChatDatabase
         return $targetLocation;
     }
 
-    public function getAllMessagesWithUser($user1Id, $user2Id)
-    {
-        $query = "SELECT * FROM messages WHERE (sender_id = '$user1Id'
-       AND receiver_id = '$user2Id') OR (sender_id = '$user2Id' AND receiver_id='$user1Id')";
-        $result = $this->_dbHandler->prepare($query);
-        $result->execute();
-        $messages = [];
-        while ($row = $result->fetch()) {
-            $messages[] = new Message($row);
-        }
-        return $messages;
-    }
-
     public function insertNewMessage($messageContent, $date, $sender_id, $receiver_id)
     {
-        $query = "INSERT INTO messages VALUES (NULL,'$messageContent','$date', '$sender_id','$receiver_id',NULL)";
+        $query = "INSERT INTO messages VALUES (NULL,'$messageContent','$date', '$sender_id','$receiver_id',NULL,false)";
 
         $this->executeQuery($query);
 
@@ -68,7 +55,7 @@ class ChatDatabase
 
     public function insertImageMessage($imagePath, $date, $sender_id, $receiver_id)
     {
-        $query = "INSERT INTO messages VALUES (NULL,NULL,'$date', '$sender_id','$receiver_id','$imagePath')";
+        $query = "INSERT INTO messages VALUES (NULL,NULL,'$date', '$sender_id','$receiver_id','$imagePath',false)";
         $this->executeQuery($query);
     }
 
@@ -99,8 +86,8 @@ class ChatDatabase
 
     public function createChatLiveFunctions($charId, $user1Id, $user2Id)
     {
-        $query = "INSERT INTO chat_live_functions VALUES ('$charId','$user1Id',false)";
-        $secondQuery = "INSERT INTO chat_live_functions VALUES ('$charId','$user2Id',false)";
+        $query = "INSERT INTO chat_live_functions VALUES ('$charId','$user1Id',false,false)";
+        $secondQuery = "INSERT INTO chat_live_functions VALUES ('$charId','$user2Id',false,false)";
         $this->executeQuery($query);
         $this->executeQuery($secondQuery);
     }
@@ -138,9 +125,9 @@ OR (user1_id = '$user2Id' AND user2_id='$user1Id')";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         $row = $result->fetch();
-        if($row["user_is_typing"] == 1){
+        if ($row["user_is_typing"] == 1) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
@@ -158,16 +145,39 @@ OR (user1_id = '$user2Id' AND user2_id='$user1Id')";
 
     }
 
-    public function fetchLastMessageID($user1Id, $user2Id)
+    public function fetchLastMessage($user1Id, $user2Id)
     {
-        $query = "SELECT  message_id FROM messages WHERE
+        $query = "SELECT  * FROM messages WHERE
         ((receiver_id = '$user1Id' AND sender_id = '$user2Id')
                               OR (receiver_id ='$user2Id' AND sender_id = '$user1Id'))
 ORDER BY message_id DESC LIMIT 1";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         $row = $result->fetch();
-        return $row['message_id'];
+        return new Message($row);
+    }
+
+    public function markMessagesAsSeen($currentUserID, $senderID)
+    {
+        $query = "UPDATE messages SET message_seen = TRUE WHERE 
+                             receiver_id = :currentUserID AND sender_id = :senderID";
+        $result = $this->_dbHandler->prepare($query);
+        $result->bindValue(':currentUserID', $currentUserID);
+        $result->bindValue(':senderID', $senderID);
+        $result->execute();
+    }
+
+    public function getUsersIDsForUnseenMessages($currentUserId)
+    {
+        $query = "SELECT DISTINCT sender_id FROM messages WHERE receiver_id = :currentUserID AND message_seen = FALSE";
+        $result = $this->_dbHandler->prepare($query);
+        $result->bindValue(':currentUserID', $currentUserId);
+        $result->execute();
+        $ids = [];
+        while ($row = $result->fetch()) {
+            $ids[] = $row['sender_id'];
+        }
+        return $ids;
     }
 
 

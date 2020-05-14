@@ -2,33 +2,38 @@
 require_once("Data/FriendsDatabase.php");
 require_once("Data/DataManager.php");
 require_once("Api/ApiKeyManager.php");
-include_once("utilities/CommonFunctions.php");
-
-
+include_once("utilities/Functions.php");
 
 $apiManager = ApiKeyManager::getInstance();
-$responseObject = new stdClass();
-$apiKey = null;
 
+
+$responseObject = new stdClass();
+$requestAccepted = false;
+
+/**
+ * Check weather the request url contains an api key
+ * if not ,do not process the request further
+ */
 if (isset($_REQUEST['apiKey'])) {
-    $apiKey = $apiManager->fetchApiKey($_SERVER['REMOTE_ADDR']);
+    $requestAccepted = $apiManager->isRequestAccepted($_REQUEST['apiKey'], $_SERVER['REMOTE_ADDR']);
+
 }
 
-if ($apiKey != null) {
+
+if ($requestAccepted == true) {
 
     if (isset($_REQUEST["query"])) {
-        $query = CommonFunctions::getSanitizedQuery($_REQUEST["query"]);
         $suggestions = [];
-        if ($query !== "") {
+        if (Functions::isParameterValid($_REQUEST["query"]) ) {
             $friendDb = FriendsDatabase::getInstance();
-            $suggestions = $friendDb->getAllFriendsSuggestionsForQuery($query);
+            $suggestions = $friendDb->getAllFriendsSuggestionsForQuery($_REQUEST["query"]);
         }
         echo json_encode($suggestions);
     }
 
 
     if (isset($_REQUEST["postsSearchQuery"])) {
-        $query = CommonFunctions::getSanitizedQuery($_REQUEST["postsSearchQuery"]);
+        $query = Functions::sanitizeParameter($_REQUEST["postsSearchQuery"]);
         $postCategory = null;
         $sortDate = null;
         if (isset($_REQUEST['sortDate'])) {
@@ -42,13 +47,14 @@ if ($apiKey != null) {
         if ($query !== "") {
             $dbManager = DataManager::getInstance();
             $fetchedSuggestions = $dbManager->fetchSearchSuggestions($query, $sortDate, $postCategory);
+
         }
         echo json_encode($fetchedSuggestions);
     }
 
 
 } else {
-    $responseObject->errorMessage = "Api key not provided or invalid";
+    $responseObject->errorMessage = "Api key not provided or you tried too many requests in a given time";
     echo json_encode($responseObject);
 }
 ?>

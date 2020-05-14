@@ -2,6 +2,7 @@
 session_start();
 include_once "Data/SessionManager.php";
 include_once "Management/UserAccountManager.php";
+include_once  "utilities/Functions.php";
 
 $view = new stdClass();
 $view->pageTitle = "Login";
@@ -17,8 +18,8 @@ if (isset($_POST['resendVerificationEmail'])) {
 }
 
 if (isset($_POST['loginButton'])) {
-    $email = htmlentities($_POST['emailSignIn']);
-    $enteredPassword = htmlentities($_POST['passwordSignIn']);
+    $email = Functions::sanitizeParameter($_POST['emailSignIn']);
+    $enteredPassword = Functions::sanitizeParameter($_POST['passwordSignIn']);
     $loginResult = $sessionManager->loginUser($email, $enteredPassword);
     if ($loginResult !== true) {
         if ($loginResult === "Email not verified") {

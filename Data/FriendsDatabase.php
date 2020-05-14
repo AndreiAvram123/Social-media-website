@@ -1,12 +1,8 @@
 <?php
 
-//todo
-//users now has an username field ...........
 require_once "Data/Database.php";
 require_once "Data/FriendRequest.php";
 require_once "Data/User.php";
-require_once "Data/Friend.php";
-require_once "Data/UserModelAsync.php";
 require_once "Data/Message.php";
 
 class FriendsDatabase
@@ -17,7 +13,6 @@ class FriendsDatabase
     //create a singleton pattern for this as well
     private static $friendsDatabase;
     //define how may posts should be displayed on page
-    private $postPerPage = 10;
 
     //method used to create a singleton pattern
     public static function getInstance()
@@ -85,7 +80,7 @@ WHERE user_id IN
         $result->execute();
         $friends = [];
         while ($row = $result->fetch()) {
-            $friend = new Friend($row);
+            $friend = new User($row);
             $friend->setLastMessage($this->fetchLastMessage($user_id, $friend->getUserId()));
             $friends[] = $friend;
         }
@@ -123,18 +118,6 @@ WHERE user_id IN
         $query = "INSERT INTO friend_requests VALUES (NULL,'$sender_id','$receiver_id')";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
-    }
-
-    public function getAllFriendRequestsIds()
-    {
-        $query = "SELECT request_id FROM friend_requests";
-        $result = $this->_dbHandler->prepare($query);
-        $result->execute();
-        $ids = [];
-        while ($row = $result->fetch()) {
-            $ids[] = $row["request_id"];
-        }
-        return $ids;
     }
 
     /**
@@ -178,17 +161,19 @@ WHERE user_id IN
      * for a given query
      * The query returns only the id, username and profile picture in order to optimize
      * the speed
-     * @param $query
+     * @param $searchQuery
      * @return array
      */
-    public function getAllFriendsSuggestionsForQuery($query)
+    public function getAllFriendsSuggestionsForQuery($searchQuery)
     {
-        $query = "SELECT user_id,username,profile_picture FROM users WHERE username LIKE '$query%'";
+        $query = "SELECT * FROM users WHERE username LIKE :query LIMIT 8";
         $result = $this->_dbHandler->prepare($query);
+        $result->bindValue(':query', $searchQuery . "%");
         $result->execute();
         $users = [];
         while ($row = $result->fetch()) {
-            $users[] = new UserModelAsync($row);
+            $row['user_id'] = Functions::encodeWithSha512($row['user_id']);
+            $users[] = new User($row);
         }
         return $users;
     }
@@ -206,6 +191,19 @@ WHERE user_id IN
         } else {
             return new Message($row);
         }
+    }
+
+    public function hasNewMessageWith($currentUserID, $user2ID)
+    {
+       $query = "SELECT COUNT(message_seen) AS 'unseen_messages' FROM messages WHERE message_seen = FALSE AND sender_id= :senderID AND receiver_id= :receiverID;";
+        $result = $this->_dbHandler->prepare($query);
+        $result->bindValue(':senderID', $user2ID);
+        $result->bindValue(':receiverID', $currentUserID);
+        $result->execute();
+        $row = $result->fetch();
+        return $row['unseen_messages'] > 0;
+
+
     }
 
 }
