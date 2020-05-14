@@ -1,5 +1,5 @@
 # PHPCms
-A forum built in order for users to create and share their posts among friends.
+A forum built in order for users to create and share their posts among friends. Users can use the live messaging system in order to chat between them.
 Technologies used : PHP, JavaScript(AJAX), ResfulApi, Bootstrap.
 
 
