@@ -345,6 +345,7 @@ WHERE comment_post_id = '$postID'";
 
         $result = $this->_dbHandler->prepare($query);
         $result->bindValue(':searchQueryTitle', '%' . $searchQuery . '%');
+
         $result->bindValue(':searchQueryAuthor', '%' . $searchQuery . '%');
         $result->execute();
         $posts = [];
