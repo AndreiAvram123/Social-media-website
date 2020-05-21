@@ -9,10 +9,6 @@ class Database
     public static function getInstance()
     {
         //login details
-        $host = 'poseidon.salford.ac.uk';
-        $username = 'sgb967';
-        $password = 'Wanrltwaezakmi1239';
-        $dbName = 'sgb967';
         if (self::$_dbInstance === null) {
             // check if there is an instance
             self::$_dbInstance = new self($username, $password, $host, $dbName);
