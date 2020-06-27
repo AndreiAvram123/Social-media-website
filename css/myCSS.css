@@ -69,7 +69,7 @@
 .message-window {
     position: fixed;
     bottom: 10px;
-    width: 20%;
+    width: 20% !important;
     right: 18%;
     background: #EBE2E2;
 }
@@ -264,6 +264,12 @@
 .postSuggestionImage{
     max-width: 70px;
     margin-right: 20px;
+}
+
+@media (max-width: 992px) {
+    .message-window {
+      width: 30% !important;
+    }
 }
 
 @media (min-width: 992px) {
