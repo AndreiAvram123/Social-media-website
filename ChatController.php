@@ -59,13 +59,12 @@ if ($requestAccepted == true && isset($_REQUEST['requestName'])) {
     if ($_REQUEST["requestName"] === "UploadImage") {
         $base = $_REQUEST['imageData'];
         $filename = md5($_REQUEST['imageName']) . ".jpeg";
-        $fileLocation = 'images/chatImages/' . $filename;
-
+        $fileLocation =  'images/chatImages/' . $filename;
         $binary = base64_decode($base);
-        header('Content-Type: image/jpeg; charset=utf-8');
         $file = fopen($fileLocation, 'wb');
         fwrite($file, $binary);
         fclose($file);
+
 
         $messageDate = time() * 1000;
 

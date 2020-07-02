@@ -2,8 +2,12 @@
 <project version="4">
   <component name="SshConfigs">
     <configs>
-      <sshConfig authType="PASSWORD" host="poseidon.salford.ac.uk" id="d5c1b720-4551-4f20-ac8c-93274a436435" port="22" customName="poseidon" nameFormat="CUSTOM" username="sgb967" />
-      <sshConfig authType="PASSWORD" host="poseidon.salford.ac.uk" id="78437f29-5237-4414-81b8-8731a2415731" port="22" customName="poseidon" nameFormat="CUSTOM" username="sgb967" />
+      <sshConfig authType="PASSWORD" host="poseidon.salford.ac.uk" id="97f60bc0-d46e-4b57-b0a4-11534c0bc5ed" port="22" customName="poseidon" nameFormat="CUSTOM" username="sgb967" />
+      <sshConfig authType="PASSWORD" host="poseidon.salford.ac.uk" id="33f528c2-71e1-47b5-b95f-cd26649a9401" port="22" customName="poseidon" nameFormat="CUSTOM" />
+      <sshConfig authType="PASSWORD" host="poseidon.salford.ac.uk" id="cf24f03a-88d0-4d65-ac74-73a198fc0781" port="22" customName="poseidon" nameFormat="CUSTOM" />
+      <sshConfig authType="PASSWORD" host="poseidon.salford.ac.uk" id="55d2a564-3722-4600-9048-a389dab71bb2" port="22" customName="poseidon" nameFormat="CUSTOM" />
+      <sshConfig authType="PASSWORD" host="poseidon.salford.ac.uk" id="ba734675-0326-4151-ab63-23ac2d33f065" port="22" customName="poseidon" nameFormat="CUSTOM" />
+      <sshConfig authType="PASSWORD" host="poseidon.salford.ac.uk" id="87aaea19-154f-4d22-a8ea-f8171c052253" port="22" customName="poseidon" nameFormat="CUSTOM" />
     </configs>
   </component>
 </project>
