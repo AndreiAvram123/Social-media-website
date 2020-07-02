@@ -28,7 +28,7 @@ class FriendSuggestionItem {
     constructor(elementData) {
         let domParser = new DOMParser();
         let htmlString = '<div class="suggestion-friend-item clearfix">\n' +
-            '                        <img class="float-left" src="' + 'https://robohash.org/' + elementData.username.replace(/,/g, '-') + ' ?size=100x100&set=set4' + '"/>\n' +
+            '                        <img class="float-left" src="' + elementData.profilePicture + '&size=100x100' + '"/>\n' +
             '  <form method="get" action="ProfilePage.php">\n' +
             '\n' +
             '            <button type="submit" class="link-button" name="profileButton">\n' +
@@ -142,7 +142,7 @@ function fetchFriendsSuggestions(event, query) {
         if (query.length > 1) {
             abortCurrentRequest();
             let url = "LiveSearchController.php?query=" + query + "&apiKey=" + apiKey;
-            fetch(url, {method: 'get' ,signal: signal}).then(function (response) {
+            fetch(url, {method: 'get', signal: signal}).then(function (response) {
                 return response.text();
             }).then(data => {
                 processResponse(JSON.parse(data));

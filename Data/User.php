@@ -23,7 +23,8 @@ class User implements JsonSerializable
         $this->email = $db_row['email'];
         $this->joinDate = $db_row['creation_date'];
         $this->isEmailVerified = $db_row['email_verified'];
-        $this->profilePicture = "https://robohash.org/" . $this->username . "?size=100x100&set=set4";
+
+        $this->profilePicture = "https://robohash.org/" . str_replace(" ", "", $this->username) . "?set=set1";
 
     }
 
@@ -33,7 +34,7 @@ class User implements JsonSerializable
 
         return
             [
-
+                'profilePicture' => $this->profilePicture,
                 'userID' => $this->getUserId(),
                 'username' => $this->getUsername(),
                 'lastMessage' => $this->getLastMessage(),
@@ -71,11 +72,12 @@ class User implements JsonSerializable
     }
 
     /**
+     * @param int $width
      * @return mixed
      */
-    public function getProfilePicture()
+    public function getProfilePicture(int $width)
     {
-        return $this->profilePicture;
+        return $this->profilePicture . '&size=' . $width . 'x' . $width;
     }
 
     /**

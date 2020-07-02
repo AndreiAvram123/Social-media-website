@@ -1,7 +1,9 @@
 <?php
 include "Views/pageElements/Header.phtml";
 include "Modals/WriteReviewModal.phtml";
-
+/**
+ * @var Post $currentPost
+ */
 $currentPost = $view->currentPost;
 
 if (isset($view->warningMessage)) {

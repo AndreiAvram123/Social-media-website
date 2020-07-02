@@ -208,7 +208,7 @@ VALUES (NULL,?,?,?,?)";
      */
     public function getPostById($postId)
     {
-        $query = "SELECT post_id, post_author_id, post_title, post_content, post_category_name, post_date, post_image,users.username
+        $query = "SELECT *
          FROM forum_posts
          INNER JOIN users ON user_id = post_author_id
          WHERE post_id ='$postId'";

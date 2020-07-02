@@ -21,7 +21,7 @@ if (isset($_POST['addToFriendsButton'])) {
         }
     }
 }
-if (isset($_GET['profileButton'])) {
+if (isset($_GET['authorIDValue'])) {
     //get the encrypted user id from the view
     $encryptedUserID = $_GET['authorIDValue'];
     //loop through the available users ids

@@ -2,8 +2,12 @@ $primaryDarkColor: #382323;
 $primaryButtonBKColor: #b35844;
 
 $textColor: white;
+
 $textColorDark: #b35844;
 
+h1{
+  color: $textColorDark;
+}
 
 .navbar {
   background: $primaryDarkColor !important;

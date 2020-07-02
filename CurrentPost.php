@@ -7,6 +7,8 @@
 
 require_once "Data/DataManager.php";
 include_once "utilities/Functions.php";
+
+
 session_start();
 $view = new stdClass();
 $view->pageTitle = "OpenedPost";
@@ -45,13 +47,16 @@ if ($currentPostID == null) {
     $view->warningMessage = "!!!Any attempt to hack the website could lead to you being banned 
     from the forum!!!";
 } else {
-    //get the expanded post
-    $view->currentPost = $dbHandler->getPostById($currentPostID);
+    /**
+     * @var Post $currentPost
+     */
+    $currentPost = $dbHandler->getPostById($currentPostID);
+    $view->currentPost = $currentPost;
     //check if the user is logged in
     //in order to see if the post belongs to
     //him or if it is added to the watch list
     if (isset($_SESSION['user_id'])) {
-        if ($_SESSION['user_id'] !== $view->currentPost->getAuthorID()) {
+        if ($_SESSION['user_id'] !== $currentPost->getUser()->getUserId()) {
             $view->postBelongsToUser = false;
             $addedToWatchList = $dbHandler->isPostAddedToFavorites($currentPostID, $_SESSION['user_id']);
             $view->currentPost->setAddedToWatchList($addedToWatchList);
