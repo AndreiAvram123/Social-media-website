@@ -56,7 +56,7 @@ class DataManager
         $offset = ($page - 1) * $this->postPerPage;
         //Get the posts in chronological order
         //and in order of pagination
-        $query = "SELECT forum_posts.post_id, post_author_id, post_title, post_content, post_category_name, post_date, post_image, username
+        $query = "SELECT *
  FROM forum_posts INNER JOIN users ON users.user_id = forum_posts.post_author_id 
  ORDER BY post_date DESC LIMIT $this->postPerPage OFFSET $offset";
         $result = $this->_dbHandler->prepare($query);

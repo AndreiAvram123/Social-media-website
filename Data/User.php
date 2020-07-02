@@ -23,6 +23,7 @@ class User implements JsonSerializable
         $this->email = $db_row['email'];
         $this->joinDate = $db_row['creation_date'];
         $this->isEmailVerified = $db_row['email_verified'];
+        $this->profilePicture = "https://robohash.org/" . $this->username . "?size=100x100&set=set4";
 
     }
 

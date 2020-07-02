@@ -40,6 +40,7 @@ if (isset($_GET['nextPage'])) {
 
 $view->currentPage = $currentPage;
 $view->posts = $dbHandle->getPosts($view->currentPage);
+
 if (isset($_SESSION['user_id'])) {
     $view->friends = $dbFriends->getAllFriends($_SESSION['user_id']);
     $newMessages = [];
