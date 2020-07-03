@@ -1,8 +1,8 @@
-$primaryDarkColor: #382323;
+$primaryDarkColor: #4D0C02;
 
 $primaryButtonBKColor: #b35844;
 
-$shadowColor: #EBE2E2;
+$shadowColor: #F2D1CB;
 
 $textColor: white;
 
@@ -10,6 +10,7 @@ $textColorDark: #b35844;
 
 $breakpointLargeScreen: 992px;
 
+$defaultFontSize: 20px;
 
 @mixin setHeight($max_height) {
   overflow: auto;
@@ -17,6 +18,9 @@ $breakpointLargeScreen: 992px;
 }
 
 
+body {
+  background: #FFF6F3 !important;
+}
 
 h1 {
   color: $textColorDark;
@@ -37,6 +41,23 @@ h1 {
   border-color: #b35844 !important;
 }
 
+#search-posts-field {
+  border-radius: 10px;
+  color: $primaryDarkColor ;
+  &::placeholder{
+    color: $primaryDarkColor;
+  }
+
+}
+.search-button {
+  color: $primaryDarkColor !important;
+  border-radius: 100px !important;
+  background-color: #B75B4D !important;
+  i{
+    font-size: 20px ;
+  }
+}
+
 #header-friends-list {
   background: $primaryDarkColor;
   color: $textColor;
@@ -48,14 +69,23 @@ h1 {
   padding: 2px;
 }
 
+
 .card {
   max-width: 60vw;
   margin: auto;
+  background: $shadowColor !important;
+  font-family: Corbel, sans-serif;
+  cursor: pointer;
   @media(min-width: $breakpointLargeScreen) {
     width: 50vw;
   }
 
+  p {
+    font-size: $defaultFontSize;
+  }
+
   .card-title {
+    font-size: 40px;
     display: inline;
     color: $primaryDarkColor;
   }
@@ -66,9 +96,11 @@ h1 {
 }
 
 .thumbnail-image {
-  max-width: 50px;
+  max-width: 70px;
   float: right;
   cursor: pointer;
+  background: #B75B4D;
+  border-radius: 100px;
 }
 
 .autocomplete {
@@ -257,10 +289,12 @@ textarea {
 
 .add-post-button {
   @extend .float-button-left;
+
   i {
     margin-top: 23px;
   }
 }
+
 
 .image-card {
   max-width: 200px;

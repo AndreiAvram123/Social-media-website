@@ -2,11 +2,15 @@
 /**
  * @var Post $post
  */
+
 $post = $view->post;
 ?>
-<div class="card mt-3 p-3">
+
+<div class="card mt-3 p-3"
+     onclick="window.location.href ='CurrentPost.php?valuePostID=' + '<?php echo Functions::encodeWithSha512($post->getPostID()) ?>'">
     <div>
-        <h3 class="card-title">  <?php echo $post->getPostTitle() ?></h3>
+
+        <h3 class="card-title"> <?php echo $post->getPostTitle() ?></h3>
         <?php
         if (isset($_SESSION['user_id'])) {
             ?>
@@ -39,6 +43,7 @@ $post = $view->post;
 
     <div>
         <span>Posted on : <?php echo Functions::formatDate($post->getPostDate()) ?></span>
+        <p class="card-text"> <?php echo substr($post->getPostContent(), 0, 200) ?></p>
     </div>
 
     <img src="<?php
@@ -50,15 +55,8 @@ $post = $view->post;
 
     ?>" class="card-img-top card-image" alt="">
 
-    <div class="card-body">
-        <p class="card-text"> <?php echo $post->getPostContent() ?></p>
-        <form action="CurrentPost.php" method="get">
-            <button type="submit" class="btn btn-primary" name="OpenPostButton">See post</button>
-            <input type="hidden" name="valuePostID" value="<?php
-            //it is better for security if we encrypt the post id, so
-            // users cannot change it in the inspector
-            echo Functions::encodeWithSha512($post->getPostID()) ?>">
-        </form>
+    <div>
+
         <?php
         //only show the remove from favorite button if the post is added to favorites
         //we don't want to show this button on specific pages such as the home page

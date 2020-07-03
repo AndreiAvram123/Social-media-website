@@ -47,9 +47,7 @@ if ($currentPostID == null) {
     $view->warningMessage = "!!!Any attempt to hack the website could lead to you being banned 
     from the forum!!!";
 } else {
-    /**
-     * @var Post $currentPost
-     */
+
     $currentPost = $dbHandler->getPostById($currentPostID);
     $view->currentPost = $currentPost;
     //check if the user is logged in

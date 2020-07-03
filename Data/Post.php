@@ -23,10 +23,10 @@ class Post extends LowDataPost implements JsonSerializable
     {
 
         parent::__construct($db_row);
-        $this->user= new User($db_row);
+        $this->user = new User($db_row);
 
         $this->postDate = $db_row['post_date'];
-        $this->postContent = utf8_encode(substr($db_row['post_content'], 0, 700));
+        $this->postContent = utf8_encode($db_row['post_content']);
         $this->postCategoryName = $db_row['post_category_name'];
         $this->isFavorite = FALSE;
     }
@@ -43,8 +43,8 @@ class Post extends LowDataPost implements JsonSerializable
                 'postAuthor' => $this->getUser()->getUsername(),
                 'postCategory' => $this->getCategoryName(),
                 'postContent' => $this->getPostContent(),
-                'postAuthorID'=>$this ->user->getUserId(),
-                'isFavorite' =>$this->isFavorite,
+                'postAuthorID' => $this->user->getUserId(),
+                'isFavorite' => $this->isFavorite,
             ];
     }
 
@@ -57,13 +57,10 @@ class Post extends LowDataPost implements JsonSerializable
     }
 
 
-
-
     public function getCategoryName()
     {
         return $this->postCategoryName;
     }
-
 
 
     public function getPostDate()
