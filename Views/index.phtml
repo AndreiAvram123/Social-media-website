@@ -19,7 +19,7 @@ include "Views/commonLayouts/SearchForm.phtml";
 
         ?>
 
-        <div id="friendsList" class="text-center">
+        <div id="friends-list" class="text-center">
             <div id="header-friends-list" onclick="toggleElement(document.getElementById('friends-list-body'))">
                 <p>Friends</p>
             </div>
@@ -38,6 +38,9 @@ include "Views/commonLayouts/SearchForm.phtml";
                     ?>
                     <div id="friend-container">
                         <?php
+                        /**
+                         * @var User $friend
+                         */
                         foreach ($view->friends as $friend) {
                             //todo
                             //here
@@ -71,7 +74,7 @@ include "Views/commonLayouts/SearchForm.phtml";
 if ($view->isUserLoggedIn) {
 
     ?>
-    <div data-toggle="modal" data-target="#addPostModal" class="float-button-left"><i class="fa fa-plus add-button"></i>
+    <div data-toggle="modal" data-target="#addPostModal" class="add-post-button"><i class="fa fa-plus "></i>
     </div>
     <?php
 }

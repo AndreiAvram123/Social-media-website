@@ -1,16 +1,35 @@
 $primaryDarkColor: #382323;
+
 $primaryButtonBKColor: #b35844;
+
+$shadowColor: #EBE2E2;
 
 $textColor: white;
 
 $textColorDark: #b35844;
 
-h1{
+$breakpointLargeScreen: 992px;
+
+
+@mixin setHeight($max_height) {
+  overflow: auto;
+  height: $max_height;
+}
+
+
+
+h1 {
   color: $textColorDark;
 }
 
 .navbar {
   background: $primaryDarkColor !important;
+}
+
+.navbar-collapse {
+  a {
+    font-size: 20px;
+  }
 }
 
 .btn-primary {
@@ -23,10 +42,27 @@ h1{
   color: $textColor;
 }
 
+.message-header {
+  cursor: pointer;
+  background: $primaryDarkColor;
+  padding: 2px;
+}
 
-.card-title {
-  display: inline;
-  color: $primaryDarkColor;
+.card {
+  max-width: 60vw;
+  margin: auto;
+  @media(min-width: $breakpointLargeScreen) {
+    width: 50vw;
+  }
+
+  .card-title {
+    display: inline;
+    color: $primaryDarkColor;
+  }
+
+  .card-image {
+    max-height: 40vh;
+  }
 }
 
 .thumbnail-image {
@@ -39,6 +75,7 @@ h1{
   position: relative;
   display: inline-block;
 }
+
 
 .autocomplete-items {
   position: absolute;
@@ -73,4 +110,182 @@ h1{
   border-radius: 50px;
   text-align: center;
   box-shadow: 2px 2px 3px #999;
+
+  &:hover {
+    background-color: rgba($primaryButtonBKColor, .5);
+  }
+
+}
+
+.comment-body {
+  padding: 10px 20px;
+  background: whitesmoke;
+
+  p {
+    margin-top: 10px;
+  }
+
+  span {
+    color: $primaryDarkColor;
+    font-weight: bold;
+  }
+
+  .delete-icon {
+    @extend .icon-template;
+    background: url("../images/trash.png");
+  }
+
+}
+
+.icon-template {
+  width: 32px;
+  height: 32px;
+  display: block;
+}
+
+.edit-icon {
+  @extend .icon-template;
+  background: url("../images/edit-icon.png");
+}
+
+.search-box {
+  width: 60% !important;
+  margin: auto;
+}
+
+textarea {
+  resize: none !important;
+}
+
+.image-profile {
+  max-width: 40vw;
+  max-height: 40vh;
+}
+
+.link-button {
+  background: none !important;
+  border: none;
+  padding: 0 !important;
+  font-size: 20px;
+  /*optional*/
+  font-family: arial, sans-serif;
+  /*input has OS specific font-family*/
+  color: #069;
+  cursor: pointer;
+}
+
+.message-window {
+  position: fixed;
+  bottom: 10px;
+  width: 20% !important;
+  right: 18%;
+  background: $shadowColor;
+  @media (max-width: $breakpointLargeScreen) {
+    width: 30% !important;
+  }
+
+  .fa-times {
+    cursor: pointer;
+    font-size: 30px;
+  }
+
+  .message-container {
+    @include setHeight(40vh)
+  }
+
+  .message-area {
+    @include setHeight(40vh)
+  }
+
+  .message-footer {
+    display: flex;
+
+    textarea {
+      width: 100%;
+      overflow: hidden;
+    }
+
+    button {
+      background: $primaryButtonBKColor;
+      color: $textColor;
+    }
+  }
+
+  .message-image {
+    max-width: 250px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+}
+
+#friends-list {
+  z-index: 1;
+  position: fixed;
+  bottom: 10px;
+  width: 15%;
+  right: 2%;
+  background: #EBE2E2;
+
+  #header-friends-list {
+    background: $primaryDarkColor;
+    border-bottom: 2px solid;
+    cursor: pointer;
+  }
+
+  p {
+    font-size: 20px;
+    margin-bottom: 0 !important;
+  }
+
+  #friends-list-body {
+    height: 80vh;
+  }
+}
+
+.error-field {
+  border-width: 5px !important;
+  border-color: red !important;
+}
+
+.container-element-center {
+  width: 70vw;
+  margin: 0 auto;
+  @media(min-width: $breakpointLargeScreen) {
+    width: 40vw;
+  }
+}
+
+.add-post-button {
+  @extend .float-button-left;
+  i {
+    margin-top: 23px;
+  }
+}
+
+.image-card {
+  max-width: 200px;
+  max-height: 200px;
+}
+
+.suggestion-friend-item img {
+  max-width: 100px;
+}
+
+.container-item {
+  background: #EFEBEB;
+  padding: 20px;
+}
+
+
+.icon-button {
+  background-color: transparent; /* Blue background */
+  border: none; /* Remove borders */
+  padding: 4px 6px; /* Some padding */
+  font-size: 16px; /* Set a font size */
+  cursor: pointer; /* Mouse pointer on hover */
+}
+
+.postSuggestionImage {
+  max-width: 70px;
+  margin-right: 20px;
 }

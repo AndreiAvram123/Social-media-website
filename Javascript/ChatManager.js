@@ -195,7 +195,7 @@ class ChatWindow {
 
 
     hideNotification() {
-        this.chatHeader.style.background = "#007BFF";
+        this.chatHeader.style.background = "#b35844";
     }
 
     scrollToLastFetchedMessage() {
