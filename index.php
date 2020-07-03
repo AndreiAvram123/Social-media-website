@@ -3,11 +3,13 @@ session_start();
 require_once "Data/SessionManager.php";
 require_once "Data/DataManager.php";
 require_once "Data/FriendsDatabase.php";
-require_once("Api/ApiKeyManager.php");
+require_once "Api/ApiKeyManager.php";
 require_once "utilities/Functions.php";
 
 $view = new stdClass();
+
 $view->pageTitle = "Home";
+
 $dbHandle = DataManager::getInstance();
 $dbFriends = FriendsDatabase::getInstance();
 
@@ -37,7 +39,7 @@ if (isset($_GET['nextPage'])) {
         }
     }
 }
-
+//get the posts for the current page
 $view->currentPage = $currentPage;
 $view->posts = $dbHandle->getPosts($view->currentPage);
 

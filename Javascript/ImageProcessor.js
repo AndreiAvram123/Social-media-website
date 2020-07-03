@@ -1,6 +1,6 @@
 let canvas = document.createElement("canvas");
 
-function resizeImage(file,newWidth,newHeight) {
+function resizeImage(file, newWidth, newHeight) {
 
     return new Promise((resolve, reject) => {
 
@@ -30,5 +30,17 @@ function resizeImage(file,newWidth,newHeight) {
         }
     )
 }
+
+ function getBase64Image(file) {
+    return new Promise((resolve, reject) => {
+        let fileReader = new FileReader();
+        fileReader.onload = () => resolve(fileReader.result.split(",")[1])
+        if (file) {
+            fileReader.readAsDataURL(file);
+        }
+        fileReader.onerror = (error) => reject(error)
+    })
+}
+
 
 

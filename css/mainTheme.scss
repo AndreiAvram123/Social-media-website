@@ -12,6 +12,10 @@ $breakpointLargeScreen: 992px;
 
 $defaultFontSize: 20px;
 
+$sentMessageBKColor: #FF6804;
+
+$receivedMessageBK: #E4E6EB;
+
 @mixin setHeight($max_height) {
   overflow: auto;
   height: $max_height;
@@ -41,26 +45,40 @@ h1 {
   border-color: #b35844 !important;
 }
 
-#search-posts-field {
-  border-radius: 10px;
-  color: $primaryDarkColor ;
-  &::placeholder{
+.image-profile-thumbnail {
+  max-width: 40px;
+  margin-right: 30px;
+  background-color: #F2D1CB;
+  border-radius: 100px;
+  cursor: pointer;
+}
+
+.search-field {
+  border-radius: 10px !important;
+  color: $primaryDarkColor;
+
+  &::placeholder {
     color: $primaryDarkColor;
   }
 
 }
+
 .search-button {
   color: $primaryDarkColor !important;
   border-radius: 100px !important;
   background-color: #B75B4D !important;
-  i{
-    font-size: 20px ;
+
+  i {
+    font-size: 20px;
   }
 }
 
 #header-friends-list {
   background: $primaryDarkColor;
   color: $textColor;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  font-size: $defaultFontSize;
 }
 
 .message-header {
@@ -75,7 +93,6 @@ h1 {
   margin: auto;
   background: $shadowColor !important;
   font-family: Corbel, sans-serif;
-  cursor: pointer;
   @media(min-width: $breakpointLargeScreen) {
     width: 50vw;
   }
@@ -85,12 +102,14 @@ h1 {
   }
 
   .card-title {
+    cursor: pointer;
     font-size: 40px;
     display: inline;
     color: $primaryDarkColor;
   }
 
   .card-image {
+    cursor: pointer;
     max-height: 40vh;
   }
 }
@@ -175,11 +194,6 @@ h1 {
   display: block;
 }
 
-.edit-icon {
-  @extend .icon-template;
-  background: url("../images/edit-icon.png");
-}
-
 .search-box {
   width: 60% !important;
   margin: auto;
@@ -211,7 +225,7 @@ textarea {
   bottom: 10px;
   width: 20% !important;
   right: 18%;
-  background: $shadowColor;
+  background: white;
   @media (max-width: $breakpointLargeScreen) {
     width: 30% !important;
   }
@@ -248,6 +262,31 @@ textarea {
     margin-top: 20px;
     margin-bottom: 20px;
   }
+
+  .text-message-wrapper {
+    margin-top: 10px;
+
+    .text-message {
+      margin-top: 10px;
+      background: $sentMessageBKColor;
+      padding: 5px 10px 5px 5px;
+      border-radius: 10px;
+    }
+
+    .text-message-sent {
+      @extend .text-message;
+      background: $sentMessageBKColor;
+      color: $textColor;
+    }
+
+    .text-message-received {
+      @extend .text-message;
+      background: $receivedMessageBK;
+      color: black;
+    }
+
+  }
+
 }
 
 #friends-list {

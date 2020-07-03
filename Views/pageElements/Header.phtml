@@ -36,10 +36,7 @@
                         <a class="nav-link" href="MyPosts.php">My Posts <span class="sr-only"></span></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="WatchList.php">Watch list <span class="sr-only"></span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="Friends.php">All Friends <span class="sr-only"></span></a>
+                        <a class="nav-link" href="WatchList.php">Favorites <span class="sr-only"></span></a>
                     </li>
                     <?php
                 }
@@ -57,10 +54,11 @@
         } else {
 
             ?>
-            <button type="button" data-toggle="modal" data-target="#ConfirmationModal" name="signOutButton"
-                    class="btn btn-primary mr-4">
-                Sign out
-            </button>
+            <img src="https://robohash.org/24.218.243.24.png" class = "image-profile-thumbnail" onclick="window.location.href ='MyProfile.php' "/>
+            <!--            <button type="button" data-toggle="modal" data-target="#ConfirmationModal" name="signOutButton"-->
+            <!--                    class="btn btn-primary mr-4">-->
+            <!--                Sign out-->
+            <!--            </button>-->
             <?php
         }
         ?>

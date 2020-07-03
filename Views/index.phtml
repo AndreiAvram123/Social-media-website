@@ -25,7 +25,7 @@ include "Views/commonLayouts/SearchForm.phtml";
             </div>
             <div id="friends-list-body">
                 <div class="mt-3 mb-3" style="padding: 8px">
-                    <input class="form-control mr-sm-2" autocomplete="off"
+                    <input class="form-control mr-sm-2 search-field" autocomplete="off"
                            placeholder="Search for new people"
                            name="search-text"
                            aria-label="Search"
@@ -42,8 +42,6 @@ include "Views/commonLayouts/SearchForm.phtml";
                          * @var User $friend
                          */
                         foreach ($view->friends as $friend) {
-                            //todo
-                            //here
                             ?>
                             <div id="friend_container_<?php echo $friend->getUserId() ?>" >
                                 <button class="link-button"

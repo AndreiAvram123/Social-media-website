@@ -21,11 +21,8 @@ if ($currentPost != null) {
         <div class="col">
             <h1 class="text-center title-post"> <?php echo $currentPost->getPostTitle() ?></h1>
             <h3 class="text-center">Category : <?php echo $currentPost->getCategoryName() ?></h3>
-            <img src="<?php if (isset($_SESSION['user_id'])) {
-                echo $currentPost->getPostImage();
-            } else {
-                echo "images/posts/image_not_logged_in.png";
-            } ?>" class="img-fluid mx-auto d-block">
+            <img src="<?php
+            echo $currentPost->getPostImage(); ?>" class="img-fluid mx-auto d-block">
             <p class="post-text mt-5"> <?php echo $currentPost->getPostContent(); ?> </p>
             <?php
             //check if the user is logged in and if the post belong to him
@@ -34,7 +31,7 @@ if ($currentPost != null) {
                     //if the user is logged in but the post is not added to favorite
                     ?>
                     <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
-                        <button type="submit" class="btn btn-primary btn" name="addToFavoriteButton">Add to watch list
+                        <button type="submit" class="btn btn-primary btn" name="addToFavoriteButton">Add to favorites
                         </button>
                     </form>
                     <?php
