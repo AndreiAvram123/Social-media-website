@@ -29,7 +29,6 @@
                 <?php
                 //include options for the profile if the user is logged in
                 if (isset($_SESSION['user_id'])) {
-
                     ?>
                     <!--List items that should be shown if the user is logged in -->
                     <li class="nav-item">
@@ -52,13 +51,13 @@
             <a class="btn btn-primary" href="Register.php" role="button">Register</a>
             <?php
         } else {
-
+            /**
+             * @var User $currentUser
+             */
+                $currentUser = DataManager::getInstance()->getUserById($_SESSION['user_id']);
             ?>
-            <img src="https://robohash.org/24.218.243.24.png" class = "image-profile-thumbnail" onclick="window.location.href ='MyProfile.php' "/>
-            <!--            <button type="button" data-toggle="modal" data-target="#ConfirmationModal" name="signOutButton"-->
-            <!--                    class="btn btn-primary mr-4">-->
-            <!--                Sign out-->
-            <!--            </button>-->
+            <img src="<?php echo $currentUser->getProfilePicture(100) ?>" class="image-profile-thumbnail"
+                 onclick="window.location.href ='MyProfile.php' "/>
             <?php
         }
         ?>

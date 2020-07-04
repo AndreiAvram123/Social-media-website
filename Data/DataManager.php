@@ -249,9 +249,7 @@ VALUES (NULL,?,?,?,?)";
      */
     public function getCommentsForPost($postID)
     {
-        $query = "SELECT comment_id, comment_user_id, comment_post_id, comment_text, comment_date, user_id, username, email, password, creation_date,username
-FROM comments  INNER JOIN users ON users.user_id = comments.comment_user_id
-WHERE comment_post_id = '$postID'";
+        $query = "SELECT *FROM comments  INNER JOIN users ON users.user_id = comments.comment_user_id WHERE comment_post_id = '$postID'";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         $comments = [];

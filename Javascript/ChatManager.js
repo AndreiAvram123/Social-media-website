@@ -217,7 +217,6 @@ class ChatWindow {
  * different types of messages
  */
 class MessageFactory {
-
     createMessageElement(messageJson) {
         if (messageJson.messageImage !== null) {
             let imageMessage = new ImageMessageView(messageJson);

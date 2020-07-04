@@ -30,6 +30,12 @@ h1 {
   color: $textColorDark;
 }
 
+.dark-header {
+  color: $primaryDarkColor;
+  font-family: Corbel;
+}
+
+
 .navbar {
   background: $primaryDarkColor !important;
 }
@@ -51,6 +57,11 @@ h1 {
   background-color: #F2D1CB;
   border-radius: 100px;
   cursor: pointer;
+}
+
+.image-profile-thumbnail-large {
+  @extend .image-profile-thumbnail;
+  max-width: 100px;
 }
 
 .search-field {
@@ -168,22 +179,41 @@ h1 {
 
 }
 
-.comment-body {
-  padding: 10px 20px;
-  background: whitesmoke;
+.comment-wrapper {
+  background: #F2D1CB;
+  padding: 10px;
+  border-radius: 10px;
 
-  p {
-    margin-top: 10px;
+  .comment-body {
+    padding: 10px 20px;
+    display: inline;
+
+    p {
+      margin-top: 10px;
+    }
+
+    span {
+      color: $primaryDarkColor;
+      font-weight: bold;
+    }
+
+    .delete-icon {
+      @extend .icon-template;
+      background: url("../images/trash.svg");
+    }
+
   }
+}
 
-  span {
-    color: $primaryDarkColor;
-    font-weight: bold;
-  }
+.add-favorite-button {
+  position: absolute;
+  right: 3%;
+  width: 40px;
+  margin-top: 10px;
 
-  .delete-icon {
+  i {
     @extend .icon-template;
-    background: url("../images/trash.png");
+    background: url("/images/favorite-no-border.svg");
   }
 
 }
@@ -265,12 +295,13 @@ textarea {
 
   .text-message-wrapper {
     margin-top: 10px;
+    margin-bottom: 10px;
 
     .text-message {
-      margin-top: 10px;
       background: $sentMessageBKColor;
       padding: 5px 10px 5px 5px;
       border-radius: 10px;
+
     }
 
     .text-message-sent {
@@ -358,7 +389,13 @@ textarea {
   cursor: pointer; /* Mouse pointer on hover */
 }
 
+
 .postSuggestionImage {
   max-width: 70px;
   margin-right: 20px;
+}
+
+.post-text {
+  font-size: $defaultFontSize;
+  font-family: Corbel, sans-serif;
 }

@@ -46,8 +46,8 @@ $view->posts = $dbHandle->getPosts($view->currentPage);
 if (isset($_SESSION['user_id'])) {
     $view->friends = $dbFriends->getAllFriends($_SESSION['user_id']);
     $newMessages = [];
-    foreach ($view->friends as $friend){
-        $newMessages[] = $dbFriends->hasNewMessageWith($_SESSION['user_id'],$friend->getUserId());
+    foreach ($view->friends as $friend) {
+        $newMessages[] = $dbFriends->hasNewMessageWith($_SESSION['user_id'], $friend->getUserId());
     }
     $view->newMessages = $newMessages;
 }

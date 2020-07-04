@@ -54,7 +54,10 @@ class PostSuggestionItem {
         if (showImages) {
             let image = document.createElement("img");
             image.className = "postSuggestionImage";
-            image.src = "ImageController.php?imageName=" +  suggestionJson.postImage + "&width=70";
+            image.src = suggestionJson.postImage;
+            if (!suggestionJson.postImage.startsWith("http")) {
+                image.src += "&width=70";
+            }
             this.suggestionView.append(image);
         }
 

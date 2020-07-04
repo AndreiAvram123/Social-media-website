@@ -8,6 +8,7 @@
  * Post.php
  */
 include_once "utilities/Functions.php";
+
 class LowDataPost implements JsonSerializable
 {
     private $postTitle;
@@ -29,6 +30,9 @@ class LowDataPost implements JsonSerializable
 
     public function getPostImage()
     {
+        if (substr($this->postImage, 0, 4) !== "http") {
+            return "ImageController.php?imageName=" . $this->postImage;
+        }
         return $this->postImage;
     }
 

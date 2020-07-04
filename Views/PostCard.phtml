@@ -31,7 +31,8 @@ $post = $view->post;
         <p class="card-text"> <?php echo substr($post->getPostContent(), 0, 200) ?></p>
     </div>
 
-    <img src="<?php echo "ImageController.php?imageName=" . $post->getPostImage(); ?>"
+
+    <img src="<?php echo $post->getPostImage() ?>"
          onclick="window.location.href ='CurrentPost.php?valuePostID=' + '<?php echo Functions::encodeWithSha512($post->getPostID()) ?>'"
          class="card-img-top card-image">
 
