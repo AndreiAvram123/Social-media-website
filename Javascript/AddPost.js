@@ -58,10 +58,8 @@ function submitPost(userID) {
             formData.append("postContent", postContent.value);
             formData.append("imageName", file.name);
             formData.append("userID", userID);
-            Promise.all([resizeImage(file, 600, 500),
-                resizeImage(file, 70, 40)]).then((images) => {
-                formData.append("imageData", images[0]);
-                formData.append("imageResizedData", images[1]);
+            getBase64Image(file).then(data => {
+                formData.append("imageData", data)
                 fetch(url, {
                     method: 'POST',
                     body: formData,
@@ -75,10 +73,8 @@ function submitPost(userID) {
                         resolve();
                     }
                 })
+            })
 
-            });
-        });
-
-
+        })
     }
 }

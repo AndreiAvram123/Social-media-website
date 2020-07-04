@@ -1,22 +1,26 @@
 <?php
 include_once "Views/pageElements/Header.phtml";
+/**
+ * @var User $currentUser
+ */
+$currentUser = null;
+if (isset($view->currentUser)) {
+    $currentUser = $view->currentUser;
+}
 
 if (isset($view->warningMessage)) {
     include_once "Modals/WarningModal.phtml";
     echo "<script>$('#warningModal').modal('show')</script>";
 }
 
-if ($view->currentUser !== null) {
-    $currentUser = $view->currentUser;
+if ($currentUser !== null) {
     $userPosts = $view->userPosts;
     ?>
     <div class="row">
-        <div class="col">
-            <img class="rounded image-profile" src="<?php echo "https://robohash.org/nela". (str_replace(" ","",$currentUser->getUsername())) ."?size=300x300&set=set4" ;?>">
-        </div>
-        <div class="col">
+        <div class="col" style="flex-grow: 0.5">
+            <img class="rounded image-profile" src="<?php echo $currentUser->getProfilePicture(300) ?>"/>
             <h1><?php echo $currentUser->getUsername() ?></h1>
-            <h2>A member since <?php echo $currentUser->getJoinDate() ?></h2>
+            <h2>A member since <?php echo Functions::formatDate($currentUser->getJoinDate()) ?></h2>
             <span>Email : <?php echo $currentUser->getEmail() ?></span>
             <?php
             //display the add to friend button only if the user
@@ -27,18 +31,15 @@ if ($view->currentUser !== null) {
                 ?>
                 <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>" class="mt-3">
                     <button type="submit" name="addToFriendsButton" class="btn btn-primary ">Add to friends</button>
-                    <input type="hidden" name="userIdValue" value="<?php echo Functions::encodeWithSha512($currentUser->getUserId()) ?>">
+                    <input type="hidden" name="userIdValue"
+                           value="<?php echo Functions::encodeWithSha512($currentUser->getUserId()) ?>">
                 </form>
                 <?php
             }
             ?>
-
         </div>
-    </div>
 
-    <div class="row mt-4">
-        <div class="col">
-            <h2 class="text-center">Here are the posts of this user</h2>
+        <div class="col-5">
             <?php
             foreach ($userPosts as $post) {
                 $view->post = $post;
@@ -47,6 +48,9 @@ if ($view->currentUser !== null) {
             ?>
         </div>
     </div>
+
+
+
     <?php
 }
 ?>

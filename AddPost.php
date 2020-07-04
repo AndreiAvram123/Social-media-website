@@ -22,18 +22,7 @@ if ($requestAccepted == true) {
     $filename = md5($_REQUEST['imageName']) . ".jpeg";
     $fileLocation = 'images/posts/' . $filename;
     $binary = base64_decode($base);
-    header('Content-Type: image/jpeg; charset=utf-8');
     $file = fopen($fileLocation, 'wb');
-    fwrite($file, $binary);
-    fclose($file);
-
-
-    $resizedBase = $_REQUEST['imageResizedData'];
-    $resizedFilename = md5($_REQUEST['imageName']) . "_resized" . ".jpeg";
-    $resizedFileLocation = 'images/posts/' . $resizedFilename;
-    $binary = base64_decode($resizedBase);
-    header('Content-Type: image/jpeg; charset=utf-8');
-    $file = fopen($resizedFileLocation, 'wb');
     fwrite($file, $binary);
     fclose($file);
 

@@ -4,11 +4,18 @@ session_start();
 require_once "Data/DataManager.php";
 require_once "utilities/Functions.php";
 require_once "Data/FriendsDatabase.php";
+require_once "Data/SessionManager.php";
 
 $view = new stdClass();
 $view->pageTitle = "Profile";
 $view->isUserLoggedIn = isset($_SESSION['user_id']);
 $dbManger = DataManager::getInstance();
+
+
+if (isset($_POST['signOutButton'])) {
+    SessionManager::getInstance()->signUserOut();
+    $view->redirectHome = true;
+}
 
 if (isset($_POST['addToFriendsButton'])) {
     $encryptedUserID = $_POST['userIdValue'];
@@ -21,7 +28,7 @@ if (isset($_POST['addToFriendsButton'])) {
         }
     }
 }
-if (isset($_GET['profileButton'])) {
+if (isset($_GET['authorIDValue'])) {
     //get the encrypted user id from the view
     $encryptedUserID = $_GET['authorIDValue'];
     //loop through the available users ids

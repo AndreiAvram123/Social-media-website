@@ -1,0 +1,401 @@
+$primaryDarkColor: #4D0C02;
+
+$primaryButtonBKColor: #b35844;
+
+$shadowColor: #F2D1CB;
+
+$textColor: white;
+
+$textColorDark: #b35844;
+
+$breakpointLargeScreen: 992px;
+
+$defaultFontSize: 20px;
+
+$sentMessageBKColor: #FF6804;
+
+$receivedMessageBK: #E4E6EB;
+
+@mixin setHeight($max_height) {
+  overflow: auto;
+  height: $max_height;
+}
+
+
+body {
+  background: #FFF6F3 !important;
+}
+
+h1 {
+  color: $textColorDark;
+}
+
+.dark-header {
+  color: $primaryDarkColor;
+  font-family: Corbel;
+}
+
+
+.navbar {
+  background: $primaryDarkColor !important;
+}
+
+.navbar-collapse {
+  a {
+    font-size: 20px;
+  }
+}
+
+.btn-primary {
+  background: $primaryButtonBKColor !important;
+  border-color: #b35844 !important;
+}
+
+.image-profile-thumbnail {
+  max-width: 40px;
+  margin-right: 30px;
+  background-color: #F2D1CB;
+  border-radius: 100px;
+  cursor: pointer;
+}
+
+.image-profile-thumbnail-large {
+  @extend .image-profile-thumbnail;
+  max-width: 100px;
+}
+
+.search-field {
+  border-radius: 10px !important;
+  color: $primaryDarkColor;
+
+  &::placeholder {
+    color: $primaryDarkColor;
+  }
+
+}
+
+.search-button {
+  color: $primaryDarkColor !important;
+  border-radius: 100px !important;
+  background-color: #B75B4D !important;
+
+  i {
+    font-size: 20px;
+  }
+}
+
+#header-friends-list {
+  background: $primaryDarkColor;
+  color: $textColor;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  font-size: $defaultFontSize;
+}
+
+.message-header {
+  cursor: pointer;
+  background: $primaryDarkColor;
+  padding: 2px;
+}
+
+
+.card {
+  max-width: 60vw;
+  margin: auto;
+  background: $shadowColor !important;
+  font-family: Corbel, sans-serif;
+  @media(min-width: $breakpointLargeScreen) {
+    width: 50vw;
+  }
+
+  p {
+    font-size: $defaultFontSize;
+  }
+
+  .card-title {
+    cursor: pointer;
+    font-size: 40px;
+    display: inline;
+    color: $primaryDarkColor;
+  }
+
+  .card-image {
+    cursor: pointer;
+    max-height: 40vh;
+  }
+}
+
+.thumbnail-image {
+  max-width: 70px;
+  float: right;
+  cursor: pointer;
+  background: #B75B4D;
+  border-radius: 100px;
+}
+
+.autocomplete {
+  position: relative;
+  display: inline-block;
+}
+
+
+.autocomplete-items {
+  position: absolute;
+  border: 1px solid #d4d4d4;
+  border-bottom: none;
+  border-top: none;
+  z-index: 99;
+  top: 100%;
+  left: 0;
+  right: 0;
+
+  div {
+    padding: 10px;
+    cursor: pointer;
+    background-color: #fff;
+    border-bottom: 1px solid #d4d4d4;
+  }
+
+  &:hover {
+    background-color: #e9e9e9;
+  }
+}
+
+.float-button-left {
+  position: fixed;
+  width: 60px;
+  height: 60px;
+  bottom: 40px;
+  left: 40px;
+  background-color: $primaryButtonBKColor;
+  color: $textColor;
+  border-radius: 50px;
+  text-align: center;
+  box-shadow: 2px 2px 3px #999;
+
+  &:hover {
+    background-color: rgba($primaryButtonBKColor, .5);
+  }
+
+}
+
+.comment-wrapper {
+  background: #F2D1CB;
+  padding: 10px;
+  border-radius: 10px;
+
+  .comment-body {
+    padding: 10px 20px;
+    display: inline;
+
+    p {
+      margin-top: 10px;
+    }
+
+    span {
+      color: $primaryDarkColor;
+      font-weight: bold;
+    }
+
+    .delete-icon {
+      @extend .icon-template;
+      background: url("../images/trash.svg");
+    }
+
+  }
+}
+
+.add-favorite-button {
+  position: absolute;
+  right: 3%;
+  width: 40px;
+  margin-top: 10px;
+
+  i {
+    @extend .icon-template;
+    background: url("/images/favorite-no-border.svg");
+  }
+
+}
+
+.icon-template {
+  width: 32px;
+  height: 32px;
+  display: block;
+}
+
+.search-box {
+  width: 60% !important;
+  margin: auto;
+}
+
+textarea {
+  resize: none !important;
+}
+
+.image-profile {
+  max-width: 40vw;
+  max-height: 40vh;
+}
+
+.link-button {
+  background: none !important;
+  border: none;
+  padding: 0 !important;
+  font-size: 20px;
+  /*optional*/
+  font-family: arial, sans-serif;
+  /*input has OS specific font-family*/
+  color: #069;
+  cursor: pointer;
+}
+
+.message-window {
+  position: fixed;
+  bottom: 10px;
+  width: 20% !important;
+  right: 18%;
+  background: white;
+  @media (max-width: $breakpointLargeScreen) {
+    width: 30% !important;
+  }
+
+  .fa-times {
+    cursor: pointer;
+    font-size: 30px;
+  }
+
+  .message-container {
+    @include setHeight(40vh)
+  }
+
+  .message-area {
+    @include setHeight(40vh)
+  }
+
+  .message-footer {
+    display: flex;
+
+    textarea {
+      width: 100%;
+      overflow: hidden;
+    }
+
+    button {
+      background: $primaryButtonBKColor;
+      color: $textColor;
+    }
+  }
+
+  .message-image {
+    max-width: 250px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+
+  .text-message-wrapper {
+    margin-top: 10px;
+    margin-bottom: 10px;
+
+    .text-message {
+      background: $sentMessageBKColor;
+      padding: 5px 10px 5px 5px;
+      border-radius: 10px;
+
+    }
+
+    .text-message-sent {
+      @extend .text-message;
+      background: $sentMessageBKColor;
+      color: $textColor;
+    }
+
+    .text-message-received {
+      @extend .text-message;
+      background: $receivedMessageBK;
+      color: black;
+    }
+
+  }
+
+}
+
+#friends-list {
+  z-index: 1;
+  position: fixed;
+  bottom: 10px;
+  width: 15%;
+  right: 2%;
+  background: #EBE2E2;
+
+  #header-friends-list {
+    background: $primaryDarkColor;
+    border-bottom: 2px solid;
+    cursor: pointer;
+  }
+
+  p {
+    font-size: 20px;
+    margin-bottom: 0 !important;
+  }
+
+  #friends-list-body {
+    height: 80vh;
+  }
+}
+
+.error-field {
+  border-width: 5px !important;
+  border-color: red !important;
+}
+
+.container-element-center {
+  width: 70vw;
+  margin: 0 auto;
+  @media(min-width: $breakpointLargeScreen) {
+    width: 40vw;
+  }
+}
+
+.add-post-button {
+  @extend .float-button-left;
+
+  i {
+    margin-top: 23px;
+  }
+}
+
+
+.image-card {
+  max-width: 200px;
+  max-height: 200px;
+}
+
+.suggestion-friend-item img {
+  max-width: 100px;
+}
+
+.container-item {
+  background: #EFEBEB;
+  padding: 20px;
+}
+
+
+.icon-button {
+  background-color: transparent; /* Blue background */
+  border: none; /* Remove borders */
+  padding: 4px 6px; /* Some padding */
+  font-size: 16px; /* Set a font size */
+  cursor: pointer; /* Mouse pointer on hover */
+}
+
+
+.postSuggestionImage {
+  max-width: 70px;
+  margin-right: 20px;
+}
+
+.post-text {
+  font-size: $defaultFontSize;
+  font-family: Corbel, sans-serif;
+}

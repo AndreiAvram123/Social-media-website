@@ -7,16 +7,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link rel="stylesheet" href="css/myCSS.css">
-    <meta name="description" content="Assassins'creed forum. Post tutorials on missions or hidden locations"
-    <meta name="keywords" content="Assassin's creed , forum, tutorials"
+    <link rel="stylesheet" href="/css/mainTheme.css">
 
 
 </head>
 
 <body>
 <header>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -31,17 +29,13 @@
                 <?php
                 //include options for the profile if the user is logged in
                 if (isset($_SESSION['user_id'])) {
-
                     ?>
                     <!--List items that should be shown if the user is logged in -->
                     <li class="nav-item">
                         <a class="nav-link" href="MyPosts.php">My Posts <span class="sr-only"></span></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="WatchList.php">Watch list <span class="sr-only"></span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="Friends.php">All Friends <span class="sr-only"></span></a>
+                        <a class="nav-link" href="WatchList.php">Favorites <span class="sr-only"></span></a>
                     </li>
                     <?php
                 }
@@ -57,12 +51,13 @@
             <a class="btn btn-primary" href="Register.php" role="button">Register</a>
             <?php
         } else {
-
+            /**
+             * @var User $currentUser
+             */
+                $currentUser = DataManager::getInstance()->getUserById($_SESSION['user_id']);
             ?>
-            <button type="button" data-toggle="modal" data-target="#ConfirmationModal" name="signOutButton"
-                    class="btn btn-primary mr-4">
-                Sign out
-            </button>
+            <img src="<?php echo $currentUser->getProfilePicture(100) ?>" class="image-profile-thumbnail"
+                 onclick="window.location.href ='MyProfile.php' "/>
             <?php
         }
         ?>

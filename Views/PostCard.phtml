@@ -1,64 +1,42 @@
 <?php
+/**
+ * @var Post $post
+ */
+
 $post = $view->post;
 ?>
+
 <div class="card mt-3 p-3">
     <div>
-        <h3 class="card-title text-primary">  <?php echo $post->getPostTitle() ?></h3>
+        <h3 class="card-title"
+            onclick="window.location.href ='CurrentPost.php?valuePostID=' + '<?php echo Functions::encodeWithSha512($post->getPostID()) ?>'"> <?php echo $post->getPostTitle() ?></h3>
         <?php
-        //if the user is logged in and the post belongs to him
-        //let him him edit the post no matter where in the forum
-        if (isset($_SESSION['user_id']) && Functions::encodeWithSha512($_SESSION['user_id']) === $post->getAuthorID()) {
+        if (isset($_SESSION['user_id'])) {
             ?>
-            <form method="get" action="EditPost.php" class="float-right">
-                <button class="icon-button" type="submit"><i class="edit-icon"></i></button>
-                <input type="hidden" name="valuePostID" value="<?php
-                //it is better for security if we encrypt the post id, so
-                // users cannot change it in the inspector
-                echo  Functions::encodeWithSha512($post->getPostID()) ?>">
+            <form method="get" action="ProfilePage.php" style="display:inline">
+                <input type="image"
+                       src="<?php echo $post->getUser()->getProfilePicture(100) ?>"
+                       class="thumbnail-image">
+                <input type="hidden" name="authorIDValue"
+                       value="<?php echo Functions::encodeWithSha512($post->getUser()->getUserId()) ?>">
             </form>
             <?php
         }
         ?>
+
     </div>
-    <?php
-    if (isset($_SESSION['user_id'])) {
-        ?>
-        <form method="get" action="ProfilePage.php">
 
-            <button type="submit" class="link-button" name="profileButton">Author
-                : <?php echo $post->getAuthorName() ?></button>
-            <input type="hidden" name="authorIDValue" value="<?php echo Functions::encodeWithSha512($post->getAuthorID()) ?>">
-
-        </form>
-        <?php
-    } else {
-        ?>
-        <span>Author: <?php echo $post->getAuthorName() ?></span>
-        <?php
-    }
-    ?>
     <div>
-        <span>Posted on : <?php echo $post->getPostDate() ?></span>
+        <span>Posted on : <?php echo Functions::formatDate($post->getPostDate()) ?></span>
+        <p class="card-text"> <?php echo substr($post->getPostContent(), 0, 200) ?></p>
     </div>
 
-    <img src="<?php
-    if (isset($_SESSION['user_id'])) {
-        echo $post->getPostImage();
-    } else {
-        echo "images/posts/image_not_logged_in.png";
-    }
 
-    ?>" class="card-img-top card-image" alt="">
+    <img src="<?php echo $post->getPostImage() ?>"
+         onclick="window.location.href ='CurrentPost.php?valuePostID=' + '<?php echo Functions::encodeWithSha512($post->getPostID()) ?>'"
+         class="card-img-top card-image">
 
-    <div class="card-body">
-        <p class="card-text"> <?php echo $post->getPostContent() ?></p>
-        <form action="CurrentPost.php" method="get">
-            <button type="submit" class="btn btn-primary" name="OpenPostButton">See post</button>
-            <input type="hidden" name="valuePostID" value="<?php
-            //it is better for security if we encrypt the post id, so
-            // users cannot change it in the inspector
-            echo Functions::encodeWithSha512($post->getPostID()) ?>">
-        </form>
+    <div>
         <?php
         //only show the remove from favorite button if the post is added to favorites
         //we don't want to show this button on specific pages such as the home page
@@ -80,6 +58,24 @@ $post = $view->post;
         }
         ?>
     </div>
+
+    <?php
+    //if the user is logged in and the post belongs to him
+    //let him him edit the post no matter where in the forum
+
+    if (isset($_SESSION['user_id']) && $_SESSION['user_id'] === $post->getUser()->getUserId()) {
+        ?>
+        <form method="get" action="EditPost.php" class="float-right mt-4">
+            <button class="btn btn-primary" type="submit">Edit</button>
+            <input type="hidden" name="valuePostID" value="<?php
+            //it is better for security if we encrypt the post id, so
+            // users cannot change it in the inspector
+            echo Functions::encodeWithSha512($post->getPostID()) ?>">
+        </form>
+        <?php
+    }
+    ?>
+
 </div>
 
 

@@ -56,9 +56,8 @@ class DataManager
         $offset = ($page - 1) * $this->postPerPage;
         //Get the posts in chronological order
         //and in order of pagination
-        $query = "SELECT forum_posts.post_id, post_author_id, post_title, post_content, post_category_name, post_date, post_image, username
- FROM forum_posts INNER JOIN users ON users.user_id = forum_posts.post_author_id 
- ORDER BY post_date DESC LIMIT $this->postPerPage OFFSET $offset";
+        $query = "SELECT * FROM forum_posts INNER JOIN users ON users.user_id = forum_posts.post_author_id 
+         ORDER BY post_date DESC LIMIT $this->postPerPage OFFSET $offset";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         $posts = [];
@@ -208,7 +207,7 @@ VALUES (NULL,?,?,?,?)";
      */
     public function getPostById($postId)
     {
-        $query = "SELECT post_id, post_author_id, post_title, post_content, post_category_name, post_date, post_image,users.username
+        $query = "SELECT *
          FROM forum_posts
          INNER JOIN users ON user_id = post_author_id
          WHERE post_id ='$postId'";
@@ -250,9 +249,7 @@ VALUES (NULL,?,?,?,?)";
      */
     public function getCommentsForPost($postID)
     {
-        $query = "SELECT comment_id, comment_user_id, comment_post_id, comment_text, comment_date, user_id, username, email, password, creation_date,username
-FROM comments  INNER JOIN users ON users.user_id = comments.comment_user_id
-WHERE comment_post_id = '$postID'";
+        $query = "SELECT *FROM comments  INNER JOIN users ON users.user_id = comments.comment_user_id WHERE comment_post_id = '$postID'";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         $comments = [];
@@ -444,9 +441,7 @@ WHERE comment_post_id = '$postID'";
      */
     public function getUserPosts($user_id)
     {
-        $query = "SELECT  post_id, post_author_id, post_title, post_content, post_category_name, post_date, post_image,username FROM forum_posts
-        INNER JOIN users ON user_id = post_author_id
-       WHERE post_author_id = '$user_id' LIMIT 10";
+        $query = "SELECT  * FROM forum_posts INNER JOIN users ON user_id = post_author_id  WHERE post_author_id = '$user_id' LIMIT 10";
         $result = $this->_dbHandler->prepare($query);
         $result->execute();
         $posts = [];
@@ -677,7 +672,6 @@ WHERE comment_post_id = '$postID'";
         $suggestions = [];
 
         while ($row = $result->fetch()) {
-            $this->getSmallPostImage($row);
             $this->encryptPostID($row);
             $suggestions[] = new LowDataPost($row);
         }
@@ -707,18 +701,6 @@ ORDER BY comment_id DESC LIMIT 1";
         return new Post($row);
     }
 
-    /**
-     * @param $row
-     */
-    public function getSmallPostImage(&$row)
-    {
-        if ($row['post_image'] == null) {
-            $row['post_image'] = "https://i.picsum.photos/id/" . rand(0, 150) . "/70/40.jpg";
-        } else {
-            $position = strpos($row['post_image'], ".");
-            $row['post_image'] = substr_replace($row['post_image'], "_resized", $position, 0);
-        }
-    }
 
     private function encryptPostID(&$row)
     {
@@ -733,7 +715,6 @@ ORDER BY comment_id DESC LIMIT 1";
         $result->execute();
         $suggestions = [];
         while ($row = $result->fetch()) {
-            $this->getSmallPostImage($row);
             $suggestions[] = new LowDataPost($row);
         }
         return $suggestions;

@@ -195,7 +195,7 @@ class ChatWindow {
 
 
     hideNotification() {
-        this.chatHeader.style.background = "#007BFF";
+        this.chatHeader.style.background = "#b35844";
     }
 
     scrollToLastFetchedMessage() {
@@ -217,7 +217,6 @@ class ChatWindow {
  * different types of messages
  */
 class MessageFactory {
-
     createMessageElement(messageJson) {
         if (messageJson.messageImage !== null) {
             let imageMessage = new ImageMessageView(messageJson);
@@ -245,11 +244,14 @@ class ImageMessageView {
 
 class TextMessage {
     constructor(messageJson) {
-        let messageHtml = '<span style="display: block; ">' + messageJson.messageContent + '</span>';
+        let messageHtml = '<div class="text-message-wrapper"><span>' + messageJson.messageContent + '</span></div>';
         let domParser = new DOMParser();
-        let messageView = domParser.parseFromString(messageHtml, "text/html").getElementsByTagName('span')[0];
+        let messageView = domParser.parseFromString(messageHtml, "text/html").getElementsByTagName('div')[0];
         if (messageJson.senderId === sessionUserId) {
             messageView.style.textAlign = "right";
+            messageView.getElementsByTagName("span")[0].className = "text-message-sent"
+        }else{
+            messageView.getElementsByTagName("span")[0].className = "text-message-received"
         }
         this.messageView = messageView;
     }

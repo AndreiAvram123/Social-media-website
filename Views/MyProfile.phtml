@@ -1,0 +1,58 @@
+<?php
+include_once "Views/pageElements/Header.phtml";
+/**
+ * @var  User $currentUser
+ */
+$currentUser = $view->currentUser;
+
+/**
+ * @var FriendRequest[] $friendRequests
+ */
+$friendRequests = $view->friendRequests;
+
+?>
+<div class="row">
+    <div class="col">
+        <img class="rounded image-profile" src="<?php echo $currentUser->getProfilePicture(300) ?>"/>
+    </div>
+    <div class="col mt-3">
+        <h1><?php echo $currentUser->getUsername() ?></h1>
+        <h2>A member since <?php echo Functions::formatDate($currentUser->getJoinDate()) ?></h2>
+        <span>Email : <?php echo $currentUser->getEmail() ?></span>
+        <button type="button" data-toggle="modal" data-target="#ConfirmationModal" name="signOutButton"
+                class="btn btn-primary mr-4">
+            Sign out
+        </button>
+    </div>
+
+</div>
+
+<h3 class="text-center">Pending friend requests</h3>
+<?php
+if (sizeof($view->friendRequests) > 0) {
+    foreach ($view->friendRequests as $friendRequest) {
+        $view->friendRequest = $friendRequest;
+        ?>
+        <div class="row">
+            <div class="col">
+                <?php
+                include "Views/commonLayouts/FriendRequestLayout.phtml";
+                ?>
+            </div>
+
+        </div>
+        <?php
+    }
+} else {
+    ?>
+    <div class="alert alert-warning mt-3" role="alert">
+        You do not have any friend requests
+    </div>
+    <?php
+}
+?>
+
+</div>
+</body>
+</html>
+

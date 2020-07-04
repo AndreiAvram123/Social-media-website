@@ -1,7 +1,9 @@
 <?php
 include "Views/pageElements/Header.phtml";
 include "Modals/WriteReviewModal.phtml";
-
+/**
+ * @var Post $currentPost
+ */
 $currentPost = $view->currentPost;
 
 if (isset($view->warningMessage)) {
@@ -14,31 +16,49 @@ if (isset($view->warningMessage)) {
 if ($currentPost != null) {
     $currentPostComments = $view->currentPostComments;
     ?>
-
     <div class="row mt-4">
         <div class="col">
-            <h1 class="text-center title-post"> <?php echo $currentPost->getPostTitle() ?></h1>
-            <h3 class="text-center">Category : <?php echo $currentPost->getCategoryName() ?></h3>
-            <img src="<?php if (isset($_SESSION['user_id'])) {
-                echo $currentPost->getPostImage();
-            } else {
-                echo "images/posts/image_not_logged_in.png";
-            } ?>" class="img-fluid mx-auto d-block">
-            <p class="post-text mt-5"> <?php echo $currentPost->getPostContent(); ?> </p>
+            <h1 class="dark-header"> <?php echo $currentPost->getPostTitle() ?></h1>
+            <h3 class="dark-header mt-5"><?php echo Functions::formatDate($currentPost->getPostDate()) ?></h3>
+        </div>
+        <div class="col">
+            <?php
+            $user = $currentPost->getUser();
+            ?>
+            <form method="get" action="ProfilePage.php">
+                <div class="float-right">
+
+                    <input type="image" class="image-profile-thumbnail-large"
+                           src="<?php echo $user->getProfilePicture(200) ?>"/>
+                    <h3 class="dark-header"><?php echo $user->getUsername() ?></h3>
+                    <input type="hidden" name="authorIDValue"
+                           value="<?php echo Functions::encodeWithSha512($user->getUserId()) ?>"/>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row mt-2">
+        <div class="col">
+            <img class="img-fluid" src="<?php
+            echo $currentPost->getPostImage(); ?>">
             <?php
             //check if the user is logged in and if the post belong to him
             if (isset($_SESSION['user_id']) && !$view->postBelongsToUser) {
-                if ($currentPost->getIsFavorite() === false) {
-                    //if the user is logged in but the post is not added to favorite
-                    ?>
-                    <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
-                        <button type="submit" class="btn btn-primary btn" name="addToFavoriteButton">Add to watch list
+                //if the user is logged in but the post is not added to favorite
+                ?>
+                <form method="post"  class="mt-3" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+                    <?php if ($currentPost->getIsFavorite() === false) { ?>
+                        <button type="submit" class="btn btn-primary btn" name="addToFavoriteButton">Add to Favorites
                         </button>
-                    </form>
-                    <?php
-                }
+
+                    <?php } ?>
+
+                </form>
+                <?php
             }
             ?>
+            <p class="post-text mt-5"> <?php echo $currentPost->getPostContent(); ?> </p>
         </div>
     </div>
 
@@ -51,28 +71,35 @@ if ($currentPost != null) {
     <div class="row mt-3">
         <div class="col">
             <?php
+            /**
+             * @var Comment $comment
+             */
             foreach ($currentPostComments as $comment) {
+                $commentUser = $comment->getAuthor()
                 ?>
-                <div class="comment-body mt-3 clearfix">
-                    <span><?php echo $comment->getAuthor() ?></span>
-                    <p><?php echo $comment->getCommentText(); ?></p>
-                    <div>
-                        <span class="float-right"><?php echo $comment->getCommentDate() ?></span>
-                    </div>
-                    <?php
-                    //allow the user to remove a comment directly from the post
-                    //but check if the user of the comment is the user logged in
-                    if (isset($_SESSION['user_id']) && $comment->getCommentUserID() === $_SESSION['user_id']) {
-                        ?>
-                        <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
-                            <button type="submit" name="removeCommentButton" class="button-icon">
-                                <i class="delete-icon"></i></button>
-                            <input type="hidden" name="valueCommentID"
-                                   value="<?php echo md5($comment->getCommentID()) ?>">
-                        </form>
+                <div class="clearfix comment-wrapper mt-1">
+                    <img src="<?php echo $commentUser->getProfilePicture(100) ?>"
+                         class="image-profile-thumbnail-large"/>
+                    <div class="comment-body">
+                        <span><?php echo $comment->getAuthor()->getUsername() ?></span>
+                        <p><?php echo $comment->getCommentText(); ?></p>
+                        <span><?php echo Functions::formatDate($comment->getCommentDate()) ?></span>
+
                         <?php
-                    }
-                    ?>
+                        //allow the user to remove a comment directly from the post
+                        //but check if the user of the comment is the user logged in
+                        if (isset($_SESSION['user_id']) && $comment->getAuthor()->getUserId() === $_SESSION['user_id']) {
+                            ?>
+                            <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>" style="display: inline">
+                                <button type="submit" name="removeCommentButton" class="icon-button float-right">
+                                    <i class="delete-icon"></i></button>
+                                <input type="hidden" name="valueCommentID"
+                                       value="<?php echo md5($comment->getCommentID()) ?>">
+                            </form>
+                            <?php
+                        }
+                        ?>
+                    </div>
                 </div>
 
                 <?php
@@ -95,10 +122,7 @@ if ($currentPost != null) {
             ?>
         </div>
     </div>
-
-    <?php
-}
-?>
+<?php } ?>
 </div>
 </body>
 </html>

@@ -7,13 +7,17 @@
 
 require_once "Data/DataManager.php";
 include_once "utilities/Functions.php";
+
+
 session_start();
 $view = new stdClass();
+
+
 $view->pageTitle = "OpenedPost";
 $dbHandler = DataManager::getInstance();
 $view->categories = $dbHandler->getAllCategories();
-
 //check if the user has pressed the add to favorite button
+
 if (isset($_POST['addToFavoriteButton'])) {
     //if the user has pressed this button it means that it is logged in
     $userId = $_SESSION['user_id'];
@@ -45,13 +49,14 @@ if ($currentPostID == null) {
     $view->warningMessage = "!!!Any attempt to hack the website could lead to you being banned 
     from the forum!!!";
 } else {
-    //get the expanded post
-    $view->currentPost = $dbHandler->getPostById($currentPostID);
+
+    $currentPost = $dbHandler->getPostById($currentPostID);
+    $view->currentPost = $currentPost;
     //check if the user is logged in
     //in order to see if the post belongs to
     //him or if it is added to the watch list
     if (isset($_SESSION['user_id'])) {
-        if ($_SESSION['user_id'] !== $view->currentPost->getAuthorID()) {
+        if ($_SESSION['user_id'] !== $currentPost->getUser()->getUserId()) {
             $view->postBelongsToUser = false;
             $addedToWatchList = $dbHandler->isPostAddedToFavorites($currentPostID, $_SESSION['user_id']);
             $view->currentPost->setAddedToWatchList($addedToWatchList);
@@ -66,7 +71,7 @@ if ($currentPostID == null) {
     if (isset($_POST['postReviewButton'])) {
 
         $comment_text = Functions::sanitizeParameter($_POST['comment_text']);
-        if ($comment_text!=="") {
+        if ($comment_text !== "") {
             $comment_user_id = $_SESSION['user_id'];
             $comment_post_id = $currentPostID;
             $comment_date = date('Y-m-d H:i:s');
@@ -93,7 +98,7 @@ if ($currentPostID == null) {
     $currentPostComments = $dbHandler->getCommentsForPost($currentPostID);
     $view->currentPostComments = $currentPostComments;
 }
-//include the view
+
 include_once("Views/CurrentPost.phtml");
 
 ?>

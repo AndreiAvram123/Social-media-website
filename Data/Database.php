@@ -6,10 +6,15 @@ class Database
     protected static $_dbInstance = null;
     protected $_dbHandle;
 
+
     public static function getInstance()
     {
         //login details
         if (self::$_dbInstance === null) {
+            $username = 'andreiSql';
+            $host = '139.162.192.88:3306';
+            $password = 'andrei1239';
+            $dbName = 'forum';
             // check if there is an instance
             self::$_dbInstance = new self($username, $password, $host, $dbName);
         }
