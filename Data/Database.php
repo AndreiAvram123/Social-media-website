@@ -11,10 +11,10 @@ class Database
     {
         //login details
         if (self::$_dbInstance === null) {
-            $username = 'andreiSql';
-            $host = '139.162.192.88:3306';
-            $password = 'andrei1239';
-            $dbName = 'forum';
+            $username = 'sgb967';
+            $host = 'sgb967.poseidon.salford.ac.uk:3306';
+            $password = 'Wanrltwaezakmi1239';
+            $dbName = 'sgb967';
             // check if there is an instance
             self::$_dbInstance = new self($username, $password, $host, $dbName);
         }
