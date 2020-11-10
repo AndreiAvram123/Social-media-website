@@ -2,10 +2,8 @@
 
 class Database
 {
-    //create singletonPattern
     protected static $_dbInstance = null;
     protected $_dbHandle;
-
 
     public static function getInstance()
     {
