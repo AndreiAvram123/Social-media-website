@@ -1,0 +1,341 @@
+body {
+  background: #FFF6F3 !important;
+}
+
+h1 {
+  color: #b35844;
+}
+
+.dark-header {
+  color: #4D0C02;
+  font-family: Corbel, serif;
+}
+
+.navbar {
+  background: #4D0C02 !important;
+}
+
+.navbar-collapse a {
+  font-size: 20px;
+}
+
+.btn-primary {
+  background: #b35844 !important;
+  border-color: #b35844 !important;
+}
+
+.image-profile-thumbnail, .image-profile-thumbnail-large {
+  max-width: 40px;
+  margin-right: 30px;
+  background-color: #F2D1CB;
+  border-radius: 100px;
+  cursor: pointer;
+}
+
+.image-profile-thumbnail-large {
+  max-width: 100px;
+}
+
+.search-field {
+  border-radius: 10px !important;
+  color: #4D0C02;
+}
+.search-field::placeholder {
+  color: #4D0C02;
+}
+
+.search-button {
+  color: #4D0C02 !important;
+  border-radius: 100px !important;
+  background-color: #B75B4D !important;
+}
+.search-button i {
+  font-size: 20px;
+}
+
+#header-friends-list {
+  background: #4D0C02;
+  color: white;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  font-size: 20px;
+}
+
+.message-header {
+  cursor: pointer;
+  background: #4D0C02;
+  padding: 2px;
+}
+
+.card {
+  max-width: 60vw;
+  margin: auto;
+  background: #F2D1CB !important;
+  font-family: Corbel, sans-serif;
+}
+@media (min-width: 992px) {
+  .card {
+    width: 50vw;
+  }
+}
+.card p {
+  font-size: 20px;
+}
+.card .card-title {
+  cursor: pointer;
+  font-size: 40px;
+  display: inline;
+  color: #4D0C02;
+}
+.card .card-image {
+  cursor: pointer;
+  max-height: 40vh;
+}
+
+.thumbnail-image {
+  max-width: 70px;
+  float: right;
+  cursor: pointer;
+  background: #B75B4D;
+  border-radius: 100px;
+}
+
+.autocomplete {
+  position: relative;
+  display: inline-block;
+}
+
+.autocomplete-items {
+  position: absolute;
+  border: 1px solid #d4d4d4;
+  border-bottom: none;
+  border-top: none;
+  z-index: 99;
+  top: 100%;
+  left: 0;
+  right: 0;
+}
+.autocomplete-items div {
+  padding: 10px;
+  cursor: pointer;
+  background-color: #fff;
+  border-bottom: 1px solid #d4d4d4;
+}
+.autocomplete-items:hover {
+  background-color: #e9e9e9;
+}
+
+.float-button-left, .add-post-button {
+  position: fixed;
+  width: 60px;
+  height: 60px;
+  bottom: 40px;
+  left: 40px;
+  background-color: #b35844;
+  color: white;
+  border-radius: 50px;
+  text-align: center;
+  box-shadow: 2px 2px 3px #999;
+}
+.float-button-left:hover, .add-post-button:hover {
+  background-color: rgba(179, 88, 68, 0.5);
+}
+
+.comment-wrapper {
+  background: #F2D1CB;
+  padding: 10px;
+  border-radius: 10px;
+}
+.comment-wrapper .comment-body {
+  padding: 10px 20px;
+  display: inline;
+}
+.comment-wrapper .comment-body p {
+  margin-top: 10px;
+}
+.comment-wrapper .comment-body span {
+  color: #4D0C02;
+  font-weight: bold;
+}
+.comment-wrapper .comment-body .delete-icon {
+  background: url("../images/trash.svg");
+}
+
+.add-favorite-button {
+  position: absolute;
+  right: 3%;
+  width: 40px;
+  margin-top: 10px;
+}
+.add-favorite-button i {
+  background: url("/images/favorite-no-border.svg");
+}
+
+.icon-template, .comment-wrapper .comment-body .delete-icon, .add-favorite-button i {
+  width: 32px;
+  height: 32px;
+  display: block;
+}
+
+.search-box {
+  width: 60% !important;
+  margin: auto;
+}
+
+textarea {
+  resize: none !important;
+}
+
+.image-profile {
+  max-width: 40vw;
+  max-height: 40vh;
+}
+
+.link-button {
+  background: none !important;
+  border: none;
+  padding: 0 !important;
+  font-size: 20px;
+  /*optional*/
+  font-family: arial, sans-serif;
+  /*input has OS specific font-family*/
+  color: #069;
+  cursor: pointer;
+}
+
+.message-window {
+  position: fixed;
+  bottom: 10px;
+  width: 20% !important;
+  right: 18%;
+  background: white;
+}
+@media (max-width: 992px) {
+  .message-window {
+    width: 30% !important;
+  }
+}
+.message-window .fa-times {
+  cursor: pointer;
+  font-size: 30px;
+}
+.message-window .message-container {
+  overflow: auto;
+  height: 40vh;
+}
+.message-window .message-area {
+  overflow: auto;
+  height: 40vh;
+}
+.message-window .message-footer {
+  display: flex;
+}
+.message-window .message-footer textarea {
+  width: 100%;
+  overflow: hidden;
+}
+.message-window .message-footer button {
+  background: #b35844;
+  color: white;
+}
+.message-window .message-image {
+  max-width: 250px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+.message-window .text-message-wrapper {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.message-window .text-message-wrapper .text-message, .message-window .text-message-wrapper .text-message-received, .message-window .text-message-wrapper .text-message-sent {
+  background: #FF6804;
+  padding: 5px 10px 5px 5px;
+  border-radius: 10px;
+}
+.message-window .text-message-wrapper .text-message-sent {
+  background: #FF6804;
+  color: white;
+}
+.message-window .text-message-wrapper .text-message-received {
+  background: #E4E6EB;
+  color: black;
+}
+
+#friends-list {
+  z-index: 1;
+  position: fixed;
+  bottom: 10px;
+  width: 15%;
+  right: 2%;
+  background: #EBE2E2;
+}
+#friends-list #header-friends-list {
+  background: #4D0C02;
+  border-bottom: 2px solid;
+  cursor: pointer;
+}
+#friends-list p {
+  font-size: 20px;
+  margin-bottom: 0 !important;
+}
+#friends-list #friends-list-body {
+  height: 80vh;
+}
+
+.error-field {
+  border-width: 5px !important;
+  border-color: red !important;
+}
+
+.container-element-center {
+  width: 70vw;
+  margin: 0 auto;
+}
+@media (min-width: 992px) {
+  .container-element-center {
+    width: 40vw;
+  }
+}
+
+.add-post-button i {
+  margin-top: 23px;
+}
+
+.image-card {
+  max-width: 200px;
+  max-height: 200px;
+}
+
+.suggestion-friend-item img {
+  max-width: 100px;
+}
+
+.container-item {
+  background: #EFEBEB;
+  padding: 20px;
+}
+
+.icon-button {
+  background-color: transparent;
+  /* Blue background */
+  border: none;
+  /* Remove borders */
+  padding: 4px 6px;
+  /* Some padding */
+  font-size: 16px;
+  /* Set a font size */
+  cursor: pointer;
+  /* Mouse pointer on hover */
+}
+
+.postSuggestionImage {
+  max-width: 70px;
+  margin-right: 20px;
+}
+
+.post-text {
+  font-size: 20px;
+  font-family: Corbel, sans-serif;
+}
+
+/*# sourceMappingURL=mainTheme.css.map */

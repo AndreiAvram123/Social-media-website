@@ -29,10 +29,9 @@ body {
 h1 {
   color: $textColorDark;
 }
-
 .dark-header {
   color: $primaryDarkColor;
-  font-family: Corbel;
+  font-family: Corbel, serif;
 }
 
 
@@ -58,7 +57,6 @@ h1 {
   border-radius: 100px;
   cursor: pointer;
 }
-
 .image-profile-thumbnail-large {
   @extend .image-profile-thumbnail;
   max-width: 100px;
