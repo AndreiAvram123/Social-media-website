@@ -40,7 +40,7 @@ class ApiKeyDatabase
     {
         $apiKey = $this->generateApiKey($ip);
         $date = time();
-        $query = "INSERT INTO api_keys VALUES (NULL,'$ip','$apiKey','$date',null)";
+        $query = "INSERT INTO api_keys VALUES (NULL,'$ip','$apiKey','$date',0)";
         $this->executeQuery($query);
         return $apiKey;
     }
